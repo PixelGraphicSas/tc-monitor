@@ -2536,18 +2536,34 @@ function renderTransacciones() {
   const fMoneda = document.getElementById('filter-moneda').value;
   const fBuscar = document.getElementById('filter-buscar').value.toLowerCase();
 
+  // Populate & restore subcategory filter
+  const filterSubcat = document.getElementById('filter-subcat');
+  const savedSubcat = filterSubcat?.value || '';
+  if (filterSubcat) {
+    while (filterSubcat.options.length > 1) filterSubcat.remove(1);
+    const allSubcats = [...new Set(txs.map(t => t.subcategoria).filter(Boolean))].sort();
+    allSubcats.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s; o.textContent = s;
+      filterSubcat.appendChild(o);
+    });
+    if (savedSubcat) filterSubcat.value = savedSubcat;
+  }
+  const fSubcat = filterSubcat?.value || '';
+
   if (fTarjeta) { const nums = fTarjeta.split('|'); txs = txs.filter(t => nums.includes(t.tarjetaNum)); }
   if (fNat) txs = txs.filter(t => t.naturaleza === fNat);
   if (fMoneda) txs = txs.filter(t => t.moneda === fMoneda);
+  if (fSubcat) txs = txs.filter(t => t.subcategoria === fSubcat);
   if (fBuscar) txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
 
   txs.sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
 
-  // Calculate filtered totals
-  const filteredCOP = txs.filter(t => !t.isAbono && t.naturaleza !== 'financiero' && t.moneda === 'COP').reduce((s, t) => s + t.cargoMes, 0);
-  const filteredUSD = txs.filter(t => !t.isAbono && t.naturaleza !== 'financiero' && t.moneda === 'USD').reduce((s, t) => s + t.cargoMes, 0);
-  const filteredEquiv = txs.filter(t => !t.isAbono && t.naturaleza !== 'financiero').reduce((s, t) => s + copValue(t), 0);
-  const totalCount = txs.filter(t => !t.isAbono).length;
+  // Totals = ALL filtered txs (no exclusions — if user filters by financiero, show those totals)
+  const filteredCOP = txs.filter(t => t.moneda === 'COP').reduce((s, t) => s + t.cargoMes, 0);
+  const filteredUSD = txs.filter(t => t.moneda === 'USD').reduce((s, t) => s + t.cargoMes, 0);
+  const filteredEquiv = txs.reduce((s, t) => s + copValue(t), 0);
+  const totalCount = txs.length;
 
   document.getElementById('tx-count').textContent = `${txs.length} transacciones`;
   // Update totals bar
