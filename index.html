@@ -1791,21 +1791,64 @@ async function saveToFirebase() {
   if (!currentUser) return;
   const uid = currentUser.uid;
   try {
-    // Split into chunks: config and data per period
+    // Save config (strip avatars to stay under 1MB limit)
+    const configToSave = {
+      ...config,
+      miembros: config.miembros.map(m => ({ ...m, avatar: m.avatar ? '__avatar__' : null }))
+    };
     await db.collection('users').doc(uid).set({
-      config: JSON.stringify(config),
+      config: JSON.stringify(configToSave),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // Save each period as separate document (avoids 1MB Firestore limit)
-    const batch = db.batch();
-    Object.entries(allData).forEach(([key, pd]) => {
-      const ref = db.collection('users').doc(uid).collection('periods').doc(key);
-      batch.set(ref, { data: JSON.stringify(pd), key });
+    // Save avatars separately (one doc per member with avatar)
+    const avatarBatch = db.batch();
+    config.miembros.forEach(m => {
+      if (m.avatar && m.avatar !== '__avatar__') {
+        const ref = db.collection('users').doc(uid).collection('avatars').doc(m.id);
+        avatarBatch.set(ref, { avatar: m.avatar, miembroId: m.id });
+      }
     });
-    await batch.commit();
+    await avatarBatch.commit();
+
+    // Save each period — split transactions into chunks of 50 to avoid 1MB doc limit
+    for (const [key, pd] of Object.entries(allData)) {
+      const txs = pd.transacciones || [];
+      const extractos = pd.extractos || [];
+
+      // Save period metadata + extractos
+      await db.collection('users').doc(uid)
+        .collection('periods').doc(key)
+        .set({ key, extractos: JSON.stringify(extractos), txCount: txs.length });
+
+      // Save transactions in chunks of 50
+      const chunkSize = 50;
+      const existingChunks = await db.collection('users').doc(uid)
+        .collection('periods').doc(key).collection('txChunks').get();
+      // Delete old chunks first
+      if (!existingChunks.empty) {
+        const delBatch = db.batch();
+        existingChunks.forEach(d => delBatch.delete(d.ref));
+        await delBatch.commit();
+      }
+      // Write new chunks
+      for (let i = 0; i < txs.length; i += chunkSize) {
+        const chunk = txs.slice(i, i + chunkSize);
+        const chunkId = `chunk_${Math.floor(i / chunkSize)}`;
+        await db.collection('users').doc(uid)
+          .collection('periods').doc(key)
+          .collection('txChunks').doc(chunkId)
+          .set({ txs: JSON.stringify(chunk), idx: Math.floor(i / chunkSize) });
+      }
+    }
+    // Small indicator
+    const ind = document.getElementById('fb-sync-indicator');
+    if (ind) { ind.textContent = '☁ Guardado'; ind.style.color = 'var(--green)';
+      setTimeout(() => { if(ind) ind.textContent = ''; }, 2000); }
   } catch(e) {
     console.warn('Firebase save error:', e);
+    const ind = document.getElementById('fb-sync-indicator');
+    if (ind) { ind.textContent = '⚠ Error sync'; ind.style.color = 'var(--red)'; }
   }
 }
 
@@ -1826,16 +1869,32 @@ async function loadFromFirebase(uid) {
         params: { ...loadConfigDefaults().params, ...savedConfig.params },
         categorias: savedConfig.categorias || loadConfigDefaults().categorias
       };
-      loadAvatarsIntoConfig();
     }
-    // Load periods
+    // Load avatars
+    const avatarsSnap = await db.collection('users').doc(uid).collection('avatars').get();
+    avatarsSnap.forEach(doc => {
+      const m = config.miembros.find(x => x.id === doc.data().miembroId);
+      if (m) m.avatar = doc.data().avatar;
+    });
+
+    // Load periods + transaction chunks
     const periodsSnap = await db.collection('users').doc(uid).collection('periods').get();
     allData = {};
-    periodsSnap.forEach(doc => {
-      try {
-        allData[doc.data().key] = JSON.parse(doc.data().data);
-      } catch(e) {}
-    });
+    for (const periodDoc of periodsSnap.docs) {
+      const key = periodDoc.data().key;
+      const extractos = JSON.parse(periodDoc.data().extractos || '[]');
+      // Load all tx chunks for this period
+      const chunksSnap = await db.collection('users').doc(uid)
+        .collection('periods').doc(key).collection('txChunks')
+        .orderBy('idx').get();
+      let transacciones = [];
+      chunksSnap.forEach(chunkDoc => {
+        try {
+          transacciones = transacciones.concat(JSON.parse(chunkDoc.data().txs));
+        } catch(e) {}
+      });
+      allData[key] = { extractos, transacciones };
+    }
     return true;
   } catch(e) {
     console.warn('Firebase load error:', e);
