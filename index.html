@@ -1885,10 +1885,13 @@ async function loadFromFirebase(uid) {
       const extractos = JSON.parse(periodDoc.data().extractos || '[]');
       // Load all tx chunks for this period
       const chunksSnap = await db.collection('users').doc(uid)
-        .collection('periods').doc(key).collection('txChunks')
-        .orderBy('idx').get();
+        .collection('periods').doc(key).collection('txChunks').get();
       let transacciones = [];
-      chunksSnap.forEach(chunkDoc => {
+      // Sort chunks by idx client-side (avoids Firestore composite index requirement)
+      const chunkDocs = [];
+      chunksSnap.forEach(d => chunkDocs.push(d));
+      chunkDocs.sort((a, b) => (a.data().idx || 0) - (b.data().idx || 0));
+      chunkDocs.forEach(chunkDoc => {
         try {
           transacciones = transacciones.concat(JSON.parse(chunkDoc.data().txs));
         } catch(e) {}
@@ -3553,56 +3556,53 @@ function restoreData(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
+  reader.onload = async ev => {
     try {
       const backup = JSON.parse(ev.target.result);
       if (!backup.version || !backup.data) throw new Error('Archivo de backup inválido');
       if (!confirm(`¿Restaurar backup del ${backup.exportedAt?.slice(0,10)}? Esto reemplazará todos los datos actuales.`)) return;
 
-      // Restore data (transactions) — clear first to free space
-      localStorage.removeItem('tcm_data');
-      localStorage.removeItem('tcm_config');
-      localStorage.removeItem('tcm_avatares');
+      showToast('Restaurando...', 'info');
 
-      // Save transaction data
-      try {
-        localStorage.setItem('tcm_data', JSON.stringify(backup.data));
-      } catch(e) {
-        throw new Error('Datos demasiado grandes para el almacenamiento local (' + e.message + ')');
-      }
-
-      // Save config — separate avatars to avoid quota
+      // Restore into memory directly
       if (backup.config && Object.keys(backup.config).length > 0) {
-        const avatarMap = {};
-        const configLight = {
-          ...backup.config,
-          miembros: (backup.config.miembros || []).map(m => {
-            // Avatar can be base64 string or '__avatar__' placeholder
-            const av = m.avatar && m.avatar !== '__avatar__' ? m.avatar : null;
-            if (av) avatarMap[m.id] = av;
-            return { ...m, avatar: av ? '__avatar__' : null };
-          })
+        config = { ...loadConfigDefaults(), ...backup.config,
+          rules: { ...loadConfigDefaults().rules, ...(backup.config.rules || {}) },
+          params: { ...loadConfigDefaults().params, ...(backup.config.params || {}) },
+          categorias: backup.config.categorias || loadConfigDefaults().categorias
         };
-
-        // Save avatars separately
-        if (Object.keys(avatarMap).length > 0) {
-          try {
-            localStorage.setItem('tcm_avatares', JSON.stringify(avatarMap));
-          } catch(e) {
-            console.warn('Avatares no restaurados por falta de espacio — se pueden subir de nuevo en Configuración');
+        // Rehydrate avatars if present in backup
+        (backup.config.miembros || []).forEach(bm => {
+          if (bm.avatar && bm.avatar !== '__avatar__') {
+            const m = config.miembros.find(x => x.id === bm.id);
+            if (m) m.avatar = bm.avatar;
           }
-        }
+        });
+      }
+      allData = backup.data || {};
 
-        // Save config without avatars
-        try {
-          localStorage.setItem('tcm_config', JSON.stringify(configLight));
-        } catch(e) {
-          throw new Error('Config demasiado grande: ' + e.message);
-        }
+      // Save to localStorage
+      try {
+        localStorage.removeItem('tcm_data');
+        localStorage.removeItem('tcm_config');
+        localStorage.removeItem('tcm_avatares');
+        saveConfigData();
+        saveAllData();
+      } catch(e) { console.warn('localStorage restore error:', e); }
+
+      // Push to Firebase immediately
+      if (currentUser) {
+        await saveToFirebase();
+        showToast('✓ Backup restaurado y sincronizado con la nube', 'ok');
+      } else {
+        showToast('✓ Backup restaurado localmente', 'ok');
       }
 
-      showToast('✓ Backup restaurado correctamente. Recargando...', 'ok');
-      setTimeout(() => location.reload(), 1200);
+      // Re-render without full page reload
+      autoDetectPeriod();
+      renderActivePage();
+      renderCarga();
+      updateBadge();
 
     } catch(err) {
       showToast('Error al restaurar: ' + err.message, 'err');
@@ -4555,6 +4555,13 @@ initTheme();
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
+    // Show loading state
+    document.getElementById('auth-overlay').style.display = 'flex';
+    document.getElementById('auth-btn').textContent = 'Cargando datos...';
+    document.getElementById('auth-email').style.display = 'none';
+    document.getElementById('auth-pass').style.display = 'none';
+    document.querySelector('#auth-overlay button:last-of-type').style.display = 'none';
+
     // Load data from Firebase
     const loaded = await loadFromFirebase(user.uid);
     if (!loaded) {
