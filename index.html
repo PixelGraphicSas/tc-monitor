@@ -1,0 +1,4323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TC Monitor — Pixel Graphic SAS</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzE2MWMyNiIvPgogIDxyZWN0IHg9IjIiIHk9IjIiIHdpZHRoPSIyOCIgaGVpZ2h0PSIyOCIgcng9IjUiIGZpbGw9IiMxYzI0MzMiLz4KICA8IS0tIFBpeGVsIGRvdCBncmlkIC0gcmVmZXJlbmNpbmcgUGl4ZWwgR3JhcGhpYyBsb2dvIC0tPgogIDxyZWN0IHg9IjEzIiB5PSI4IiB3aWR0aD0iMyIgaGVpZ2h0PSIzIiByeD0iMC41IiBmaWxsPSIjYzg3OTQxIiBvcGFjaXR5PSIwLjkiLz4KICA8cmVjdCB4PSIxNyIgeT0iOCIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIgb3BhY2l0eT0iMC42Ii8+CiAgPHJlY3QgeD0iOSIgeT0iMTIiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiIHJ4PSIwLjUiIGZpbGw9IiNjODc5NDEiIG9wYWNpdHk9IjAuNiIvPgogIDxyZWN0IHg9IjEzIiB5PSIxMiIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIvPgogIDxyZWN0IHg9IjE3IiB5PSIxMiIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIvPgogIDxyZWN0IHg9IjIxIiB5PSIxMiIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIgb3BhY2l0eT0iMC42Ii8+CiAgPHJlY3QgeD0iMTMiIHk9IjE2IiB3aWR0aD0iMyIgaGVpZ2h0PSIzIiByeD0iMC41IiBmaWxsPSIjYzg3OTQxIiBvcGFjaXR5PSIwLjYiLz4KICA8cmVjdCB4PSIxNyIgeT0iMTYiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiIHJ4PSIwLjUiIGZpbGw9IiNjODc5NDEiIG9wYWNpdHk9IjAuOSIvPgogIDwhLS0gVEMgdGV4dCBiZWxvdyAtLT4KICA8dGV4dCB4PSIxNiIgeT0iMjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1zaXplPSI3IiAKICAgIGZpbGw9IiM5YWFlYzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxIj5UQzwvdGV4dD4KPC9zdmc+">
+<link rel="shortcut icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzE2MWMyNiIvPgogIDxyZWN0IHg9IjIiIHk9IjIiIHdpZHRoPSIyOCIgaGVpZ2h0PSIyOCIgcng9IjUiIGZpbGw9IiMxYzI0MzMiLz4KICA8IS0tIFBpeGVsIGRvdCBncmlkIC0gcmVmZXJlbmNpbmcgUGl4ZWwgR3JhcGhpYyBsb2dvIC0tPgogIDxyZWN0IHg9IjEzIiB5PSI4IiB3aWR0aD0iMyIgaGVpZ2h0PSIzIiByeD0iMC41IiBmaWxsPSIjYzg3OTQxIiBvcGFjaXR5PSIwLjkiLz4KICA8cmVjdCB4PSIxNyIgeT0iOCIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIgb3BhY2l0eT0iMC42Ii8+CiAgPHJlY3QgeD0iOSIgeT0iMTIiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiIHJ4PSIwLjUiIGZpbGw9IiNjODc5NDEiIG9wYWNpdHk9IjAuNiIvPgogIDxyZWN0IHg9IjEzIiB5PSIxMiIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIvPgogIDxyZWN0IHg9IjE3IiB5PSIxMiIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIvPgogIDxyZWN0IHg9IjIxIiB5PSIxMiIgd2lkdGg9IjMiIGhlaWdodD0iMyIgcng9IjAuNSIgZmlsbD0iI2M4Nzk0MSIgb3BhY2l0eT0iMC42Ii8+CiAgPHJlY3QgeD0iMTMiIHk9IjE2IiB3aWR0aD0iMyIgaGVpZ2h0PSIzIiByeD0iMC41IiBmaWxsPSIjYzg3OTQxIiBvcGFjaXR5PSIwLjYiLz4KICA8cmVjdCB4PSIxNyIgeT0iMTYiIHdpZHRoPSIzIiBoZWlnaHQ9IjMiIHJ4PSIwLjUiIGZpbGw9IiNjODc5NDEiIG9wYWNpdHk9IjAuOSIvPgogIDwhLS0gVEMgdGV4dCBiZWxvdyAtLT4KICA8dGV4dCB4PSIxNiIgeT0iMjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9IjcwMCIgZm9udC1zaXplPSI3IiAKICAgIGZpbGw9IiM5YWFlYzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxIj5UQzwvdGV4dD4KPC9zdmc+">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1218;          /* lifted from #07090d — deep navy, not pure black */
+    --surface: #161c26;     /* lifted from #0d1117 — visible card separation */
+    --surface2: #1c2433;    /* lifted from #111822 */
+    --surface3: #222d3f;    /* lifted from #161e2c */
+    --border: #2a3547;      /* lifted from #1c2535 — borders now visible */
+    --border2: #344560;     /* lifted from #243048 */
+    --text: #f0f4fc;        /* brighter primary text */
+    --text2: #9aaec8;       /* lifted from #7c8da6 — secondary now readable */
+    --text3: #6b82a0;       /* lifted from #3f5068 — tertiary now readable */
+    --accent: #4f8ef7;
+    --accent2: #2563eb;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --teal: #06b6d4;
+    --orange: #f97316;
+    --chart1: #4f8ef7;
+    --chart2: #10b981;
+    --chart3: #f59e0b;
+    --chart4: #8b5cf6;
+    --chart5: #ef4444;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  /* LIGHT THEME */
+  html.light {
+    --bg: #f0f4fa;
+    --surface: #ffffff;
+    --surface2: #f5f8ff;
+    --surface3: #eaeff8;
+    --border: #d0daea;
+    --border2: #b8c8de;
+    --text: #0f172a;
+    --text2: #3d5066;
+    --text3: #8fa0b8;
+    --accent: #2563eb;
+    --accent2: #1d4ed8;
+    --green: #059669;
+    --yellow: #d97706;
+    --red: #dc2626;
+    --purple: #7c3aed;
+    --teal: #0891b2;
+  }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text3);
+    transition: color 0.15s;
+    user-select: none;
+  }
+  .theme-toggle:hover { color: var(--text2); }
+
+  .toggle-track {
+    width: 34px;
+    height: 18px;
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  html.light .toggle-track { background: var(--accent); border-color: var(--accent); }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    background: var(--text3);
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+  }
+  html.light .toggle-thumb { transform: translateX(16px); background: #fff; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* LAYOUT */
+  .app { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: var(--text);
+  }
+
+  .logo-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav { padding: 12px 0; flex: 1; }
+
+  .nav-section {
+    padding: 8px 20px 4px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 400;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    position: relative;
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+
+  .nav-item.active {
+    color: var(--accent);
+    background: rgba(79,142,247,0.08);
+    border-left-color: var(--accent);
+  }
+
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .badge {
+    margin-left: auto;
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .period-selector {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .period-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+
+  .period-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .period-display:hover { border-color: var(--border2); }
+
+  .period-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .period-arrows { display: flex; gap: 4px; }
+
+  .period-btn {
+    background: var(--surface3);
+    border: none;
+    color: var(--text2);
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .period-btn:hover { background: var(--border2); color: var(--text); }
+
+  /* MAIN */
+  .main { flex: 1; overflow-y: auto; }
+
+  .page { display: none; padding: 32px 36px; }
+  .page.active { display: block; }
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 20px;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .03em;
+  }
+
+  /* CARDS */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .card-value {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .card-value.green { color: var(--green); }
+  .card-value.yellow { color: var(--yellow); }
+  .card-value.red { color: var(--red); }
+  .card-value.accent { color: var(--accent); }
+
+  .card-sub {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  .card-delta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .table-actions { display: flex; gap: 8px; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 10px 16px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .mono { font-family: var(--font-mono); }
+
+  /* BADGES */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    letter-spacing: 0.03em;
+  }
+
+  .tag-empresarial { background: rgba(79,142,247,0.12); color: var(--accent); border: 1px solid rgba(79,142,247,0.25); }
+  .tag-personal { background: rgba(168,85,247,0.12); color: var(--purple); border: 1px solid rgba(168,85,247,0.25); }
+  .tag-financiero { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); }
+  .tag-pendiente { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+  .tag-gerencial { background: rgba(20,184,166,0.12); color: var(--teal); border: 1px solid rgba(20,184,166,0.25); }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    font-family: var(--font-body);
+  }
+
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-sm { padding: 5px 11px; font-size: 12px; }
+  .btn-danger { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn-success { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+  .btn-success:hover { background: rgba(34,197,94,0.2); }
+
+  /* PROGRESS BAR */
+  .progress-wrap { margin-top: 10px; }
+  .progress-bar-bg { background: var(--surface3); border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+  .progress-info { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--text3); margin-top: 5px; }
+
+  /* UPLOAD ZONE */
+  .upload-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+
+  .upload-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .upload-card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .upload-card-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .upload-card-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .drop-zone {
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px dashed transparent;
+    margin: 12px;
+    border-radius: 8px;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(79,142,247,0.04);
+  }
+
+  .drop-icon { font-size: 28px; opacity: 0.4; }
+  .drop-text { font-size: 12px; color: var(--text3); text-align: center; line-height: 1.6; }
+  .drop-text strong { color: var(--text2); }
+
+  .upload-status {
+    display: none;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    gap: 8px;
+    align-items: center;
+  }
+
+  .upload-status.show { display: flex; }
+  .upload-status.ok { color: var(--green); }
+  .upload-status.error { color: var(--red); }
+  .upload-status.loading { color: var(--yellow); }
+
+  /* CLASSIFY MODAL */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px;
+    width: 520px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
+
+  .tx-detail {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .tx-detail-desc {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .tx-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .tx-detail-item label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .tx-detail-item span {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .classify-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .classify-opt {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .classify-opt:hover { border-color: var(--border2); background: var(--surface2); }
+  .classify-opt.selected { border-color: var(--accent); background: rgba(79,142,247,0.07); }
+
+  .classify-opt input[type=radio] { display: none; }
+
+  .classify-opt-icon { font-size: 20px; }
+
+  .classify-opt-info strong {
+    font-size: 13px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .classify-opt-info span { font-size: 12px; color: var(--text2); }
+
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+  /* SOCIO CARD */
+  .socio-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+
+  .socio-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .socio-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .socio-tc {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 16px;
+  }
+
+  .socio-stat { margin-bottom: 12px; }
+
+  .socio-stat-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+
+  .socio-stat-value {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* FILTERS */
+  .filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    padding: 7px 12px;
+    font-size: 12px;
+    font-family: var(--font-body);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .filter-select:hover, .filter-select:focus { border-color: var(--border2); color: var(--text); }
+
+  .search-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 7px 12px;
+    font-size: 12px;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.15s;
+    width: 200px;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text3);
+  }
+
+  .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+  .empty-text { font-size: 13px; line-height: 1.7; }
+
+  /* ALERTS */
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  .alert-warn { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--yellow); }
+  .alert-info { background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.2); color: var(--accent); }
+
+  /* YEAR CHART */
+  .year-chart {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .month-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+
+  .month-bar-container { height: 60px; display: flex; align-items: flex-end; width: 100%; }
+
+  .month-bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.4s;
+    min-height: 2px;
+  }
+
+  .month-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    text-align: center;
+  }
+
+  /* SETTINGS */
+  .settings-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .settings-section-title {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 20px;
+  }
+
+  .settings-row:last-child { border-bottom: none; }
+
+  .settings-row-info strong { font-size: 13px; font-weight: 500; display: block; margin-bottom: 2px; }
+  .settings-row-info span { font-size: 12px; color: var(--text3); }
+
+  .settings-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 7px 12px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    outline: none;
+    width: 180px;
+    text-align: right;
+    transition: border-color 0.15s;
+  }
+
+  .settings-input:focus { border-color: var(--accent); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 200;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    max-width: 340px;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.ok { border-left: 3px solid var(--green); }
+  .toast.err { border-left: 3px solid var(--red); }
+  .toast.info { border-left: 3px solid var(--accent); }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* DASH FILTER BUTTONS */
+  .dash-filter-btn {
+    background: transparent; border: none; padding: 6px 14px;
+    border-radius: 7px; font-size: 12px; font-family: var(--font-body);
+    color: var(--text2); cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  .dash-filter-btn:hover { background: var(--surface2); color: var(--text); }
+  .dash-filter-btn.active { background: var(--accent); color: #fff; font-weight: 500; }
+
+  /* CHART CARDS */
+  .dash-chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .dash-chart-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px; gap: 10px;
+  }
+  .dash-chart-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--text);
+  }
+  .dash-chart-sub {
+    font-family: var(--font-mono); font-size: 10px; color: var(--text2);
+    letter-spacing: .05em;
+  }
+
+  /* KPI TICKER BAR */
+  .kpi-ticker {
+    display: flex; align-items: stretch;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .kpi-tick {
+    flex: 1; padding: 16px 18px; min-width: 0;
+    position: relative;
+  }
+  .kpi-tick-label {
+    font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 6px;
+  }
+  .kpi-tick-value {
+    font-family: var(--font-display); font-size: 20px; font-weight: 700;
+    letter-spacing: -.02em; color: var(--text); line-height: 1;
+  }
+  .kpi-tick-sub {
+    font-family: var(--font-mono); font-size: 10px; color: var(--text2);
+    margin-top: 4px;
+  }
+  .kpi-divider {
+    width: 1px; background: var(--border); flex-shrink: 0;
+  }
+
+  /* SIDEBAR refined */
+  .logo-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+  .logo-sub { font-family: var(--font-mono); font-size: 9px; color: var(--text3); letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
+
+  /* PAGE TITLE refined */
+  .page-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+
+  /* TABLE refined */
+  thead th { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; color: var(--text2) !important; }
+  tbody td { font-size: 12px; }
+
+  /* CARD refined */
+  .card-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; color: var(--text2); text-transform: uppercase; }
+  .card-value { font-family: var(--font-display); font-size: 20px; font-weight: 700; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .socio-cards { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+  }
+
+  .cuotas-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: var(--surface3);
+    color: var(--text3);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .tx-amount-cop { font-family: var(--font-mono); font-size: 13px; }
+  .tx-amount-usd { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
+
+  .inline-select {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text2);
+    padding: 3px 8px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.15s;
+  }
+  .inline-select:hover { border-color: var(--border2); }
+  .inline-select:focus { border-color: var(--accent); color: var(--text); }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 4px;
+    font-family: var(--font-mono); font-size: 10px;
+  }
+  .chip-socio { background: rgba(168,85,247,0.1); color: var(--purple); }
+  .chip-gerencial { background: rgba(20,184,166,0.1); color: var(--teal); }
+  .chip-cargo { background: rgba(79,142,247,0.1); color: var(--accent); border: 1px solid rgba(79,142,247,0.2); }
+
+  .no-data-row td { text-align: center; padding: 40px; color: var(--text3); font-family: var(--font-mono); font-size: 12px; }
+
+  input[type=file] { display: none; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:.02em;color:var(--text);margin-bottom:10px">TC Monitor</div>
+      <img src="data:image/png;base64,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" alt="Pixel Graphic SAS"
+        style="width:100%;max-width:148px;height:auto;display:block;mix-blend-mode:screen;opacity:.92"
+        title="Pixel Graphic SAS">
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" onclick="navigate('dashboard')">
+        <span class="nav-icon">◈</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('carga')">
+        <span class="nav-icon">↑</span> Cargar Extractos
+      </div>
+      <div class="nav-section">Análisis</div>
+      <div class="nav-item" onclick="navigate('transacciones')">
+        <span class="nav-icon">≡</span> Transacciones
+        <span class="badge" id="badge-pendientes" style="display:none">0</span>
+      </div>
+      <div class="nav-item" onclick="navigate('socios')">
+        <span class="nav-icon">◎</span> Beneficio Socios
+      </div>
+      <div class="nav-item" id="nav-miembro-detalle" onclick="navigate('miembro-detalle')" style="display:none">
+        <span class="nav-icon">◉</span> <span id="nav-miembro-nombre">Detalle</span>
+      </div>
+      <div class="nav-item" onclick="navigate('cuotas')">
+        <span class="nav-icon">⊞</span> Cuotas Diferidas
+      </div>
+      <div class="nav-section">Sistema</div>
+      <div class="nav-item" onclick="navigate('configuracion')">
+        <span class="nav-icon">⚙</span> Configuración
+      </div>
+    </nav>
+
+    <div class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <span id="theme-label">Modo claro</span>
+    </div>
+
+    <div class="period-selector">
+      <div class="period-label">Período activo</div>
+      <div class="period-display">
+        <span class="period-text" id="period-text">Ene 2026</span>
+        <div class="period-arrows">
+          <button class="period-btn" onclick="changePeriod(-1)">‹</button>
+          <button class="period-btn" onclick="changePeriod(1)">›</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+
+      <!-- TOP BAR -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-.02em">Dashboard</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;font-family:var(--font-mono)" id="dash-period-sub">—</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <!-- TIME FILTER -->
+          <div style="display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px">
+            <button class="dash-filter-btn active" data-filter="mes" onclick="setDashFilter('mes',this)">Mes</button>
+            <button class="dash-filter-btn" data-filter="trimestre" onclick="setDashFilter('trimestre',this)">Trimestre</button>
+            <button class="dash-filter-btn" data-filter="semestre" onclick="setDashFilter('semestre',this)">Semestre</button>
+            <button class="dash-filter-btn" data-filter="anio" onclick="setDashFilter('anio',this)">Año</button>
+            <button class="dash-filter-btn" data-filter="rango" onclick="setDashFilter('rango',this)">Rango</button>
+          </div>
+          <div id="dash-rango-wrap" style="display:none;gap:6px;align-items:center">
+            <input type="month" id="dash-desde" class="filter-select" style="padding:5px 10px;font-size:12px" onchange="renderDashboard()">
+            <span style="color:var(--text3)">→</span>
+            <input type="month" id="dash-hasta" class="filter-select" style="padding:5px 10px;font-size:12px" onchange="renderDashboard()">
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+        </div>
+      </div>
+
+      <!-- ALERT -->
+      <div id="alert-pendientes-wrap"></div>
+
+      <!-- CHARTS ROW -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+        <!-- Chart 1: Gasto histórico por mes (líneas por miembro) -->
+        <div class="dash-chart-card">
+          <div class="dash-chart-header">
+            <span class="dash-chart-title">Gasto histórico por miembro</span>
+            <select id="chart-historico-mode" onchange="renderChartHistorico()"
+              style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                     color:var(--text2);padding:3px 8px;font-size:11px;font-family:var(--font-mono);
+                     cursor:pointer;outline:none">
+              <option value="equiv">Equiv. COP</option>
+              <option value="cop">Solo Pesos</option>
+              <option value="usd">Solo Dólares</option>
+              <option value="total">Total (Pesos + Equiv)</option>
+            </select>
+          </div>
+          <div style="position:relative;height:200px">
+            <canvas id="chart-historico"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Distribución por naturaleza (barras apiladas) -->
+        <div class="dash-chart-card">
+          <div class="dash-chart-header">
+            <span class="dash-chart-title">Distribución por categoría</span>
+            <span class="dash-chart-sub">Empresarial · Socios · Financiero</span>
+          </div>
+          <div style="position:relative;height:200px">
+            <canvas id="chart-categorias"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MIEMBRO CARDS -->
+      <div id="tarjeta-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px"></div>
+
+      <!-- KPI TICKER BAR -->
+      <div class="kpi-ticker">
+        <div class="kpi-tick">
+          <div class="kpi-tick-label">TOTAL GASTO</div>
+          <div class="kpi-tick-value accent" id="kpi-total">$0</div>
+          <div class="kpi-tick-sub" id="kpi-total-sub">período</div>
+        </div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-tick">
+          <div class="kpi-tick-label">EMPRESARIAL</div>
+          <div class="kpi-tick-value" id="kpi-empresarial">$0</div>
+          <div class="kpi-tick-sub" id="kpi-empresarial-pct">—%</div>
+        </div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-tick">
+          <div class="kpi-tick-label">BENEFICIO SOCIOS</div>
+          <div class="kpi-tick-value" id="kpi-personal">$0</div>
+          <div class="kpi-tick-sub">3 socios</div>
+        </div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-tick">
+          <div class="kpi-tick-label">TOTAL USD</div>
+          <div class="kpi-tick-value" style="color:var(--teal)" id="kpi-usd">$0</div>
+          <div class="kpi-tick-sub" id="kpi-usd-cop">≈ $0 COP</div>
+        </div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-tick">
+          <div class="kpi-tick-label">PENDIENTES</div>
+          <div class="kpi-tick-value red" id="kpi-pendientes">0</div>
+          <div class="kpi-tick-sub">por clasificar</div>
+        </div>
+      </div>
+
+      <!-- RECENT TXS -->
+      <div class="table-wrap" style="margin-top:14px">
+        <div class="table-header">
+          <span class="table-title">Últimas transacciones</span>
+          <button class="btn btn-ghost btn-sm" onclick="navigate('transacciones')">Ver todas →</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Titular</th><th>Descripción</th>
+              <th>Moneda</th><th style="text-align:right">Equiv. COP</th>
+              <th>Naturaleza</th><th>Cuotas</th>
+            </tr>
+          </thead>
+          <tbody id="dash-tx-body">
+            <tr class="no-data-row"><td colspan="7">Carga extractos para ver las transacciones</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CARGA -->
+    <section class="page" id="page-carga">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Cargar Extractos</div>
+          <div class="page-subtitle" id="carga-subtitle">Selecciona el método de ingreso</div>
+        </div>
+      </div>
+
+      <!-- MODE TABS -->
+      <div style="display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content">
+        <button class="dash-filter-btn active" id="tab-pdf" onclick="setCargaMode('pdf',this)">📄 Lectura Inteligente (PDF)</button>
+        <button class="dash-filter-btn" id="tab-excel" onclick="setCargaMode('excel',this)">📊 Plantilla Excel</button>
+        <button class="dash-filter-btn" id="tab-manual" onclick="setCargaMode('manual',this)">✏️ Ingreso Manual</button>
+      </div>
+
+      <!-- MODE: PDF -->
+      <div id="carga-mode-pdf">
+        <div class="alert alert-info" style="margin-bottom:16px">
+          📄 Sube el PDF completo de cada tarjeta. La app detecta automáticamente el titular, período y moneda.
+        </div>
+        <div class="upload-grid" id="upload-cards-wrap"></div>
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-title">Extractos cargados — período activo</span></div>
+          <table>
+            <thead><tr>
+              <th>Titular</th><th>Tarjeta</th><th>Red</th><th>Período PDF</th>
+              <th style="text-align:right">Total COP</th><th style="text-align:right">Total USD</th>
+              <th>Transacciones</th><th>Estado</th>
+            </tr></thead>
+            <tbody id="extractos-body"><tr class="no-data-row"><td colspan="8">Sin extractos cargados</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MODE: EXCEL -->
+      <div id="carga-mode-excel" style="display:none">
+        <div class="alert alert-info" style="margin-bottom:16px">
+          📊 Descarga la plantilla, llénala con tus transacciones y súbela aquí.
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="downloadTemplate()">↓ Descargar plantilla CSV</button>
+          <label class="btn btn-ghost" style="cursor:pointer">
+            ↑ Subir plantilla diligenciada
+            <input type="file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleTemplateUpload(event)">
+          </label>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Vista previa de importación</span>
+            <button id="btn-confirm-import" class="btn btn-primary btn-sm" style="display:none" onclick="confirmImport()">✓ Importar transacciones</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Fecha</th><th>Titular</th><th>Tarjeta</th><th>Descripción</th>
+              <th>Moneda</th><th style="text-align:right">Valor</th>
+              <th>Naturaleza</th><th>Subcategoría</th><th>Comentario</th><th>Estado</th>
+            </tr></thead>
+            <tbody id="import-preview-body"><tr class="no-data-row"><td colspan="10">Sube una plantilla para ver la vista previa</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MODE: MANUAL -->
+      <div id="carga-mode-manual" style="display:none">
+        <div class="alert alert-info" style="margin-bottom:16px">
+          ✏️ Ingresa transacciones una a una directamente.
+        </div>
+        <div class="card" style="padding:20px;margin-bottom:20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Fecha *</label>
+              <input type="date" id="man-fecha" class="settings-input" style="width:100%;text-align:left">
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Titular *</label>
+              <select id="man-titular" class="filter-select" style="width:100%"></select>
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Tarjeta</label>
+              <select id="man-tarjeta" class="filter-select" style="width:100%"></select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:14px">
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Descripción *</label>
+              <input type="text" id="man-desc" class="search-input" style="width:100%" placeholder="Nombre del comercio o concepto">
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Moneda *</label>
+              <select id="man-moneda" class="filter-select" style="width:100%">
+                <option value="COP">COP</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Valor *</label>
+              <input type="number" id="man-valor" class="settings-input" style="width:100%;text-align:left" placeholder="0">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:16px">
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Naturaleza *</label>
+              <select id="man-nat" class="filter-select" style="width:100%" onchange="updateManSubcat()">
+                <option value="empresarial">Empresarial</option>
+                <option value="personal">Beneficio Socio</option>
+                <option value="financiero">Financiero</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Subcategoría</label>
+              <select id="man-subcat" class="filter-select" style="width:100%"><option value="">Ninguna</option></select>
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Cuota actual / Total</label>
+              <div style="display:flex;gap:6px;align-items:center">
+                <input type="number" id="man-cuota-actual" class="settings-input" style="width:60px;text-align:center" placeholder="1" value="1" min="1">
+                <span style="color:var(--text3)">/</span>
+                <input type="number" id="man-cuota-total" class="settings-input" style="width:60px;text-align:center" placeholder="1" value="1" min="1">
+              </div>
+            </div>
+            <div>
+              <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:5px">Comentario</label>
+              <input type="text" id="man-comentario" class="search-input" style="width:100%" placeholder="Opcional">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn btn-primary" onclick="addManualTransaction()">+ Agregar transacción</button>
+          </div>
+        </div>
+        <!-- Manual transactions added this session -->
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Transacciones ingresadas</span>
+            <span id="man-count" style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">0 transacciones</span>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Fecha</th><th>Titular</th><th>Descripción</th><th>Moneda</th>
+              <th style="text-align:right">Valor</th><th>Naturaleza</th><th>Sub.</th><th>Cuotas</th><th></th>
+            </tr></thead>
+            <tbody id="man-tx-body"><tr class="no-data-row"><td colspan="9">Aún no has agregado transacciones manuales</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACCIONES -->
+    <section class="page" id="page-transacciones">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Transacciones</div>
+          <div class="page-subtitle">Revisa y clasifica cada transacción del período</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Exportar CSV</button>
+      </div>
+
+      <div class="filters">
+        <select class="filter-select" id="filter-tarjeta" onchange="renderTransacciones()">
+          <option value="">Todas las tarjetas</option>
+        </select>
+        <select class="filter-select" id="filter-naturaleza" onchange="renderTransacciones()">
+          <option value="">Todas las categorías</option>
+          <option value="empresarial">Empresarial</option>
+          <option value="personal">Beneficio Socio</option>
+          <option value="financiero">Costo Financiero</option>
+          <option value="pendiente">Pendientes</option>
+        </select>
+        <select class="filter-select" id="filter-moneda" onchange="renderTransacciones()">
+          <option value="">Toda moneda</option>
+          <option value="COP">COP</option>
+          <option value="USD">USD</option>
+        </select>
+        <select class="filter-select" id="filter-subcat" onchange="renderTransacciones()">
+          <option value="">Todas las subcategorías</option>
+        </select>
+        <input type="text" class="search-input" id="filter-buscar" placeholder="Buscar descripción..." oninput="renderTransacciones()">
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-left:auto" id="tx-count"></span>
+      </div>
+
+      <!-- TOTALS BAR -->
+      <div id="tx-totals-bar" style="display:none;background:var(--surface);border:1px solid var(--border);
+        border-radius:10px;padding:12px 20px;margin-bottom:12px;
+        display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+        <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Totales filtrados</span>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div>
+            <span style="font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">COP </span>
+            <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text)" id="tx-total-cop">$0</span>
+          </div>
+          <div>
+            <span style="font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">USD </span>
+            <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--accent)" id="tx-total-usd">$0</span>
+          </div>
+          <div>
+            <span style="font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Equiv. COP </span>
+            <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--green)" id="tx-total-equiv">$0</span>
+          </div>
+          <div style="padding-left:16px;border-left:1px solid var(--border)">
+            <span style="font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Transacciones </span>
+            <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text2)" id="tx-total-count">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Titular</th>
+              <th>Descripción</th>
+              <th>Moneda</th>
+              <th style="text-align:right">Valor Original</th>
+              <th style="text-align:right">Equiv. COP</th>
+              <th>Cuotas</th>
+              <th>Naturaleza</th>
+              <th>Subcategoría</th>
+              <th>Comentario</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tx-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SOCIOS -->
+    <section class="page" id="page-socios">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Beneficio Socios</div>
+          <div class="page-subtitle">Control anual del beneficio de $1.500.000/mes por socio</div>
+        </div>
+      </div>
+
+      <div class="socio-cards" id="socio-cards-wrap">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title">Histórico anual por socio</span>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)" id="year-label"></span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Socio</th>
+              <th>Ene</th><th>Feb</th><th>Mar</th><th>Abr</th>
+              <th>May</th><th>Jun</th><th>Jul</th><th>Ago</th>
+              <th>Sep</th><th>Oct</th><th>Nov</th><th>Dic</th>
+              <th style="text-align:right">Acumulado</th>
+              <th style="text-align:right">Tope anual</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="socios-hist-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CUOTAS -->
+    <section class="page" id="page-cuotas">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Cuotas Diferidas</div>
+          <div class="page-subtitle">Compromisos futuros originados en compras a cuotas</div>
+        </div>
+      </div>
+
+      <div class="grid-3" id="cuotas-kpis">
+        <div class="card">
+          <div class="card-label">Total comprometido (saldo a diferir)</div>
+          <div class="card-value accent" id="cuotas-total-diferido">$0</div>
+          <div class="card-sub">USD + COP convertido</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Cuotas activas</div>
+          <div class="card-value" id="cuotas-activas">0</div>
+          <div class="card-sub">Transacciones en cuotas</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Promedio cuota mensual</div>
+          <div class="card-value" id="cuotas-promedio">$0</div>
+          <div class="card-sub">Compromiso recurrente</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title">Detalle de compras diferidas</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Titular</th>
+              <th>Descripción</th>
+              <th>Moneda</th>
+              <th style="text-align:right">Valor original</th>
+              <th>Cuota actual</th>
+              <th style="text-align:right">Cargo mes</th>
+              <th style="text-align:right">Saldo diferido</th>
+              <th>Naturaleza</th>
+            </tr>
+          </thead>
+          <tbody id="cuotas-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CONFIGURACIÓN -->
+    <section class="page" id="page-configuracion">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Configuración</div>
+          <div class="page-subtitle">Administra tarjetas, reglas y parámetros del sistema</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveConfig()">Guardar cambios</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title" style="justify-content:space-between">
+          <span>👤 Miembros</span>
+          <button class="btn btn-ghost btn-sm" onclick="addMiembro()">+ Agregar miembro</button>
+        </div>
+        <div id="tarjetas-config">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title" style="justify-content:space-between">
+          <span>📂 Categorías y subcategorías</span>
+          <button class="btn btn-ghost btn-sm" onclick="addCategoria()">+ Agregar categoría</button>
+        </div>
+        <div id="categorias-config"></div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">🏷 Reglas de clasificación automática</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Comercios → Empresarial</strong>
+            <span>Palabras clave separadas por coma (sin distinción de mayúsculas)</span>
+          </div>
+          <textarea id="rules-empresarial" class="settings-input" style="width:320px;height:70px;resize:vertical;text-align:left;padding:8px"></textarea>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Comercios → Beneficio Socio</strong>
+            <span>Palabras clave separadas por coma</span>
+          </div>
+          <textarea id="rules-personal" class="settings-input" style="width:320px;height:70px;resize:vertical;text-align:left;padding:8px"></textarea>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Comercios → Costo Financiero</strong>
+            <span>Palabras clave separadas por coma</span>
+          </div>
+          <textarea id="rules-financiero" class="settings-input" style="width:320px;height:70px;resize:vertical;text-align:left;padding:8px"></textarea>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">📊 Parámetros</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Tope beneficio mensual por socio</strong>
+            <span>En pesos colombianos (COP)</span>
+          </div>
+          <input type="number" id="param-tope" class="settings-input" value="1500000">
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>PIN de administrador</strong>
+            <span>Si se configura, la app pedirá PIN al abrir. Vacío = sin protección.</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="password" id="param-pin" class="settings-input" style="width:140px;letter-spacing:.2em;text-align:center" placeholder="Sin PIN" maxlength="8">
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">máx 8 dígitos</span>
+          </div>
+        </div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px">
+          <div class="settings-row-info">
+            <strong>TRM por período (USD → COP)</strong>
+            <span>Define la TRM para cada mes. Si un mes no tiene TRM específica, usa el valor por defecto.</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <input type="number" id="param-trm" class="settings-input" style="width:130px" placeholder="TRM por defecto" value="4200">
+            <span style="font-size:12px;color:var(--text3)">← valor por defecto si no hay TRM específica para el mes</span>
+          </div>
+          <div id="trm-periodos-wrap" style="width:100%;display:flex;flex-direction:column;gap:8px"></div>
+          <button class="btn btn-ghost btn-sm" onclick="addTRMPeriodo()">+ Agregar TRM para un período</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title" style="justify-content:space-between">
+          <span>🗄 Datos almacenados</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="backupData()" title="Incluye: datos, miembros, avatares, TRM por período y toda la configuración">↓ Descargar Backup</button>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+              ↑ Restaurar
+              <input type="file" accept=".json" style="display:none" onchange="restoreData(event)">
+            </label>
+            <button class="btn btn-danger btn-sm" onclick="confirmClearData()">Borrar todo</button>
+          </div>
+        </div>
+        <!-- Period list -->
+        <div id="stored-periods-list" style="padding:4px 0"></div>
+        <div style="padding:12px 20px;border-top:1px solid var(--border)">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)" id="stored-periods-count">—</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- MIEMBRO DETALLE -->
+    <section class="page" id="page-miembro-detalle">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;gap:14px">
+          <button class="btn btn-ghost btn-sm" onclick="navigate('dashboard')" style="font-size:16px;padding:6px 10px">←</button>
+          <div>
+            <div class="page-title" id="detalle-nombre">—</div>
+            <div class="page-subtitle">Historial completo de transacciones</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="exportDetalle()">↓ Exportar CSV</button>
+      </div>
+      <div class="grid-3" id="detalle-kpis" style="margin-bottom:24px"></div>
+      <div class="filters" style="margin-bottom:18px">
+        <select class="filter-select" id="detalle-filter-mes" onchange="renderDetalle()"><option value="">Todos los meses</option></select>
+        <select class="filter-select" id="detalle-filter-nat" onchange="renderDetalle()">
+          <option value="">Todas las categorías</option>
+          <option value="empresarial">Empresarial</option>
+          <option value="personal">Beneficio Socio</option>
+          <option value="financiero">Costo Financiero</option>
+          <option value="pendiente">Pendientes</option>
+        </select>
+        <select class="filter-select" id="detalle-filter-moneda" onchange="renderDetalle()">
+          <option value="">Toda moneda</option><option value="COP">COP</option><option value="USD">USD</option>
+        </select>
+        <select class="filter-select" id="detalle-filter-subcat" onchange="renderDetalle()">
+          <option value="">Todas las subcategorías</option>
+        </select>
+        <select class="filter-select" id="detalle-filter-cuotas" onchange="renderDetalle()">
+          <option value="">Todas las cuotas</option><option value="1">1 cuota</option><option value="multi">Más de 1 cuota</option>
+        </select>
+        <input type="text" class="search-input" id="detalle-filter-buscar" placeholder="Buscar descripción..." oninput="renderDetalle()">
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-left:auto" id="detalle-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mes</th><th>Fecha</th><th>Descripción</th><th>Moneda</th>
+              <th style="text-align:right">Valor Original</th>
+              <th style="text-align:right">Equiv. COP</th>
+              <th>Cuotas</th><th>Naturaleza</th>
+              <th>Subcategoría</th><th>Comentario</th><th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="detalle-tx-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+<!-- CLASSIFY MODAL -->
+<div class="overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Clasificar transacción</div>
+    <div class="modal-sub">La app sugirió una clasificación. Puedes mantenerla o cambiarla.</div>
+
+    <div class="tx-detail" id="modal-tx-detail">
+      <div class="tx-detail-desc" id="modal-desc">—</div>
+      <div class="tx-detail-grid">
+        <div class="tx-detail-item">
+          <label>Fecha</label>
+          <span id="modal-fecha">—</span>
+        </div>
+        <div class="tx-detail-item">
+          <label>Monto</label>
+          <span id="modal-monto">—</span>
+        </div>
+        <div class="tx-detail-item">
+          <label>Titular</label>
+          <span id="modal-titular">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="classify-options">
+      <label class="classify-opt" id="opt-empresarial">
+        <input type="radio" name="nat" value="empresarial" onchange="selectNat(this)">
+        <span class="classify-opt-icon">🏢</span>
+        <div class="classify-opt-info">
+          <strong>Empresarial</strong>
+          <span>Gasto operativo de la empresa (licencias, herramientas, servicios)</span>
+        </div>
+      </label>
+      <label class="classify-opt" id="opt-personal">
+        <input type="radio" name="nat" value="personal" onchange="selectNat(this)">
+        <span class="classify-opt-icon">👤</span>
+        <div class="classify-opt-info">
+          <strong>Beneficio Socio</strong>
+          <span>Gasto personal del socio dentro del beneficio de $1.500.000/mes</span>
+        </div>
+      </label>
+      <label class="classify-opt" id="opt-financiero">
+        <input type="radio" name="nat" value="financiero" onchange="selectNat(this)">
+        <span class="classify-opt-icon">🏦</span>
+        <div class="classify-opt-info">
+          <strong>Costo Financiero</strong>
+          <span>GMF, cuota de manejo, intereses — asumidos al 100% por la empresa</span>
+        </div>
+      </label>
+    </div>
+
+    <!-- Subcategoría -->
+    <div id="modal-subcat-wrap" style="margin-bottom:16px">
+      <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px">Subcategoría</label>
+      <select id="modal-subcat" class="filter-select" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;outline:none">
+        <option value="">Sin subcategoría</option>
+      </select>
+    </div>
+
+    <!-- Comentario -->
+    <div style="margin-bottom:16px">
+      <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px">Comentario</label>
+      <textarea id="modal-comentario" placeholder="Agrega una nota a esta transacción..."
+        style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+               color:var(--text);padding:8px 12px;font-size:12px;font-family:var(--font-body);
+               resize:vertical;min-height:56px;outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" onclick="deleteTransaction(modalTxId)" style="margin-right:auto">🗑 Eliminar</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveClassification()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- PIN LOGIN OVERLAY -->
+<div id="pin-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
+  <div style="text-align:center;margin-bottom:32px">
+    <div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text);margin-bottom:6px">TC Monitor</div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">Pixel Graphic SAS</div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 40px;width:340px;text-align:center">
+    <div style="font-size:32px;margin-bottom:16px">🔐</div>
+    <div style="font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:6px">Ingresa tu PIN</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:24px">Acceso de administrador o invitado</div>
+    <input id="pin-input" type="password" maxlength="8" placeholder="••••"
+      style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+             color:var(--text);padding:14px;font-size:22px;text-align:center;letter-spacing:.3em;
+             outline:none;font-family:var(--font-mono);margin-bottom:12px;transition:border-color .15s"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"
+      onkeydown="if(event.key==='Enter') checkPin()">
+    <button onclick="checkPin()" style="width:100%;background:var(--accent);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-size:14px;font-family:var(--font-display);font-weight:600;
+      cursor:pointer;transition:background .15s;margin-bottom:10px"
+      onmouseover="this.style.background='var(--accent2)'" onmouseout="this.style.background='var(--accent)'">
+      Entrar
+    </button>
+    <button onclick="enterGuest()" style="width:100%;background:transparent;color:var(--text2);border:1px solid var(--border);
+      border-radius:10px;padding:10px;font-size:13px;font-family:var(--font-body);
+      cursor:pointer;transition:all .15s"
+      onmouseover="this.style.borderColor='var(--border2)';this.style.color='var(--text)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
+      👁 Entrar como invitado (solo lectura)
+    </button>
+    <div id="pin-error" style="color:var(--red);font-size:12px;font-family:var(--font-mono);margin-top:10px;display:none">
+      PIN incorrecto
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG & STATE
+// ============================================================
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const MONTHS_ES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MONTHS_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+let activePeriod = { year: 2026, month: 1 }; // 1-indexed month
+
+let config = loadConfig();
+loadAvatarsIntoConfig();  // rehydrate avatars from separate storage
+let allData = loadAllData(); // { "2026-01": { extractos: [], transacciones: [] }, ... }
+
+let modalTxId = null;
+
+// ============================================================
+// PERSISTENCE
+// ============================================================
+function loadConfig() {
+  const defaults = {
+    // miembros: cada persona puede tener N tarjetas históricas
+    miembros: [
+      { id: 'm1', nombre: 'John Alejandro Morales', tipo: 'gerencial',
+        tarjetas: [{ num: '3806', red: 'MasterCard', desde: null, hasta: null, cupo: 27000000 }] },
+      { id: 'm2', nombre: 'Filiberto Hincapié', tipo: 'socio',
+        tarjetas: [{ num: '4547', red: 'Amex', desde: null, hasta: null, cupo: 3000000 }] },
+      { id: 'm3', nombre: 'Alexander Hincapié', tipo: 'socio',
+        tarjetas: [
+          { num: '7145', red: 'Amex', desde: null, hasta: '2026-01', cupo: 6000000 },
+          { num: '4064', red: 'Amex', desde: '2026-02', hasta: null, cupo: 6000000 }
+        ] },
+      { id: 'm4', nombre: 'Andrés Florez', tipo: 'socio',
+        tarjetas: [{ num: '0304', red: 'Amex', desde: null, hasta: null, cupo: 0 }] },
+    ],
+    // legacy alias — kept for backward compat with any existing localStorage
+    tarjetas: [],
+    rules: {
+      empresarial: 'adobe,google workspace,workspace,midjourney,openai,chatgpt,capture one,capture,github,notion,dropbox,figma,zoom,microsoft,office,slack,aws,amazon web,digital ocean,cloudflare,namecheap,godaddy,wix,shopify,intercom,hubspot,mailchimp,twilio,stripe,payoneer,deel,remote,gusto,linear,jira,asana,trello',
+      personal: 'eds,rodeo,escobero,ayura,gasolinera,combustible,rappi,ifood,uber eats,domicilio,spotify,netflix,hbo,hbomax,amazon prime,disney,apple.com,apple com,applebill,supermercado,carulla,exito,éxito,jumbo,mercado madrid,arkandia,crepes,waffles,restaurante,gym,gimnasio,farmacia,drogueria,droguería,salud,medical,clinica,clínica,tmk cardif,cardif,jgj accesorios,accesorios,ropa,h&m,hym,zara,alkosto,ktronix,falabella,paris,ripley,homecenter,corona',
+      financiero: 'gmf,cuota de manejo,intereses corrientes,interes,mora,comision avance,comisión avance'
+    },
+    params: {
+      topePersonal: 1500000,
+      trm: 4200,
+      trmPorPeriodo: {},
+      pinAdmin: ''   // empty = no PIN set, app always opens as admin
+    },
+    categorias: [
+      { id: 'c1', nombre: 'Empresariales', naturaleza: 'empresarial', color: '#4f8ef7',
+        subcategorias: ['IA Herramientas','IA Aprendizaje','Cursos','Herramientas Digitales','Diseño','Otros'] },
+      { id: 'c2', nombre: 'Beneficio Socios', naturaleza: 'personal', color: '#10b981', subcategorias: [] },
+      { id: 'c3', nombre: 'Financieros', naturaleza: 'financiero', color: '#f59e0b', subcategorias: [] },
+    ]
+  };
+
+  try {
+    const saved = localStorage.getItem('tcm_config');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Merge to ensure new defaults are present
+      return { ...defaults, ...parsed, rules: { ...defaults.rules, ...parsed.rules }, params: { ...defaults.params, ...parsed.params }, categorias: parsed.categorias || defaults.categorias };
+    }
+  } catch(e) {}
+  return defaults;
+}
+
+function loadAvatarsIntoConfig() {
+  try {
+    const saved = localStorage.getItem('tcm_avatares');
+    if (!saved) return;
+    const avatarMap = JSON.parse(saved);
+    (config.miembros || []).forEach(m => {
+      if (m.avatar === '__avatar__' && avatarMap[m.id]) m.avatar = avatarMap[m.id];
+    });
+  } catch(e) {}
+}
+
+function saveConfigData() {
+  try {
+    // Split avatars into separate storage key to avoid quota issues
+    const avatarMap = {};
+    const configToSave = {
+      ...config,
+      miembros: config.miembros.map(m => {
+        if (m.avatar) avatarMap[m.id] = m.avatar;
+        return { ...m, avatar: m.avatar ? '__avatar__' : null };
+      })
+    };
+    try { localStorage.setItem('tcm_avatares', JSON.stringify(avatarMap)); } catch(e) {}
+    localStorage.setItem('tcm_config', JSON.stringify(configToSave));
+  } catch(e) {
+    if (e.name === 'QuotaExceededError') {
+      // Try saving without avatars to free space
+      try {
+        const configLight = {
+          ...config,
+          miembros: config.miembros.map(m => ({ ...m, avatar: null }))
+        };
+        localStorage.setItem('tcm_config', JSON.stringify(configLight));
+        console.warn('Config guardada sin avatares por límite de almacenamiento');
+      } catch(e2) {
+        console.error('No se pudo guardar config:', e2);
+      }
+    }
+  }
+}
+
+function loadAllData() {
+  try {
+    const saved = localStorage.getItem('tcm_data');
+    const data = saved ? JSON.parse(saved) : {};
+    // Fix duplicate IDs across all periods
+    const seenIds = new Set();
+    Object.entries(data).forEach(([key, pd]) => {
+      if (!pd.transacciones) return;
+      pd.transacciones.forEach((t, i) => {
+        if (seenIds.has(t.id)) {
+          // Duplicate found — make unique
+          t.id = `${t.id}_${key}_${i}`;
+        }
+        seenIds.add(t.id);
+      });
+    });
+    return data;
+  } catch(e) { return {}; }
+}
+
+function saveAllData() {
+  try {
+    localStorage.setItem('tcm_data', JSON.stringify(allData));
+  } catch(e) {
+    if (e.name === 'QuotaExceededError') {
+      // Don't show toast here — let the caller handle it
+      // But do throw so callers know it failed
+      throw e;
+    }
+  }
+}
+
+function periodKey(y, m) { return `${y}-${String(m).padStart(2,'0')}`; }
+function activePeriodKey() { return periodKey(activePeriod.year, activePeriod.month); }
+
+function getPeriodData() {
+  const key = activePeriodKey();
+  if (!allData[key]) allData[key] = { extractos: [], transacciones: [] };
+  return allData[key];
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigate(page) {
+  // Block guest access to editing pages
+  if (guestMode && (page === 'carga' || page === 'configuracion')) {
+    showToast('Modo invitado — sin acceso a esta sección', 'info');
+    return;
+  }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + page + "'")) {
+      n.classList.add('active');
+    }
+  });
+
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'transacciones') renderTransacciones();
+  if (page === 'socios') renderSocios();
+  if (page === 'miembro-detalle') renderDetalle();
+  if (page === 'cuotas') renderCuotas();
+  if (page === 'carga') renderCarga();
+  if (page === 'configuracion') renderConfig();
+}
+
+function changePeriod(dir) {
+  activePeriod.month += dir;
+  if (activePeriod.month > 12) { activePeriod.month = 1; activePeriod.year++; }
+  if (activePeriod.month < 1) { activePeriod.month = 12; activePeriod.year--; }
+  document.getElementById('period-text').textContent = MONTHS_ES[activePeriod.month - 1] + ' ' + activePeriod.year;
+  renderActivePage();
+}
+
+function renderActivePage() {
+  const active = document.querySelector('.page.active');
+  if (!active) return;
+  const id = active.id.replace('page-', '');
+  navigate(id);
+}
+
+// ============================================================
+// MIEMBRO HELPERS
+// ============================================================
+
+// Get the miembro object for a given card number
+function getMiembro(tarjetaNum) {
+  return config.miembros.find(m => m.tarjetas.some(t => t.num === tarjetaNum));
+}
+
+// Get all card numbers belonging to a miembro
+function getNums(miembro) {
+  return miembro.tarjetas.map(t => t.num);
+}
+
+// Get active card num for a miembro in a given period key (e.g. "2026-01")
+function getActivaNum(miembro, periodKey) {
+  const tc = miembro.tarjetas.find(t => {
+    const afterDesde = !t.desde || periodKey >= t.desde;
+    const beforeHasta = !t.hasta || periodKey <= t.hasta;
+    return afterDesde && beforeHasta;
+  });
+  return tc ? tc.num : miembro.tarjetas[miembro.tarjetas.length - 1].num;
+}
+
+// Get miembro from config (falls back to legacy tarjetas if needed)
+function getMiembrosList() {
+  return config.miembros || [];
+}
+
+// ============================================================
+// CLASSIFICATION RULES
+// ============================================================
+function classify(description) {
+  const desc = (description || '').toLowerCase();
+  const rules = config.rules;
+
+  const check = (ruleStr) => ruleStr.split(',').map(r => r.trim()).some(r => r && desc.includes(r));
+
+  if (check(rules.financiero)) return 'financiero';
+  if (check(rules.empresarial)) return 'empresarial';
+  if (check(rules.personal)) return 'personal';
+  return 'pendiente';
+}
+
+// ============================================================
+// PDF PARSING — MULTI-TARJETA
+// ============================================================
+async function parsePDF(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const pages = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    // Join with spaces to preserve word separation; pdf.js items are individual spans
+    const pageText = content.items.map(item => item.str).join(' ');
+    pages.push(pageText);
+  }
+  const fullText = pages.join('\n---PAGE---\n');
+  // DEBUG — remove after validating
+  pages.forEach((p, i) => console.log(`=== PAGE ${i+1} (300 chars) ===`, p.replace(/\s+/g,' ').substring(0, 300)));
+  return splitAndParseExtractos(fullText, file.name);
+}
+
+// Split full PDF text into one extracto per tarjeta
+function splitAndParseExtractos(fullText, filename) {
+  // pdf.js sometimes collapses spaces, so normalize before any string matching
+  // Replace multiple spaces with single space for marker detection
+  const norm = fullText.replace(/[ \t]+/g, ' ');
+
+  // (debug logging moved to parsePDF)
+
+  // Strategy: split on card number boundaries.
+  // Each card section contains "TARJETA: ***N digits" — reliable anchor.
+  // We process page by page (separated by ---PAGE---) and track which
+  // card+currency each page belongs to.
+
+  const pages = fullText.split('---PAGE---');
+  const cardBlocks = {};
+
+  for (const page of pages) {
+    const p = page.replace(/[ 	]+/g, ' ').trim();
+    if (p.length < 50) continue;
+
+    // Find card number on this page
+    const numMatch = p.match(/TARJETA:\s*\*+(\d{4})/) || p.match(/\*{3,}(\d{4})/);
+    if (!numMatch) continue;
+    const num = numMatch[1];
+
+    if (!cardBlocks[num]) cardBlocks[num] = { cop: '', usd: '', red: 'MasterCard' };
+
+    // Detect network
+    if (/AMERICAN EXPRESS/i.test(p)) cardBlocks[num].red = 'Amex';
+
+    // Detect currency for this page — flexible regex handles spacing variations
+    const isUSD = /ESTADO\s+DE\s+CUENTA\s+EN\s*:\s*DOLARES/i.test(p)
+               || /CUP[ÓO]N\s+DE\s+PAGO\s+EN\s*:\s*DOLARES/i.test(p)
+               || /ESTADO\s+DE\s+CUENTA\s+EN\s*:?\s*DOLARES/i.test(p);
+
+    if (isUSD) {
+      cardBlocks[num].usd += '\n' + p;
+    } else {
+      cardBlocks[num].cop += '\n' + p;
+    }
+  }
+
+  // If page-based split found nothing (pages not split correctly), 
+  // fall back to splitting on the ESTADO marker
+  if (Object.keys(cardBlocks).length === 0) {
+    const fallbackBlocks = norm.split(/(?=ESTADO\s+DE\s+CUENTA\s+EN\s*:)/i)
+                               .filter(b => b.trim().length > 100);
+    for (const block of fallbackBlocks) {
+      const numMatch = block.match(/TARJETA:\s*\*+(\d{4})/) || block.match(/\*{3,}(\d{4})/);
+      if (!numMatch) continue;
+      const num = numMatch[1];
+      if (!cardBlocks[num]) cardBlocks[num] = { cop: '', usd: '', red: 'MasterCard' };
+      if (/AMERICAN EXPRESS/i.test(block)) cardBlocks[num].red = 'Amex';
+      if (/DOLARES/i.test(block.substring(0, 200))) {
+        cardBlocks[num].usd += ' ' + block;
+      } else {
+        cardBlocks[num].cop += ' ' + block;
+      }
+    }
+  }
+
+  const extractos = [];
+  for (const [num, blocks] of Object.entries(cardBlocks)) {
+    const ext = parseExtracto(blocks.usd, blocks.cop, num, blocks.red, filename);
+    if (ext) extractos.push(ext);
+  }
+  return extractos;
+}
+
+function parseExtracto(usdText, copText, tarjetaNum, red, filename) {
+  // Resolve name from miembros (supports multi-tarjeta per person)
+  const miembro = getMiembro(tarjetaNum);
+  const titular = miembro ? miembro.nombre : tarjetaNum;
+
+  const fullText = usdText + ' ' + copText;
+  let periodoDesde = '', periodoHasta = '';
+  const perMatch = fullText.match(/Desde[:\s]+(\d{2}\/\d{2}\/\d{4}).*?Hasta[:\s]+(\d{2}\/\d{2}\/\d{4})/);
+  if (perMatch) { periodoDesde = perMatch[1]; periodoHasta = perMatch[2]; }
+
+  const transacciones = [];
+  let txId = 0;
+
+  function parseBlock(text, moneda) {
+    if (!text || text.trim().length < 10) return;
+    let clean = text.replace(/\s+/g, ' ');
+
+    // CRITICAL: Only parse the transaction TABLE section.
+    // Skip everything before "Número de Autorización" header which marks start of the table.
+    // This prevents picking up numbers from cupos, saldos, tasas sections.
+    const tableMarkers = [
+      'Número de Autorización',
+      'N\u00famero de Autorizaci\u00f3n',  // with accents
+      'NÚMERO DE AUTORIZACIÓN',
+      'Número de',  // fallback
+    ];
+    let tableStart = -1;
+    for (const marker of tableMarkers) {
+      const idx = clean.indexOf(marker);
+      if (idx !== -1) { tableStart = idx; break; }
+    }
+    if (tableStart !== -1) {
+      // Skip the header row itself (next ~100 chars after marker)
+      const afterHeader = clean.indexOf(' ', tableStart + 80);
+      clean = clean.substring(afterHeader > tableStart ? afterHeader : tableStart + 100);
+    }
+
+    // Split into segments at each transaction start
+    const segments = clean.split(/(?=\b\d{6}\s+\d{2}\/\d{2}\/\d{4}\b)|(?=\b\d{2}\/\d{2}\/\d{4}\s+[A-ZÁÉÍÓÚÑ])/);
+
+    for (const seg of segments) {
+      const s = seg.trim();
+      if (s.length < 10) continue;
+      if (/^(Número|FECHA|Pag\.|DCF:|Con Bancolombia|Recuerda|Cupo|Disponible|Tasas|Saldo anterior|Pago mínimo|Compra un|Avance|Mora\s+\d|Desde|Hasta)/i.test(s)) continue;
+
+      // Match with auth number
+      const m = s.match(/^(\d{6})\s+(\d{2}\/\d{2}\/\d{4})\s+(.+?)\s+([\d,]+\.?\d*)(?:\s+([\d,]+\.?\d*))?(?:\s+([\d,]+\.?\d*))?(?:\s+([\d,]+\.?\d*))?(?:\s+(\d+\/\d+))?/);
+      // Match date-only (GMF, INTERESES, CUOTA DE MANEJO)
+      const mDate = !m && s.match(/^(\d{2}\/\d{2}\/\d{4})\s+([A-ZÁÉÍÓÚÑ].+?)\s+([\d,]+\.?\d*)(?:\s+([\d,]+\.?\d*))?/);
+
+      let authNum, fecha, desc, nums, cuotasStr;
+      if (m) {
+        authNum = m[1]; fecha = m[2];
+        desc = (m[3] || '').trim().replace(/\s*VR MONEDA ORIG.*$/i, '').trim();
+        nums = [m[4], m[5], m[6], m[7]].map(n => parseNum(n));
+        cuotasStr = m[8] || '';
+      } else if (mDate) {
+        authNum = ''; fecha = mDate[1];
+        desc = (mDate[2] || '').trim().replace(/\s*VR MONEDA ORIG.*$/i, '').trim();
+        nums = [mDate[3], mDate[4]].map(n => parseNum(n));
+        cuotasStr = '';
+      } else continue;
+
+      if (/^(FECHA|NÚMERO|DESCRIPCIÓN|BANCO|FORMA|TARJETA|SEÑOR|PIXEL|NIT|Pag\b)/i.test(desc)) continue;
+      if (desc.length < 3) continue;
+
+      const isAbono = /ABONO/i.test(desc);
+      const valorOriginal = nums[0] || 0;
+
+      // Bancolombia columns after ValorOriginal may be:
+      //   [1]=TasaPactada(<5)  [2]=TasaEA(>10)  [3]=CargosAbonos  [4]=SaldoDiferir
+      // OR for 1-cuota COP transactions (no tasa columns):
+      //   [1]=CargosAbonos(≈ValorOriginal)  [2]=SaldoDiferir(=0)
+      // Detect tasa by checking if nums[1] looks like a monthly rate (< 5.0)
+      let cargoReal, saldoReal;
+      if (!isAbono && nums[1] > 0 && nums[1] < 5.0 && nums[2] > 5.0) {
+        // Has tasa columns → real cargo is nums[3], saldo diferido is nums[4] or last num
+        cargoReal = nums[3] > 0 ? nums[3] : nums[0];
+        saldoReal  = nums[4] > 0 ? nums[4] : 0;
+      } else {
+        // No tasa columns → nums[1] is directly the cargo (or same as valorOriginal)
+        cargoReal = isAbono ? 0 : (nums[1] > 0 ? nums[1] : nums[0]);
+        saldoReal  = isAbono ? 0 : (nums[2] || 0);
+      }
+      // For USD transactions: cargoMes stores the USD amount (valorOriginal)
+      // copValue() will multiply by TRM at display time
+      const cargoMes = isAbono ? 0 : (moneda === 'USD' ? valorOriginal : cargoReal);
+      const saldoDiferir = isAbono ? 0 : saldoReal;
+
+      if (!isAbono && valorOriginal <= 0) continue;
+      if (valorOriginal > 100000000) continue;
+
+      let cuotaActual = 0, cuotaTotal = 0;
+      if (cuotasStr) {
+        const cp = cuotasStr.split('/');
+        cuotaActual = parseInt(cp[0]) || 1;
+        cuotaTotal = parseInt(cp[1]) || 1;
+      }
+
+      transacciones.push({
+        id: `tx_${tarjetaNum}_${activePeriodKey()}_${txId++}_${Math.random().toString(36).slice(2,6)}`,
+        authNum, fecha, descripcion: desc, moneda,
+        valorOriginal, cargoMes, saldoDiferir: cuotaTotal > 1 ? saldoDiferir : 0,
+        cuotaActual, cuotaTotal,
+        naturaleza: isAbono ? 'financiero' : classify(desc),
+        clasificadoManual: false, isAbono, tarjetaNum, titular
+      });
+    }
+  }
+
+  parseBlock(usdText, 'USD');
+  parseBlock(copText, 'COP');
+
+  // Deduplicate carefully:
+  // The same PDF page can appear in both usdText and copText if the split
+  // is imperfect. We only deduplicate when:
+  //   1. authNum is non-empty AND identical (Bancolombia guarantees uniqueness per tx)
+  //   2. AND same currency (same tx can't be both USD and COP)
+  // We NEVER deduplicate based on description+value alone — two distinct
+  // transactions can legitimately have the same merchant name and amount
+  // (e.g. two Adobe licenses on different dates, or same date different products).
+  const seen = new Set();
+  const unique = transacciones.filter(t => {
+    if (!t.authNum) return true; // no auth number = keep always (GMF, admin charges)
+    const key = `${t.authNum}_${t.moneda}`;
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+
+  const txCOP = unique.filter(t => t.moneda === 'COP' && !t.isAbono);
+  const txUSD = unique.filter(t => t.moneda === 'USD' && !t.isAbono);
+
+  return {
+    id: `ext_${tarjetaNum}_${activePeriodKey()}`,
+    tarjetaNum, titular, red, periodoDesde, periodoHasta,
+    totalCOP: txCOP.reduce((s,t) => s + t.cargoMes, 0),
+    totalUSD: txUSD.reduce((s,t) => s + t.cargoMes, 0),
+    transacciones: unique, filename,
+    cargadoEn: new Date().toISOString()
+  };
+}
+
+// UPLOAD HANDLING
+// ============================================================
+function renderCarga() {
+  const wrap = document.getElementById('upload-cards-wrap');
+  wrap.innerHTML = getMiembrosList().map(m => {
+    // Show the active card number for the current period
+    const activaNum = getActivaNum(m, activePeriodKey());
+    const activaTc = m.tarjetas.find(t => t.num === activaNum) || m.tarjetas[0];
+    const allNums = getNums(m).filter(n => n !== '????').join(', ****');
+    const numsDisplay = allNums ? `****${allNums}` : '****????';
+    return `
+    <div class="upload-card" id="ucard-${m.id}">
+      <div class="upload-card-header">
+        <div>
+          <div class="upload-card-title">${m.nombre}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-top:2px">
+            ${numsDisplay} · ${activaTc.red} · <span class="chip chip-cargo">${m.tipo}</span>
+          </div>
+        </div>
+        <span class="upload-card-meta" id="ustatus-${m.id}">Sin cargar</span>
+      </div>
+      <div class="drop-zone" id="dz-${m.id}"
+        onclick="triggerUpload('${m.id}')"
+        ondragover="dzDragOver(event,'${m.id}')"
+        ondragleave="dzDragLeave('${m.id}')"
+        ondrop="dzDrop(event,'${m.id}')">
+        <div class="drop-icon">📄</div>
+        <div class="drop-text"><strong>Arrastra el PDF aquí</strong><br>o haz clic para seleccionar</div>
+      </div>
+      <input type="file" id="finput-${m.id}" accept=".pdf" onchange="handleFile(event,'${m.id}')">
+      <div class="upload-status" id="ustat-${m.id}"></div>
+    </div>`;
+  }).join('');
+
+  renderExtractosTable();
+
+  // Mark already loaded cards
+  const pd = getPeriodData();
+  pd.extractos.forEach(ext => {
+    const m = getMiembro(ext.tarjetaNum);
+    if (m) markUploaded(m.id, ext.transacciones.length);
+  });
+}
+
+function triggerUpload(tcId) {
+  document.getElementById('finput-' + tcId).click();
+}
+
+function dzDragOver(e, tcId) {
+  e.preventDefault();
+  document.getElementById('dz-' + tcId).classList.add('dragover');
+}
+
+function dzDragLeave(tcId) {
+  document.getElementById('dz-' + tcId).classList.remove('dragover');
+}
+
+function dzDrop(e, tcId) {
+  e.preventDefault();
+  dzDragLeave(tcId);
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') processFile(file, tcId);
+  else showToast('Solo se aceptan archivos PDF', 'err');
+}
+
+function handleFile(e, tcId) {
+  const file = e.target.files[0];
+  if (file) processFile(file, tcId);
+}
+
+async function processFile(file, tcId) {
+  const statEl = document.getElementById('ustat-' + tcId);
+  statEl.className = 'upload-status show loading';
+  statEl.innerHTML = '⏳ Procesando PDF...';
+
+  try {
+    // parsePDF now returns an ARRAY of extractos (1 per tarjeta found in the PDF)
+    const extractos = await parsePDF(file);
+
+    if (!extractos || extractos.length === 0) {
+      throw new Error('No se encontraron transacciones en el PDF.');
+    }
+
+    const pd = getPeriodData();
+    let totalTx = 0;
+    const titulares = [];
+
+    for (const extracto of extractos) {
+      // Remove existing data for this card number before inserting
+      pd.extractos = pd.extractos.filter(e => e.tarjetaNum !== extracto.tarjetaNum);
+      pd.transacciones = pd.transacciones.filter(t => t.tarjetaNum !== extracto.tarjetaNum);
+      pd.extractos.push(extracto);
+      // Ensure unique IDs before storing (avoid collisions with other periods)
+      const existingIds = new Set(
+        Object.values(allData).flatMap(p => (p.transacciones || []).map(t => t.id))
+      );
+      extracto.transacciones.forEach((t, i) => {
+        if (existingIds.has(t.id)) {
+          t.id = `${t.id}_${activePeriodKey()}_fix${i}`;
+        }
+        existingIds.add(t.id);
+      });
+      pd.transacciones.push(...extracto.transacciones);
+      totalTx += extracto.transacciones.length;
+
+      // Resolve miembro from card number
+      const miembro = getMiembro(extracto.tarjetaNum);
+      const nombre = miembro ? miembro.nombre : (extracto.titular || `****${extracto.tarjetaNum}`);
+      titulares.push(nombre);
+      if (miembro) markUploaded(miembro.id, extracto.transacciones.length);
+    }
+
+    saveAllData();
+    renderExtractosTable();
+    updateBadge();
+
+    const multiMsg = extractos.length > 1
+      ? `✓ PDF con ${extractos.length} tarjetas detectadas: ${titulares.join(' y ')}. ${totalTx} transacciones en total.`
+      : `✓ ${totalTx} transacciones extraídas de ${titulares[0]}`;
+    showToast(multiMsg, 'ok');
+
+  } catch(err) {
+    const statEl = document.getElementById('ustat-' + tcId);
+    statEl.className = 'upload-status show error';
+    statEl.innerHTML = '✗ Error al procesar el PDF: ' + err.message;
+    console.error(err);
+  }
+}
+
+function markUploaded(tcId, count) {
+  const statEl = document.getElementById('ustat-' + tcId);
+  if (statEl) {
+    statEl.className = 'upload-status show ok';
+    statEl.innerHTML = `✓ ${count} transacciones cargadas`;
+  }
+  const ustatus = document.getElementById('ustatus-' + tcId);
+  if (ustatus) ustatus.textContent = '✓ Cargado';
+}
+
+function renderExtractosTable() {
+  const pd = getPeriodData();
+  const tbody = document.getElementById('extractos-body');
+  if (!pd.extractos.length) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="8">Sin extractos cargados en este período</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = pd.extractos.map(ext => {
+    const tc = config.tarjetas.find(t => t.num === ext.tarjetaNum);
+    const pendientes = ext.transacciones.filter(t => t.naturaleza === 'pendiente').length;
+    return `<tr>
+      <td>${ext.titular || ext.tarjetaNum}</td>
+      <td class="mono">****${ext.tarjetaNum}</td>
+      <td>${ext.red}</td>
+      <td class="mono" style="font-size:11px">${ext.periodoDesde} → ${ext.periodoHasta}</td>
+      <td class="mono" style="text-align:right">${fmtCOP(ext.totalCOP)}</td>
+      <td class="mono" style="text-align:right">$${ext.totalUSD.toFixed(2)}</td>
+      <td class="mono" style="text-align:center">${ext.transacciones.length}</td>
+      <td>${pendientes > 0 ? `<span class="tag tag-pendiente">⚠ ${pendientes} pendientes</span>` : '<span class="tag tag-empresarial">✓ Clasificado</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+// Dashboard time filter state
+let dashFilter = 'mes'; // mes | trimestre | semestre | anio | rango
+
+function setDashFilter(filter, btn) {
+  dashFilter = filter;
+  document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('dash-rango-wrap').style.display = filter === 'rango' ? 'flex' : 'none';
+  renderDashboard();
+}
+
+// Get all period keys covered by current filter
+function getDashPeriodKeys() {
+  const y = activePeriod.year;
+  const m = activePeriod.month;
+  if (dashFilter === 'mes') return [periodKey(y, m)];
+  if (dashFilter === 'anio') return Array.from({length: 12}, (_, i) => periodKey(y, i + 1));
+  if (dashFilter === 'trimestre') {
+    const q = Math.ceil(m / 3);
+    const start = (q - 1) * 3 + 1;
+    return [periodKey(y, start), periodKey(y, start+1), periodKey(y, start+2)];
+  }
+  if (dashFilter === 'semestre') {
+    const start = m <= 6 ? 1 : 7;
+    return Array.from({length: 6}, (_, i) => periodKey(y, start + i));
+  }
+  if (dashFilter === 'rango') {
+    const desde = document.getElementById('dash-desde')?.value;
+    const hasta = document.getElementById('dash-hasta')?.value;
+    if (!desde || !hasta) return [periodKey(y, m)];
+    const keys = [];
+    let [dy, dm] = desde.split('-').map(Number);
+    const [hy, hm] = hasta.split('-').map(Number);
+    while (dy < hy || (dy === hy && dm <= hm)) {
+      keys.push(periodKey(dy, dm));
+      dm++; if (dm > 12) { dm = 1; dy++; }
+    }
+    return keys;
+  }
+  return [periodKey(y, m)];
+}
+
+// Get all transactions across filtered periods
+function getDashTxs() {
+  const keys = getDashPeriodKeys();
+  const txs = [];
+  keys.forEach(k => {
+    const pd = allData[k];
+    if (pd) txs.push(...pd.transacciones.filter(t => !t.isAbono));
+  });
+  return txs;
+}
+
+function dashFilterLabel() {
+  if (dashFilter === 'mes') return `${MONTHS_FULL[activePeriod.month - 1]} ${activePeriod.year}`;
+  if (dashFilter === 'trimestre') return `T${Math.ceil(activePeriod.month/3)} ${activePeriod.year}`;
+  if (dashFilter === 'semestre') return `${activePeriod.month <= 6 ? '1er' : '2do'} Semestre ${activePeriod.year}`;
+  if (dashFilter === 'anio') return `Año ${activePeriod.year}`;
+  if (dashFilter === 'rango') {
+    const d = document.getElementById('dash-desde')?.value;
+    const h = document.getElementById('dash-hasta')?.value;
+    return d && h ? `${d} → ${h}` : 'Rango personalizado';
+  }
+  return '';
+}
+
+function renderDashboard() {
+  const txs = getDashTxs();
+
+  document.getElementById('dash-period-sub').textContent = dashFilterLabel();
+
+  // KPIs
+  const total = txs.reduce((s, t) => s + copValue(t), 0);
+  const empresarial = txs.filter(t => t.naturaleza === 'empresarial').reduce((s, t) => s + copValue(t), 0);
+  const personal = txs.filter(t => t.naturaleza === 'personal').reduce((s, t) => s + copValue(t), 0);
+  // Pendientes: only count from active period (not all time) to avoid noise
+  const pendientes = getPeriodData().transacciones.filter(t => t.naturaleza === 'pendiente' && !t.isAbono).length;
+
+  // Show empty state hint if no data for this period
+  const hasData = txs.length > 0;
+  const tickerEl = document.querySelector('.kpi-ticker');
+  if (tickerEl) tickerEl.style.opacity = hasData ? '1' : '0.45';
+
+  document.getElementById('kpi-total').textContent = fmtCOP(total);
+  document.getElementById('kpi-total-sub').textContent = dashFilterLabel();
+  document.getElementById('kpi-empresarial').textContent = fmtCOP(empresarial);
+  document.getElementById('kpi-empresarial-pct').textContent = total > 0 ? `${((empresarial/total)*100).toFixed(1)}% del total` : '—%';
+  document.getElementById('kpi-personal').textContent = fmtCOP(personal);
+  document.getElementById('kpi-pendientes').textContent = pendientes;
+
+  // Per-miembro KPIs — COP | USD | Equiv
+  const cardWrap = document.getElementById('tarjeta-cards');
+  cardWrap.innerHTML = getMiembrosList().map(m => {
+    const nums = getNums(m);
+    // Only count actual spending — exclude financial charges (GMF, cuota de manejo, intereses)
+    const mTxs = txs.filter(t => nums.includes(t.tarjetaNum) && !t.isAbono && t.naturaleza !== 'financiero');
+    const mCOP = mTxs.filter(t => t.moneda === 'COP').reduce((s, t) => s + t.cargoMes, 0);
+    const mUSD = mTxs.filter(t => t.moneda === 'USD').reduce((s, t) => s + t.cargoMes, 0);
+    const mUSDenCOP = mTxs.filter(t => t.moneda === 'USD').reduce((s, t) => s + copValue(t), 0);
+    const mTotal = mCOP + mUSDenCOP;
+    const activaNum = getActivaNum(m, activePeriodKey());
+    const activaTc = m.tarjetas.find(t => t.num === activaNum) || m.tarjetas[0];
+    const hasUSD = mUSD > 0;
+    const hasAny = mCOP > 0 || mUSD > 0;
+    return `<div class="card" style="padding:18px 20px;cursor:pointer;transition:border-color .2s" onclick="openMiembroDetalle('${m.id}')" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:28px;height:28px;border-radius:50%;overflow:hidden;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surface3);font-size:11px;font-weight:700;color:var(--text2)">
+            ${m.avatar ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover">` : m.nombre.split(' ').map(p=>p[0]).slice(0,2).join('')}
+          </div>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">${m.nombre.split(' ')[0]} ****${activaNum}${activaTc?.cupo ? ' · cupo ' + fmtCOPShort(activaTc.cupo) : ''}</span>
+        </div>
+        <span class="chip chip-cargo">${m.tipo}</span>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:3px">Pesos</div>
+          <div style="font-family:var(--font-display);font-size:${mCOP > 0 ? '18px' : '14px'};font-weight:700;color:${mCOP > 0 ? 'var(--text)' : 'var(--text3)'}">
+            ${mCOP > 0 ? fmtCOP(mCOP) : '—'}
+          </div>
+        </div>
+        ${hasUSD ? `
+        <div style="padding-left:14px;border-left:1px solid var(--border)">
+          <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:3px">Dólares</div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--accent)">
+            $${mUSD.toFixed(2)}
+          </div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-top:2px">
+            ≈ ${fmtCOP(mUSDenCOP)}
+          </div>
+        </div>` : ''}
+        ${hasAny ? `
+        <div style="padding-left:14px;border-left:1px solid var(--border);margin-left:auto">
+          <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:3px">Total</div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:#22c55e;text-shadow:0 0 20px rgba(34,197,94,.35)">
+            ${fmtCOP(mTotal)}
+          </div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-top:2px">
+            pesos + equiv
+          </div>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Charts
+  renderChartHistorico();
+  renderChartCategorias();
+
+  // USD KPI
+  const totalUSD = txs.filter(t => t.moneda === 'USD' && t.naturaleza !== 'financiero').reduce((s, t) => s + t.cargoMes, 0);
+  const totalUSDcop = txs.filter(t => t.moneda === 'USD' && t.naturaleza !== 'financiero').reduce((s, t) => s + copValue(t), 0);
+  document.getElementById('kpi-usd').textContent = '$' + totalUSD.toFixed(2);
+  document.getElementById('kpi-usd-cop').textContent = '≈ ' + fmtCOP(totalUSDcop);
+
+  // Alert
+  const alertWrap = document.getElementById('alert-pendientes-wrap');
+  if (pendientes > 0) {
+    alertWrap.innerHTML = `<div class="alert alert-warn">⚠️ <div><strong>${pendientes} transacción(es) requieren clasificación manual.</strong> Ve a la sección Transacciones y revísalas. <button class="btn btn-ghost btn-sm" style="margin-left:12px" onclick="navigate('transacciones')">Ir a clasificar →</button></div></div>`;
+  } else {
+    alertWrap.innerHTML = '';
+  }
+
+  // Last transactions
+  const recent = [...txs].sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha)).slice(0, 10);
+  const tbody = document.getElementById('dash-tx-body');
+  if (!recent.length) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="7">Carga extractos para ver las transacciones</td></tr>';
+  } else {
+    tbody.innerHTML = recent.map(t => txRow(t, false)).join('');
+  }
+
+  updateBadge();
+}
+
+// ============================================================
+// TRANSACCIONES
+// ============================================================
+function renderTransacciones() {
+  const pd = getPeriodData();
+  let txs = pd.transacciones.filter(t => !t.isAbono);
+
+  // Populate filter — one option per miembro (matches all their nums)
+  const filterTarjeta = document.getElementById('filter-tarjeta');
+  // Save current selection BEFORE resetting, then restore it after
+  const savedVal = filterTarjeta.value;
+  while (filterTarjeta.options.length > 1) filterTarjeta.remove(1);
+  getMiembrosList().forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = getNums(m).join('|');
+    opt.textContent = m.nombre.split(' ')[0];
+    filterTarjeta.appendChild(opt);
+  });
+  // Restore previously selected value if it still exists
+  if (savedVal) filterTarjeta.value = savedVal;
+
+  // Apply filters
+  const fTarjeta = filterTarjeta.value;
+  const fNat = document.getElementById('filter-naturaleza').value;
+  const fMoneda = document.getElementById('filter-moneda').value;
+  const fBuscar = document.getElementById('filter-buscar').value.toLowerCase();
+
+  if (fTarjeta) { const nums = fTarjeta.split('|'); txs = txs.filter(t => nums.includes(t.tarjetaNum)); }
+  if (fNat) txs = txs.filter(t => t.naturaleza === fNat);
+  if (fMoneda) txs = txs.filter(t => t.moneda === fMoneda);
+  if (fBuscar) txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
+
+  txs.sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
+
+  // Calculate filtered totals
+  const filteredCOP = txs.filter(t => !t.isAbono && t.naturaleza !== 'financiero' && t.moneda === 'COP').reduce((s, t) => s + t.cargoMes, 0);
+  const filteredUSD = txs.filter(t => !t.isAbono && t.naturaleza !== 'financiero' && t.moneda === 'USD').reduce((s, t) => s + t.cargoMes, 0);
+  const filteredEquiv = txs.filter(t => !t.isAbono && t.naturaleza !== 'financiero').reduce((s, t) => s + copValue(t), 0);
+  const totalCount = txs.filter(t => !t.isAbono).length;
+
+  document.getElementById('tx-count').textContent = `${txs.length} transacciones`;
+  // Update totals bar
+  let totalsBar = document.getElementById('tx-totals-bar');
+  if (!totalsBar) {
+    totalsBar = document.createElement('div');
+    totalsBar.id = 'tx-totals-bar';
+    totalsBar.style.cssText = 'display:flex;gap:24px;align-items:center;padding:10px 16px;background:var(--surface2);border-top:1px solid var(--border);flex-wrap:wrap';
+    document.querySelector('#tx-body').closest('.table-wrap').appendChild(totalsBar);
+  }
+  totalsBar.innerHTML = `
+    <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Totales filtrados</span>
+    <span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">COP: <strong style="color:var(--text)">${fmtCOP(filteredCOP)}</strong></span>
+    ${filteredUSD > 0 ? `<span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">USD: <strong style="color:var(--teal)">$${filteredUSD.toFixed(2)}</strong></span>` : ''}
+    <span style="font-family:var(--font-mono);font-size:12px;color:var(--text2)">Equiv. COP: <strong style="color:var(--green)">${fmtCOP(filteredEquiv)}</strong></span>
+    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-left:auto">${totalCount} movimientos</span>
+  `;
+
+  const tbody = document.getElementById('tx-body');
+  if (!txs.length) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="9">No hay transacciones con los filtros aplicados</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = txs.map(t => txRow(t, true)).join('');
+  // Use event delegation to handle edit buttons (avoids ID quoting issues)
+  tbody.querySelectorAll('.tx-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.getAttribute('data-txid')));
+  });
+}
+
+function txRow(t, withAction) {
+  const miembro = getMiembro(t.tarjetaNum);
+  const cuotasText = t.cuotaTotal > 1 ? `<span class="cuotas-badge">${t.cuotaActual}/${t.cuotaTotal}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>';
+  const monedaTag = t.moneda === 'USD' ? `<span class="tag" style="background:rgba(20,184,166,.1);color:var(--teal);border-color:rgba(20,184,166,.2)">USD</span>` : `<span class="tag" style="background:rgba(255,255,255,.04);color:var(--text3);border-color:var(--border)">COP</span>`;
+  const natTag = natBadge(t.naturaleza);
+
+  let amountDisplay = '';
+  if (t.moneda === 'USD') {
+    amountDisplay = `<div class="tx-amount-usd">$${t.valorOriginal.toFixed(2)} USD</div>`;
+  } else {
+    amountDisplay = `<div class="tx-amount-cop">${fmtCOP(t.valorOriginal)}</div>`;
+  }
+
+  const actionCol = withAction ? `<td>
+    <button class="btn btn-ghost btn-sm tx-edit-btn" data-txid="${t.id.replace(/'/g, '&#39;')}">
+      ${t.naturaleza === 'pendiente' ? '⚠ Clasificar' : '✎ Editar'}
+    </button>
+  </td>` : '';
+
+  const cols = withAction ? 9 : 7;
+
+  // Subcategoría badge
+  const subcatTag = t.subcategoria
+    ? `<span style="font-family:var(--font-mono);font-size:10px;background:var(--surface3);color:var(--text2);border:1px solid var(--border);padding:2px 8px;border-radius:5px">${t.subcategoria}</span>`
+    : `<span style="color:var(--text3);font-size:11px">—</span>`;
+
+  // Comentario
+  const comentarioCell = t.comentario
+    ? `<span style="font-size:11px;color:var(--text2);max-width:160px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.comentario}">💬 ${t.comentario}</span>`
+    : `<span style="color:var(--text3);font-size:11px">—</span>`;
+
+  return `<tr>
+    <td class="mono" style="font-size:12px">${t.fecha}</td>
+    <td style="font-size:12px">${t.titular || t.tarjetaNum}</td>
+    <td style="max-width:200px;font-size:12px">${t.descripcion}</td>
+    <td>${monedaTag}</td>
+    <td style="text-align:right">${amountDisplay}</td>
+    ${withAction ? `<td style="text-align:right" class="mono">${
+      t.moneda === 'USD'
+        ? `<span title="$${t.cargoMes.toFixed(2)} USD × TRM ${getTRM(txPeriodoKey(t)).toLocaleString('es-CO')}">${fmtCOP(copValue(t))}</span>`
+        : fmtCOP(t.cargoMes)
+    }</td>` : ''}
+    <td>${cuotasText}</td>
+    <td>${natTag}</td>
+    ${withAction ? `<td>${subcatTag}</td>` : ''}
+    ${withAction ? `<td>${comentarioCell}</td>` : ''}
+    ${actionCol}
+  </tr>`;
+}
+
+function natBadge(nat) {
+  const map = {
+    empresarial: ['tag-empresarial', '🏢 Empresarial'],
+    personal: ['tag-personal', '👤 Beneficio Socio'],
+    financiero: ['tag-financiero', '🏦 Financiero'],
+    pendiente: ['tag-pendiente', '⚠ Pendiente']
+  };
+  const [cls, label] = map[nat] || ['', nat];
+  return `<span class="tag ${cls}">${label}</span>`;
+}
+
+// ============================================================
+// CLASSIFY MODAL
+// ============================================================
+function openModal(txId) {
+  if (!guardAdmin()) return;
+  // Search across ALL periods (for detalle histórico view)
+  let tx = null;
+  Object.values(allData).forEach(pd => {
+    if (!tx) tx = pd.transacciones?.find(t => t.id === txId);
+  });
+  if (!tx) return;
+
+  modalTxId = txId;
+
+  document.getElementById('modal-desc').textContent = tx.descripcion;
+  document.getElementById('modal-fecha').textContent = tx.fecha;
+  document.getElementById('modal-monto').textContent = tx.moneda === 'USD'
+    ? `$${tx.valorOriginal.toFixed(2)} USD`
+    : fmtCOP(tx.valorOriginal);
+  document.getElementById('modal-titular').textContent = tx.titular;
+
+  // Clasificación
+  ['empresarial','personal','financiero'].forEach(n => {
+    const el = document.getElementById('opt-' + n);
+    el.classList.remove('selected');
+    el.querySelector('input').checked = false;
+  });
+  const current = tx.naturaleza !== 'pendiente' ? tx.naturaleza : '';
+  if (current) {
+    const el = document.getElementById('opt-' + current);
+    if (el) { el.classList.add('selected'); el.querySelector('input').checked = true; }
+  }
+
+  // Subcategoría
+  updateSubcatOptions(tx.naturaleza, tx.subcategoria || '');
+
+  // Comentario
+  document.getElementById('modal-comentario').value = tx.comentario || '';
+
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function updateSubcatOptions(naturaleza, selected) {
+  const wrap = document.getElementById('modal-subcat-wrap');
+  const sel = document.getElementById('modal-subcat');
+  if (!wrap || !sel) return;
+  const cat = (config.categorias || []).find(c => c.naturaleza === naturaleza);
+  const subs = cat?.subcategorias || [];
+  // Always show the field — hide only if truly no subcats available
+  wrap.style.display = subs.length > 0 ? 'block' : 'none';
+  sel.innerHTML = '<option value="">Sin subcategoría</option>' +
+    subs.map(s => `<option value="${s}" ${s === selected ? 'selected' : ''}>${s}</option>`).join('');
+  if (selected) sel.value = selected;
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+  modalTxId = null;
+}
+
+function deleteTransaction(txId) {
+  if (!txId) return;
+  // Find tx to show its description
+  let txDesc = txId;
+  Object.values(allData).forEach(pd => {
+    const t = pd.transacciones?.find(t => t.id === txId);
+    if (t) txDesc = t.descripcion;
+  });
+  if (!confirm(`¿Eliminar la transacción "${txDesc}"?\n\nEsta acción no se puede deshacer.`)) return;
+  if (!confirm('¿Confirmas que deseas eliminar esta transacción definitivamente?')) return;
+
+  let deleted = false;
+  Object.values(allData).forEach(pd => {
+    const before = pd.transacciones?.length || 0;
+    pd.transacciones = pd.transacciones?.filter(t => t.id !== txId) || [];
+    if (pd.transacciones.length < before) deleted = true;
+  });
+
+  if (deleted) {
+    saveAllData();
+    closeModal();
+    updateBadge();
+    renderActivePage();
+    showToast('Transacción eliminada', 'info');
+  }
+}
+
+function selectNat(input) {
+  ['empresarial','personal','financiero'].forEach(n => {
+    document.getElementById('opt-' + n).classList.remove('selected');
+  });
+  document.getElementById('opt-' + input.value).classList.add('selected');
+  updateSubcatOptions(input.value, '');
+}
+
+function saveClassification() {
+  const selected = document.querySelector('input[name="nat"]:checked');
+  if (!selected) { showToast('Selecciona una clasificación', 'err'); return; }
+
+  const newNat = selected.value;
+
+  // Find tx across all periods — search by id in allData directly
+  let foundPd = null;
+  let foundIdx = -1;
+  Object.values(allData).forEach(pd => {
+    if (foundIdx >= 0) return;
+    const idx = pd.transacciones?.findIndex(t => t.id === modalTxId);
+    if (idx >= 0) { foundPd = pd; foundIdx = idx; }
+  });
+
+  if (foundPd && foundIdx >= 0) {
+    // Mutate directly in the array (no copy)
+    foundPd.transacciones[foundIdx].naturaleza = newNat;
+    foundPd.transacciones[foundIdx].clasificadoManual = true;
+    foundPd.transacciones[foundIdx].subcategoria = document.getElementById('modal-subcat').value || '';
+    foundPd.transacciones[foundIdx].comentario = document.getElementById('modal-comentario').value.trim();
+
+    try {
+      saveAllData();
+    } catch(e) {
+      if (e.name !== 'QuotaExceededError') {
+        showToast('Error al guardar: ' + e.message, 'err');
+        return;
+      }
+      // QuotaExceeded: still saved in memory, just warn
+      showToast('⚠ Guardado en memoria (almacenamiento lleno). Descarga backup.', 'err');
+    }
+
+    closeModal();
+    updateBadge();
+    // Reset filter if it was showing only pendientes
+    const natFilter = document.getElementById('filter-naturaleza');
+    if (natFilter && natFilter.value === 'pendiente') natFilter.value = '';
+    const detalleNatFilter = document.getElementById('detalle-filter-nat');
+    if (detalleNatFilter && detalleNatFilter.value === 'pendiente') detalleNatFilter.value = '';
+    renderActivePage();
+    showToast(`Clasificado como: ${newNat}`, 'ok');
+  } else {
+    showToast('No se encontró la transacción (id: ' + modalTxId + ')', 'err');
+  }
+}
+
+// ============================================================
+// SOCIOS
+// ============================================================
+function renderSocios() {
+  // "Socios" = anyone whose cargo is not managerial (gerencia/gerente/gerencial)
+  const esGerencia = t => /gerenc/i.test(t.tipo);
+  const socios = getMiembrosList().filter(m => !esGerencia(m));
+  document.getElementById('year-label').textContent = activePeriod.year;
+
+  const cardWrap = document.getElementById('socio-cards-wrap');
+  cardWrap.innerHTML = socios.map(m => {
+    const { acumulado, excedente, saldoFavor } = calcBeneficioMiembro(m, activePeriod.year);
+    const tope = config.params.topePersonal * 12;
+    const pct = Math.min((acumulado / tope) * 100, 100);
+    const color = pct > 100 ? 'red' : pct > 80 ? 'yellow' : 'green';
+    const numsLabel = m.tarjetas.map(t => `****${t.num}`).join(', ');
+
+    return `<div class="socio-card">
+      <div class="socio-name">${m.nombre}</div>
+      <div class="socio-tc">${numsLabel} · ${m.tipo}</div>
+      <div class="socio-stat">
+        <div class="socio-stat-label">Acumulado personal ${activePeriod.year}</div>
+        <div class="socio-stat-value" style="color:var(--${color})">${fmtCOP(acumulado)}</div>
+      </div>
+      <div class="socio-stat">
+        <div class="socio-stat-label">Tope anual</div>
+        <div class="socio-stat-value">${fmtCOP(tope)}</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:${pct}%;background:var(--${color})"></div>
+        </div>
+        <div class="progress-info">
+          <span>${pct.toFixed(1)}% del tope</span>
+          <span>${excedente > 0 ? '⚠ Excedente: ' + fmtCOP(excedente) : saldoFavor > 0 ? '✓ Disponible: ' + fmtCOP(saldoFavor) : 'Tope alcanzado'}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Historical table — sum ALL tarjetas of the miembro per month
+  const tbody = document.getElementById('socios-hist-body');
+  tbody.innerHTML = socios.map(m => {
+    const nums = getNums(m);
+    const topeM = config.params.topePersonal;
+    const months = Array.from({length: 12}, (_, i) => {
+      const key = periodKey(activePeriod.year, i + 1);
+      const pd = allData[key];
+      if (!pd) return 0;
+      const txs = pd.transacciones.filter(t => nums.includes(t.tarjetaNum) && t.naturaleza === 'personal' && !t.isAbono);
+      return txs.reduce((s, t) => s + copValue(t), 0);
+    });
+
+    const total = months.reduce((s, v) => s + v, 0);
+    const tope = config.params.topePersonal * 12;
+    const excedente = total - tope;
+
+    // Month cell color: red if > tope mensual, yellow if > 80%, normal if OK
+    function monthCellStyle(v) {
+      if (v <= 0) return 'color:var(--text3)';
+      if (v > topeM) return 'color:var(--red);font-weight:600;background:rgba(239,68,68,.08)';
+      if (v > topeM * 0.8) return 'color:var(--yellow);font-weight:500';
+      return 'color:var(--text)';
+    }
+
+    return `<tr>
+      <td style="font-weight:600;font-size:13px">${m.nombre.split(' ')[0]}</td>
+      ${months.map(v => `<td class="mono" style="font-size:11px;text-align:right;padding:6px 10px;${monthCellStyle(v)}">${v > 0 ? fmtCOPShort(v) : '—'}</td>`).join('')}
+      <td class="mono" style="text-align:right;font-weight:600">${fmtCOP(total)}</td>
+      <td class="mono" style="text-align:right;color:var(--text3)">${fmtCOP(tope)}</td>
+      <td>${excedente > 0
+        ? `<span class="tag tag-pendiente">Excede ${fmtCOPShort(excedente)}</span>`
+        : `<span class="tag tag-empresarial">✓ OK</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Sums personal spending across ALL tarjetas of a miembro for a year
+function calcBeneficioMiembro(miembro, year) {
+  const nums = getNums(miembro);
+  let acumulado = 0;
+  for (let m = 1; m <= 12; m++) {
+    const key = periodKey(year, m);
+    const pd = allData[key];
+    if (!pd) continue;
+    const txs = pd.transacciones.filter(t => nums.includes(t.tarjetaNum) && t.naturaleza === 'personal' && !t.isAbono);
+    acumulado += txs.reduce((s, t) => s + copValue(t), 0);
+  }
+  const tope = config.params.topePersonal * 12;
+  return {
+    acumulado,
+    excedente: Math.max(0, acumulado - tope),
+    saldoFavor: Math.max(0, tope - acumulado)
+  };
+}
+
+// ============================================================
+// CUOTAS
+// ============================================================
+function renderCuotas() {
+  const pd = getPeriodData();
+  const txs = pd.transacciones.filter(t => !t.isAbono && t.cuotaTotal > 1);
+
+  const totalDiferido = txs.reduce((s, t) => s + copValue({ ...t, cargoMes: t.saldoDiferir }), 0);
+  const promedio = txs.length > 0 ? txs.reduce((s, t) => s + copValue(t), 0) / txs.length : 0;
+
+  document.getElementById('cuotas-total-diferido').textContent = fmtCOP(totalDiferido);
+  document.getElementById('cuotas-activas').textContent = txs.length;
+  document.getElementById('cuotas-promedio').textContent = fmtCOP(promedio);
+
+  const tbody = document.getElementById('cuotas-body');
+  if (!txs.length) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="9">No hay compras diferidas en el período activo</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = txs.sort((a, b) => b.saldoDiferir - a.saldoDiferir).map(t => {
+    const monedaTag = t.moneda === 'USD'
+      ? `<span class="tag" style="background:rgba(20,184,166,.1);color:var(--teal);border-color:rgba(20,184,166,.2)">USD</span>`
+      : `<span class="tag" style="background:rgba(255,255,255,.04);color:var(--text3);border-color:var(--border)">COP</span>`;
+
+    return `<tr>
+      <td class="mono" style="font-size:12px">${t.fecha}</td>
+      <td style="font-size:12px">${t.titular}</td>
+      <td style="max-width:200px;font-size:12px">${t.descripcion}</td>
+      <td>${monedaTag}</td>
+      <td class="mono" style="text-align:right">${t.moneda === 'USD' ? '$' + t.valorOriginal.toFixed(2) : fmtCOP(t.valorOriginal)}</td>
+      <td><span class="cuotas-badge">${t.cuotaActual}/${t.cuotaTotal}</span></td>
+      <td class="mono" style="text-align:right">${fmtCOP(t.cargoMes)}</td>
+      <td class="mono" style="text-align:right;color:var(--yellow)">${t.moneda === 'USD' ? '$' + t.saldoDiferir.toFixed(2) : fmtCOP(t.saldoDiferir)}</td>
+      <td>${natBadge(t.naturaleza)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// CONFIG PAGE
+// ============================================================
+function renderConfig() {
+  const wrap = document.getElementById('tarjetas-config');
+  wrap.innerHTML = getMiembrosList().map(m => `
+    <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px;border-bottom:1px solid var(--border);padding-bottom:20px">
+      <div style="display:flex;width:100%;justify-content:space-between;align-items:flex-start;gap:16px">
+        <!-- Avatar -->
+        <div style="display:flex;align-items:center;gap:14px;flex:1">
+          <div class="avatar-wrap" id="avatar-${m.id}" onclick="triggerAvatarUpload('${m.id}')"
+            title="Cambiar foto" style="width:48px;height:48px;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surface3);font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text2)">
+            ${m.avatar ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover">` : m.nombre.split(' ').map(p=>p[0]).slice(0,2).join('')}
+          </div>
+          <input type="file" id="avatar-input-${m.id}" accept="image/*" style="display:none" onchange="handleAvatarUpload(event,'${m.id}')">
+          <div style="flex:1">
+            <input class="settings-input" style="width:100%;margin-bottom:6px;text-align:left" value="${m.nombre}"
+              onchange="updateMiembroField('${m.id}','nombre',this.value)" placeholder="Nombre completo">
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="settings-input" style="width:180px;text-align:left" 
+                placeholder="Cargo (ej: Socio, Gerente...)" value="${m.tipo}"
+                onchange="updateMiembroField('${m.id}','tipo',this.value)">
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${m.id}</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="addTarjetaToMiembro('${m.id}')">+ Tarjeta</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMiembro('${m.id}')">Eliminar</button>
+        </div>
+      </div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:8px" id="tc-list-${m.id}">
+        ${m.tarjetas.map((t, i) => `
+          <div style="display:flex;gap:8px;align-items:center;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);width:20px">${i+1}.</span>
+            <input class="settings-input" style="width:110px" placeholder="4 dígitos" value="${t.num}"
+              onchange="updateMiembroTarjeta('${m.id}',${i},'num',this.value)">
+            <select class="filter-select" onchange="updateMiembroTarjeta('${m.id}',${i},'red',this.value)">
+              <option value="Amex" ${t.red==='Amex'?'selected':''}>Amex</option>
+              <option value="MasterCard" ${t.red==='MasterCard'?'selected':''}>MasterCard</option>
+              <option value="Visa" ${t.red==='Visa'?'selected':''}>Visa</option>
+            </select>
+            <input class="settings-input" style="width:100px" placeholder="Desde (YYYY-MM)" value="${t.desde||''}"
+              title="Período desde (dejar vacío = siempre)"
+              onchange="updateMiembroTarjeta('${m.id}',${i},'desde',this.value||null)">
+            <input class="settings-input" style="width:100px" placeholder="Hasta (YYYY-MM)" value="${t.hasta||''}"
+              title="Período hasta (dejar vacío = activa)"
+              onchange="updateMiembroTarjeta('${m.id}',${i},'hasta',this.value||null)">
+            <div style="display:flex;align-items:center;gap:5px">
+              <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);white-space:nowrap">Cupo $</span>
+              <input class="settings-input" style="width:120px" type="number" placeholder="0"
+                value="${t.cupo||''}" title="Cupo total de la tarjeta en COP"
+                onchange="updateMiembroTarjeta('${m.id}',${i},'cupo',parseInt(this.value)||0)">
+            </div>
+            ${m.tarjetas.length > 1 ? `<button class="btn btn-danger btn-sm" onclick="removeTarjetaMiembro('${m.id}',${i})">✕</button>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('rules-empresarial').value = config.rules.empresarial;
+  document.getElementById('rules-personal').value = config.rules.personal;
+  document.getElementById('rules-financiero').value = config.rules.financiero;
+  document.getElementById('param-tope').value = config.params.topePersonal;
+  document.getElementById('param-trm').value = config.params.trm || 4200;
+  const pinEl = document.getElementById('param-pin');
+  if (pinEl) pinEl.value = config.params.pinAdmin || '';
+  renderTRMPeriodos();
+
+  renderStoredPeriods();
+  renderCategoriasConfig();
+}
+
+function updateMiembroTarjeta(miembroId, tcIdx, field, value) {
+  const m = config.miembros.find(x => x.id === miembroId);
+  if (m && m.tarjetas[tcIdx] !== undefined) m.tarjetas[tcIdx][field] = value;
+}
+
+function renderTRMPeriodos() {
+  const wrap = document.getElementById('trm-periodos-wrap');
+  if (!wrap) return;
+  const trmMap = config.params.trmPorPeriodo || {};
+  const entries = Object.entries(trmMap).sort();
+  if (entries.length === 0) {
+    wrap.innerHTML = '<span style="font-size:12px;color:var(--text3)">Sin períodos configurados. Haz clic en "+ Agregar TRM".</span>';
+    return;
+  }
+  wrap.innerHTML = entries.map(([per, val]) => `
+    <div class="trm-periodo-row" style="display:flex;gap:8px;align-items:center">
+      <input type="month" class="settings-input trm-per-input" style="width:140px;text-align:left"
+        value="${per}"
+        onchange="renameTRMPeriodo('${per}', this.value)">
+      <span style="font-size:12px;color:var(--text3)">→</span>
+      <input class="settings-input trm-val-input" style="width:120px" type="number" placeholder="TRM"
+        value="${val}"
+        oninput="updateTRMValue('${per}', this.value)"
+        onchange="updateTRMValue('${per}', this.value)">
+      <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">COP</span>
+      <button class="btn btn-danger btn-sm" onclick="removeTRMPeriodo('${per}')">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateTRMValue(per, val) {
+  const v = parseInt(val);
+  if (v > 0) {
+    if (!config.params.trmPorPeriodo) config.params.trmPorPeriodo = {};
+    config.params.trmPorPeriodo[per] = v;
+    // Auto-save silently so it persists immediately
+    saveConfigData();
+  }
+}
+
+function renameTRMPeriodo(oldPer, newPer) {
+  if (!newPer || newPer === oldPer) return;
+  const val = config.params.trmPorPeriodo[oldPer];
+  delete config.params.trmPorPeriodo[oldPer];
+  config.params.trmPorPeriodo[newPer] = val;
+  saveConfigData();
+  renderTRMPeriodos();
+}
+
+function addTRMPeriodo() {
+  if (!config.params.trmPorPeriodo) config.params.trmPorPeriodo = {};
+  // Find the next month not already in the map
+  // Start from current active period and find first gap
+  let y = activePeriod.year, m = activePeriod.month;
+  let attempts = 0;
+  while (attempts < 24) {
+    const key = periodKey(y, m);
+    if (!config.params.trmPorPeriodo[key]) {
+      config.params.trmPorPeriodo[key] = config.params.trm || 4200;
+      break;
+    }
+    m++;
+    if (m > 12) { m = 1; y++; }
+    attempts++;
+  }
+  renderTRMPeriodos();
+}
+
+function removeTRMPeriodo(per) {
+  if (config.params.trmPorPeriodo) delete config.params.trmPorPeriodo[per];
+  saveConfigData();
+  renderTRMPeriodos();
+}
+
+function updateMiembroField(miembroId, field, value) {
+  const m = config.miembros.find(x => x.id === miembroId);
+  if (m) m[field] = value;
+}
+
+function addMiembro() {
+  const id = 'm' + Date.now();
+  config.miembros.push({
+    id, nombre: 'Nuevo Miembro', tipo: 'Socio', avatar: null,
+    tarjetas: [{ num: '????', red: 'Amex', desde: null, hasta: null }]
+  });
+  renderConfig();
+  showToast('Miembro agregado. Edita sus datos y guarda.', 'info');
+}
+
+function deleteMiembro(miembroId) {
+  const m = config.miembros.find(x => x.id === miembroId);
+  if (!m) return;
+  if (!confirm(`¿Eliminar a ${m.nombre}? Sus transacciones históricas se conservan pero ya no aparecerá en los reportes.`)) return;
+  config.miembros = config.miembros.filter(x => x.id !== miembroId);
+  renderConfig();
+  showToast('Miembro eliminado', 'info');
+}
+
+function triggerAvatarUpload(miembroId) {
+  document.getElementById('avatar-input-' + miembroId).click();
+}
+
+function handleAvatarUpload(e, miembroId) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const m = config.miembros.find(x => x.id === miembroId);
+    if (m) {
+      m.avatar = ev.target.result;
+      renderConfig();
+      showToast('Avatar actualizado. Recuerda guardar.', 'ok');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function addTarjetaToMiembro(miembroId) {
+  const m = config.miembros.find(x => x.id === miembroId);
+  if (!m) return;
+  m.tarjetas.push({ num: '????', red: 'Amex', desde: null, hasta: null, cupo: 0 });
+  renderConfig();
+}
+
+function removeTarjetaMiembro(miembroId, idx) {
+  const m = config.miembros.find(x => x.id === miembroId);
+  if (!m || m.tarjetas.length <= 1) return;
+  m.tarjetas.splice(idx, 1);
+  renderConfig();
+}
+
+function saveConfig() {
+  config.rules.empresarial = document.getElementById('rules-empresarial').value;
+  config.rules.personal = document.getElementById('rules-personal').value;
+  config.rules.financiero = document.getElementById('rules-financiero').value;
+  config.params.topePersonal = parseInt(document.getElementById('param-tope').value) || 1500000;
+  config.params.trm = parseInt(document.getElementById('param-trm').value) || 4200;
+  const pinVal = document.getElementById('param-pin')?.value || '';
+  config.params.pinAdmin = pinVal;
+  // Read TRM por período from UI rows
+  const newTRM = {};
+  document.querySelectorAll('.trm-periodo-row').forEach(row => {
+    const per = row.querySelector('.trm-per-input').value.trim();
+    const val = parseInt(row.querySelector('.trm-val-input').value);
+    if (per && val > 0) newTRM[per] = val;
+  });
+  config.params.trmPorPeriodo = newTRM;
+  // Save category edits inline (already mutating config.categorias directly)
+  saveConfigData();
+  showToast('Configuración guardada', 'ok');
+}
+
+function renderStoredPeriods() {
+  const stored = Object.keys(allData)
+    .filter(k => allData[k].transacciones && allData[k].transacciones.length > 0)
+    .sort();
+
+  const countEl = document.getElementById('stored-periods-count');
+  if (countEl) countEl.textContent = stored.length
+    ? `${stored.length} período(s) con datos`
+    : 'Sin datos almacenados';
+
+  const listEl = document.getElementById('stored-periods-list');
+  if (!listEl) return;
+
+  if (!stored.length) {
+    listEl.innerHTML = `<div style="padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--text3)">Sin períodos guardados.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = stored.map(key => {
+    const [y, m] = key.split('-');
+    const label = `${MONTHS_FULL[parseInt(m)-1]} ${y}`;
+    const pd = allData[key];
+    const txCount = pd.transacciones?.length || 0;
+    const extCount = pd.extractos?.length || 0;
+    return `
+    <div style="display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--border);gap:14px">
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--font-display);font-size:13px;font-weight:600">${label}</div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text2);margin-top:2px">
+          ${txCount} transacciones · ${extCount} extracto(s)
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">Mover a:</span>
+        <input type="month" value="${key}"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                 color:var(--text);padding:4px 8px;font-size:11px;font-family:var(--font-mono);
+                 outline:none;cursor:pointer"
+          onchange="movePeriod('${key}', this.value, this)">
+        <button class="btn btn-danger btn-sm" onclick="deletePeriod('${key}')">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deletePeriod(key) {
+  const [y, m] = key.split('-');
+  const label = `${MONTHS_FULL[parseInt(m)-1]} ${y}`;
+  if (!confirm(`¿Eliminar todos los datos de ${label}? Esta acción no se puede deshacer.`)) return;
+  delete allData[key];
+  saveAllData();
+  renderStoredPeriods();
+  renderCategoriasConfig();
+  showToast(`Período ${label} eliminado`, 'info');
+}
+
+function movePeriod(oldKey, newKey, inputEl) {
+  if (!newKey || newKey === oldKey) return;
+  // Convert month input value (YYYY-MM) to period key format
+  const targetKey = newKey; // already YYYY-MM format
+
+  const [oy, om] = oldKey.split('-');
+  const [ny, nm] = targetKey.split('-');
+  const oldLabel = `${MONTHS_FULL[parseInt(om)-1]} ${oy}`;
+  const newLabel = `${MONTHS_FULL[parseInt(nm)-1]} ${ny}`;
+
+  if (allData[targetKey] && (allData[targetKey].transacciones?.length > 0)) {
+    if (!confirm(`Ya existe datos en ${newLabel}. ¿Fusionar ambos períodos? Las transacciones se combinarán.`)) {
+      inputEl.value = oldKey; // revert
+      return;
+    }
+    // Merge: combine extractos and transacciones
+    allData[targetKey].extractos = [...(allData[targetKey].extractos || []), ...(allData[oldKey].extractos || [])];
+    allData[targetKey].transacciones = [...(allData[targetKey].transacciones || []), ...(allData[oldKey].transacciones || [])];
+  } else {
+    // Move cleanly
+    allData[targetKey] = { ...allData[oldKey] };
+  }
+
+  delete allData[oldKey];
+  saveAllData();
+  renderStoredPeriods();
+  renderCategoriasConfig();
+  showToast(`Datos movidos de ${oldLabel} → ${newLabel}`, 'ok');
+}
+
+function backupData() {
+  // Sync TRM inputs from DOM before saving
+  document.querySelectorAll('.trm-periodo-row').forEach(row => {
+    const per = row.querySelector('.trm-per-input')?.value.trim();
+    const val = parseInt(row.querySelector('.trm-val-input')?.value);
+    if (per && val > 0) {
+      if (!config.params.trmPorPeriodo) config.params.trmPorPeriodo = {};
+      config.params.trmPorPeriodo[per] = val;
+    }
+  });
+  // NO llamar saveConfigData/saveAllData aquí — pueden fallar por QuotaExceeded
+  // Serializar directo desde memoria sin pasar por localStorage
+  try {
+    const backup = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      config: config,
+      data: allData
+    };
+
+    const json = JSON.stringify(backup, null, 2);
+    const sizeMB = (json.length / 1024 / 1024).toFixed(1);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const filename = `tc-monitor-backup-${new Date().toISOString().slice(0,10)}.json`;
+
+    // Must append to document for Firefox/Safari compatibility
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    // Small delay before cleanup to ensure download triggers
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+
+    showToast(`✓ Backup descargado (${sizeMB} MB · ${Object.keys(allData).length} períodos)`, 'ok');
+
+  } catch(e) {
+    console.error('Backup error:', e);
+    // Fallback: try saving only data without avatars if too large
+    try {
+      const configSinAvatares = {
+        ...config,
+        miembros: config.miembros.map(m => ({ ...m, avatar: m.avatar ? '[avatar_omitido]' : null }))
+      };
+      const fallback = { version: 1, exportedAt: new Date().toISOString(),
+        config: configSinAvatares, data: allData, note: 'avatares_omitidos_por_tamaño' };
+      const json2 = JSON.stringify(fallback);
+      const blob2 = new Blob([json2], { type: 'application/json' });
+      const url2 = URL.createObjectURL(blob2);
+      const a2 = document.createElement('a');
+      a2.href = url2; a2.download = `tc-monitor-backup-sin-avatares-${new Date().toISOString().slice(0,10)}.json`;
+      a2.style.display = 'none';
+      document.body.appendChild(a2);
+      a2.click();
+      setTimeout(() => { document.body.removeChild(a2); URL.revokeObjectURL(url2); }, 200);
+      showToast('Backup descargado sin avatares (archivo demasiado grande)', 'info');
+    } catch(e2) {
+      showToast('Error al generar backup: ' + e2.message, 'err');
+    }
+  }
+}
+
+function restoreData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const backup = JSON.parse(ev.target.result);
+      if (!backup.version || !backup.data) throw new Error('Archivo de backup inválido');
+      if (!confirm(`¿Restaurar backup del ${backup.exportedAt?.slice(0,10)}? Esto reemplazará todos los datos actuales.`)) return;
+
+      // Restore data (transactions) — clear first to free space
+      localStorage.removeItem('tcm_data');
+      localStorage.removeItem('tcm_config');
+      localStorage.removeItem('tcm_avatares');
+
+      // Save transaction data
+      try {
+        localStorage.setItem('tcm_data', JSON.stringify(backup.data));
+      } catch(e) {
+        throw new Error('Datos demasiado grandes para el almacenamiento local (' + e.message + ')');
+      }
+
+      // Save config — separate avatars to avoid quota
+      if (backup.config && Object.keys(backup.config).length > 0) {
+        const avatarMap = {};
+        const configLight = {
+          ...backup.config,
+          miembros: (backup.config.miembros || []).map(m => {
+            // Avatar can be base64 string or '__avatar__' placeholder
+            const av = m.avatar && m.avatar !== '__avatar__' ? m.avatar : null;
+            if (av) avatarMap[m.id] = av;
+            return { ...m, avatar: av ? '__avatar__' : null };
+          })
+        };
+
+        // Save avatars separately
+        if (Object.keys(avatarMap).length > 0) {
+          try {
+            localStorage.setItem('tcm_avatares', JSON.stringify(avatarMap));
+          } catch(e) {
+            console.warn('Avatares no restaurados por falta de espacio — se pueden subir de nuevo en Configuración');
+          }
+        }
+
+        // Save config without avatars
+        try {
+          localStorage.setItem('tcm_config', JSON.stringify(configLight));
+        } catch(e) {
+          throw new Error('Config demasiado grande: ' + e.message);
+        }
+      }
+
+      showToast('✓ Backup restaurado correctamente. Recargando...', 'ok');
+      setTimeout(() => location.reload(), 1200);
+
+    } catch(err) {
+      showToast('Error al restaurar: ' + err.message, 'err');
+      console.error('Restore error:', err);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function confirmClearData() {
+  if (confirm('¿Seguro? Esto borrará TODOS los extractos y transacciones guardadas. Esta acción no se puede deshacer.')) {
+    allData = {};
+    saveAllData();
+    renderConfig();
+    showToast('Datos eliminados', 'info');
+  }
+}
+
+// ============================================================
+// MIEMBRO DETALLE
+// ============================================================
+let detallesMiembroId = null;
+
+function openMiembroDetalle(miembroId) {
+  detallesMiembroId = miembroId;
+  const m = config.miembros.find(x => x.id === miembroId);
+  if (!m) return;
+  document.getElementById('detalle-nombre').textContent = m.nombre;
+  document.getElementById('nav-miembro-nombre').textContent = m.nombre.split(' ')[0];
+  document.getElementById('nav-miembro-detalle').style.display = 'flex';
+  // Populate month filter
+  const selMes = document.getElementById('detalle-filter-mes');
+  while (selMes.options.length > 1) selMes.remove(1);
+  const allKeys = Object.keys(allData).sort().reverse();
+  allKeys.forEach(k => {
+    const [y, mo] = k.split('-');
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
+    selMes.appendChild(opt);
+  });
+  navigate('miembro-detalle');
+}
+
+function getAllMiembroTxs(miembroId) {
+  const m = config.miembros.find(x => x.id === miembroId);
+  if (!m) return [];
+  const nums = getNums(m);
+  const all = [];
+  Object.entries(allData).sort().forEach(([key, pd]) => {
+    if (!pd || !pd.transacciones) return;
+    pd.transacciones
+      .filter(t => nums.includes(t.tarjetaNum) && !t.isAbono)
+      .forEach(t => all.push({ ...t, _periodKey: key }));
+  });
+  return all;
+}
+
+function renderDetalle() {
+  if (!detallesMiembroId) return;
+  const m = config.miembros.find(x => x.id === detallesMiembroId);
+  if (!m) return;
+
+  let txs = getAllMiembroTxs(detallesMiembroId);
+
+  // Apply filters
+  const fMes = document.getElementById('detalle-filter-mes').value;
+  const fNat = document.getElementById('detalle-filter-nat').value;
+  const fMoneda = document.getElementById('detalle-filter-moneda').value;
+  const fCuotas = document.getElementById('detalle-filter-cuotas').value;
+  const fBuscar = document.getElementById('detalle-filter-buscar').value.toLowerCase();
+
+  // Populate subcat filter
+  const detalleSubcatSel = document.getElementById('detalle-filter-subcat');
+  if (detalleSubcatSel) {
+    const savedSub = detalleSubcatSel.value;
+    while (detalleSubcatSel.options.length > 1) detalleSubcatSel.remove(1);
+    [...new Set(txs.map(t => t.subcategoria).filter(Boolean))].sort().forEach(s => {
+      const o = document.createElement('option');
+      o.value = s; o.textContent = s;
+      detalleSubcatSel.appendChild(o);
+    });
+    if (savedSub) detalleSubcatSel.value = savedSub;
+  }
+  const fSubcat = detalleSubcatSel?.value || '';
+
+  if (fMes) txs = txs.filter(t => t._periodKey === fMes);
+  if (fNat) txs = txs.filter(t => t.naturaleza === fNat);
+  if (fMoneda) txs = txs.filter(t => t.moneda === fMoneda);
+  if (fSubcat) txs = txs.filter(t => t.subcategoria === fSubcat);
+  if (fCuotas === '1') txs = txs.filter(t => t.cuotaTotal <= 1);
+  if (fCuotas === 'multi') txs = txs.filter(t => t.cuotaTotal > 1);
+  if (fBuscar) txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
+
+  txs.sort((a, b) => b._periodKey.localeCompare(a._periodKey) || parseDate(b.fecha) - parseDate(a.fecha));
+
+  // KPIs
+  const totalCOP = txs.filter(t => t.moneda === 'COP' && t.naturaleza !== 'financiero').reduce((s, t) => s + t.cargoMes, 0);
+  const totalUSD = txs.filter(t => t.moneda === 'USD' && t.naturaleza !== 'financiero').reduce((s, t) => s + t.cargoMes, 0);
+  const totalEmp = txs.filter(t => t.naturaleza === 'empresarial').reduce((s, t) => s + copValue(t), 0);
+  document.getElementById('detalle-kpis').innerHTML = `
+    <div class="card"><div class="card-label">Total COP</div><div class="card-value">${fmtCOP(totalCOP)}</div><div class="card-sub">Gastos en pesos</div></div>
+    <div class="card"><div class="card-label">Total USD</div><div class="card-value accent">$${totalUSD.toFixed(2)}</div><div class="card-sub">≈ ${fmtCOP(txs.filter(t=>t.moneda==='USD'&&t.naturaleza!=='financiero').reduce((s,t)=>s+copValue(t),0))}</div></div>
+    <div class="card"><div class="card-label">Empresarial (equiv. COP)</div><div class="card-value">${fmtCOP(totalEmp)}</div><div class="card-sub">${txs.filter(t=>t.naturaleza==='empresarial').length} transacciones</div></div>
+  `;
+
+  // Totales filtrados
+  const dCOP = txs.filter(t => !t.isAbono && t.moneda === 'COP').reduce((s, t) => s + t.cargoMes, 0);
+  const dUSD = txs.filter(t => !t.isAbono && t.moneda === 'USD').reduce((s, t) => s + t.cargoMes, 0);
+  const dEquiv = txs.filter(t => !t.isAbono).reduce((s, t) => s + copValue(t), 0);
+  document.getElementById('detalle-count').textContent =
+    `${txs.length} transacciones · COP: ${fmtCOP(dCOP)}${dUSD > 0 ? ' · USD: $' + dUSD.toFixed(2) : ''} · Equiv: ${fmtCOP(dEquiv)}`;
+
+  const tbody = document.getElementById('detalle-tx-body');
+  if (!txs.length) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="11">Sin transacciones con los filtros aplicados</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = txs.map(t => {
+    const [y, mo] = t._periodKey.split('-');
+    const mesLabel = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
+    const cuotasText = t.cuotaTotal > 1 ? `<span class="cuotas-badge">${t.cuotaActual}/${t.cuotaTotal}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>';
+    const monedaTag = t.moneda === 'USD'
+      ? `<span class="tag" style="background:rgba(20,184,166,.1);color:var(--teal);border-color:rgba(20,184,166,.2)">USD</span>`
+      : `<span class="tag" style="background:rgba(255,255,255,.04);color:var(--text3);border-color:var(--border)">COP</span>`;
+    const valDisplay = t.moneda === 'USD'
+      ? `<div style="font-family:var(--font-mono);font-size:12px;color:var(--teal)">$${t.valorOriginal.toFixed(2)} USD</div>`
+      : `<div style="font-family:var(--font-mono);font-size:13px">${fmtCOP(t.valorOriginal)}</div>`;
+    const subcatTag = t.subcategoria
+      ? `<span style="font-family:var(--font-mono);font-size:10px;background:var(--surface3);color:var(--text2);border:1px solid var(--border);padding:2px 8px;border-radius:5px">${t.subcategoria}</span>`
+      : `<span style="color:var(--text3);font-size:11px">—</span>`;
+    const comentarioCell = t.comentario
+      ? `<span style="font-size:11px;color:var(--text2);max-width:140px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.comentario}">💬 ${t.comentario}</span>`
+      : `<span style="color:var(--text3);font-size:11px">—</span>`;
+    return `<tr>
+      <td style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">${mesLabel}</td>
+      <td style="font-family:var(--font-mono);font-size:11px">${t.fecha}</td>
+      <td style="font-size:12px;max-width:180px">${t.descripcion}</td>
+      <td>${monedaTag}</td>
+      <td style="text-align:right">${valDisplay}</td>
+      <td style="text-align:right;font-family:var(--font-mono);font-size:12px">${fmtCOP(copValue(t))}</td>
+      <td>${cuotasText}</td>
+      <td>${natBadge(t.naturaleza)}</td>
+      <td>${subcatTag}</td>
+      <td>${comentarioCell}</td>
+      <td><button class="btn btn-ghost btn-sm tx-edit-btn" data-txid="${t.id.replace(/'/g, '&#39;')}">✎</button></td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('.tx-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.getAttribute('data-txid')));
+  });
+}
+
+function exportDetalle() {
+  if (!detallesMiembroId) return;
+  const txs = getAllMiembroTxs(detallesMiembroId);
+  const header = ['Período','Fecha','Descripción','Moneda','Valor Original','Equiv COP','Cuota','Total Cuotas','Naturaleza'];
+  const rows = txs.map(t => [
+    t._periodKey, t.fecha, `"${t.descripcion}"`, t.moneda,
+    t.valorOriginal.toFixed(2), copValue(t).toFixed(0),
+    t.cuotaActual, t.cuotaTotal, t.naturaleza
+  ]);
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `detalle-${detallesMiembroId}.csv` });
+  a.click();
+  showToast('CSV exportado', 'ok');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function parseNum(str) {
+  if (!str) return 0;
+  return parseFloat(String(str).replace(/,/g, '').replace(/[^\d.]/g, '')) || 0;
+}
+
+function getTRM(periodoKey) {
+  if (config.params.trmPorPeriodo && config.params.trmPorPeriodo[periodoKey]) {
+    return config.params.trmPorPeriodo[periodoKey];
+  }
+  return config.params.trm || 4200;
+}
+
+function txPeriodoKey(t) {
+  // Derive YYYY-MM from fecha DD/MM/YYYY
+  if (!t.fecha) return activePeriodKey();
+  const parts = t.fecha.split('/');
+  if (parts.length === 3) return `${parts[2]}-${parts[1]}`;
+  return activePeriodKey();
+}
+
+function copValue(t) {
+  if (t.moneda === 'USD') return t.cargoMes * getTRM(txPeriodoKey(t));
+  return t.cargoMes || 0;
+}
+
+function fmtCOP(v) {
+  if (!v || isNaN(v)) return '$0';
+  return '$' + Math.round(v).toLocaleString('es-CO');
+}
+
+function fmtCOPShort(v) {
+  if (v >= 1000000) return '$' + (v/1000000).toFixed(1) + 'M';
+  if (v >= 1000) return '$' + (v/1000).toFixed(0) + 'K';
+  return fmtCOP(v);
+}
+
+function parseDate(str) {
+  if (!str) return 0;
+  const [d, m, y] = str.split('/');
+  return new Date(`${y}-${m}-${d}`).getTime() || 0;
+}
+
+function updateBadge() {
+  const pd = getPeriodData();
+  const pending = pd.transacciones.filter(t => t.naturaleza === 'pendiente' && !t.isAbono).length;
+  const badge = document.getElementById('badge-pendientes');
+  if (pending > 0) {
+    badge.textContent = pending;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function exportCSV() {
+  const pd = getPeriodData();
+  const txs = pd.transacciones.filter(t => !t.isAbono);
+  if (!txs.length) { showToast('No hay datos para exportar', 'err'); return; }
+
+  const header = ['Fecha','Titular','Descripción','Moneda','Valor Original','Cargo COP','Cuota','Cuotas Total','Naturaleza','Clasificado Manual'];
+  const rows = txs.map(t => [
+    t.fecha, t.titular, `"${t.descripcion}"`, t.moneda,
+    t.valorOriginal.toFixed(2), copValue(t).toFixed(0),
+    t.cuotaActual, t.cuotaTotal, t.naturaleza, t.clasificadoManual ? 'Sí' : 'No'
+  ]);
+
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tc-monitor-${activePeriodKey()}.csv`;
+  a.click();
+  showToast('CSV exportado', 'ok');
+}
+
+function showToast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// THEME
+// ============================================================
+function toggleTheme() {
+  const isLight = document.documentElement.classList.toggle("light");
+  document.getElementById("theme-label").textContent = isLight ? "Modo oscuro" : "Modo claro";
+  localStorage.setItem("tcm_theme", isLight ? "light" : "dark");
+}
+
+function initTheme() {
+  const saved = localStorage.getItem("tcm_theme");
+  if (saved === "light") {
+    document.documentElement.classList.add("light");
+    const label = document.getElementById("theme-label");
+    if (label) label.textContent = "Modo oscuro";
+  }
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+let chartHistorico = null;
+let chartCategorias = null;
+
+// Member color palette — consistent per member index
+const MEMBER_COLORS = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#f97316'];
+
+function chartDefaults() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: {
+          color: '#7c8da6',
+          font: { family: 'JetBrains Mono', size: 10 },
+          boxWidth: 10, padding: 12
+        }
+      },
+      tooltip: {
+        backgroundColor: '#161c26',
+        borderColor: '#2a3547',
+        borderWidth: 1,
+        titleColor: '#e2e8f4',
+        bodyColor: '#7c8da6',
+        titleFont: { family: 'Space Grotesk', size: 12, weight: '600' },
+        bodyFont: { family: 'JetBrains Mono', size: 11 },
+        padding: 10,
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.parsed.y)}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#2a3547', drawBorder: false },
+        ticks: { color: '#6b82a0', font: { family: 'JetBrains Mono', size: 9 } }
+      },
+      y: {
+        grid: { color: '#2a3547', drawBorder: false },
+        ticks: {
+          color: '#3f5068',
+          font: { family: 'JetBrains Mono', size: 9 },
+          callback: v => fmtCOPShort(v)
+        }
+      }
+    }
+  };
+}
+
+function renderChartHistorico() {
+  if (typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('chart-historico');
+  if (!canvas) return;
+
+  const mode = document.getElementById('chart-historico-mode')?.value || 'equiv';
+
+  // Mode labels and tooltip format
+  const modeConfig = {
+    equiv:  { label: 'Equiv. COP',          fmt: v => fmtCOP(v),         yFmt: v => fmtCOPShort(v) },
+    cop:    { label: 'Pesos (COP)',          fmt: v => fmtCOP(v),         yFmt: v => fmtCOPShort(v) },
+    usd:    { label: 'Dólares (USD)',        fmt: v => '$' + v.toFixed(2), yFmt: v => '$' + v.toFixed(0) },
+    total:  { label: 'Total (Pesos + Equiv)',fmt: v => fmtCOP(v),         yFmt: v => fmtCOPShort(v) },
+  };
+  const mc = modeConfig[mode];
+
+  // Value extractor per mode
+  function getTxValue(t) {
+    if (mode === 'cop')   return t.moneda === 'COP' ? t.cargoMes : 0;
+    if (mode === 'usd')   return t.moneda === 'USD' ? t.cargoMes : 0;
+    if (mode === 'equiv') return copValue(t);
+    if (mode === 'total') return t.moneda === 'COP' ? t.cargoMes : copValue(t);
+    return copValue(t);
+  }
+
+  const allKeys = Object.keys(allData).sort();
+  const recentKeys = allKeys.slice(-8);
+  if (!recentKeys.length) { if (chartHistorico) { chartHistorico.destroy(); chartHistorico = null; } return; }
+
+  const labels = recentKeys.map(k => {
+    const [y, m] = k.split('-');
+    return MONTHS_ES[parseInt(m) - 1] + ' ' + y.slice(2);
+  });
+
+  const members = getMiembrosList();
+  const datasets = members.map((m, idx) => {
+    const nums = getNums(m);
+    const data = recentKeys.map(k => {
+      const pd = allData[k];
+      if (!pd) return 0;
+      return pd.transacciones
+        .filter(t => nums.includes(t.tarjetaNum) && !t.isAbono && t.naturaleza !== 'financiero')
+        .reduce((s, t) => s + getTxValue(t), 0);
+    });
+    const color = MEMBER_COLORS[idx % MEMBER_COLORS.length];
+    return {
+      label: m.nombre.split(' ')[0],
+      data,
+      borderColor: color,
+      backgroundColor: color + '18',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+      tension: 0.3,
+      fill: true
+    };
+  }).filter(ds => ds.data.some(v => v > 0));
+
+  // Build options with dynamic formatters
+  const opts = {
+    ...chartDefaults(),
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      ...chartDefaults().plugins,
+      tooltip: {
+        ...chartDefaults().plugins.tooltip,
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: ${mc.fmt(ctx.parsed.y)}` }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#2a3547' },
+        ticks: { color: '#6b82a0', font: { family: 'JetBrains Mono', size: 9 } }
+      },
+      y: {
+        grid: { color: '#2a3547' },
+        ticks: {
+          color: '#6b82a0',
+          font: { family: 'JetBrains Mono', size: 9 },
+          callback: v => mc.yFmt(v)
+        }
+      }
+    }
+  };
+
+  if (chartHistorico) chartHistorico.destroy();
+  chartHistorico = new Chart(canvas, { type: 'line', data: { labels, datasets }, options: opts });
+}
+
+function renderChartCategorias() {
+  if (typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('chart-categorias');
+  if (!canvas) return;
+
+  const allKeys = Object.keys(allData).sort();
+  const recentKeys = allKeys.slice(-8);
+  if (!recentKeys.length) { if (chartCategorias) { chartCategorias.destroy(); chartCategorias = null; } return; }
+
+  const labels = recentKeys.map(k => {
+    const [y, m] = k.split('-');
+    return MONTHS_ES[parseInt(m) - 1] + ' ' + y.slice(2);
+  });
+
+  const cats = [
+    { key: 'empresarial', label: 'Empresarial', color: '#3b82f6' },
+    { key: 'personal',    label: 'Beneficio Socio', color: '#10b981' },
+    { key: 'financiero',  label: 'Financiero', color: '#3f5068' },
+  ];
+
+  const datasets = cats.map(cat => ({
+    label: cat.label,
+    data: recentKeys.map(k => {
+      const pd = allData[k];
+      if (!pd) return 0;
+      return pd.transacciones
+        .filter(t => !t.isAbono && t.naturaleza === cat.key)
+        .reduce((s, t) => s + copValue(t), 0);
+    }),
+    backgroundColor: cat.color + 'cc',
+    borderColor: cat.color,
+    borderWidth: 1,
+    borderRadius: 3,
+  }));
+
+  const opts = {
+    ...chartDefaults(),
+    plugins: {
+      ...chartDefaults().plugins,
+      tooltip: {
+        ...chartDefaults().plugins.tooltip,
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.parsed.y)}` }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { color: '#2a3547' },
+        ticks: { color: '#6b82a0', font: { family: 'JetBrains Mono', size: 9 } }
+      },
+      y: {
+        stacked: true,
+        grid: { color: '#2a3547' },
+        ticks: { color: '#6b82a0', font: { family: 'JetBrains Mono', size: 9 }, callback: v => fmtCOPShort(v) }
+      }
+    }
+  };
+
+  if (chartCategorias) chartCategorias.destroy();
+  chartCategorias = new Chart(canvas, { type: 'bar', data: { labels, datasets }, options: opts });
+}
+
+// ============================================================
+// CARGA — 3 MODOS
+// ============================================================
+let cargaMode = 'pdf';
+let importPreviewTxs = [];
+let manualTxs = [];
+
+function setCargaMode(mode, btn) {
+  cargaMode = mode;
+  document.querySelectorAll('#tab-pdf,#tab-excel,#tab-manual').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('carga-mode-pdf').style.display = mode === 'pdf' ? 'block' : 'none';
+  document.getElementById('carga-mode-excel').style.display = mode === 'excel' ? 'block' : 'none';
+  document.getElementById('carga-mode-manual').style.display = mode === 'manual' ? 'block' : 'none';
+  const subs = { pdf: 'Lectura inteligente — arrastra los PDFs de cada tarjeta',
+                 excel: 'Importa desde plantilla CSV/Excel diligenciada',
+                 manual: 'Ingresa transacciones manualmente' };
+  document.getElementById('carga-subtitle').textContent = subs[mode];
+  if (mode === 'manual') populateManualForm();
+}
+
+// --- EXCEL TEMPLATE ---
+function downloadTemplate() {
+  if (typeof XLSX === 'undefined') { showToast('Cargando librería Excel...', 'info'); return; }
+
+  // Build worksheet data
+  const headers = [
+    'Fecha (DD/MM/YYYY)', 'Titular', 'Num Tarjeta (últimos 4)',
+    'Descripcion', 'Moneda (COP/USD)', 'Valor Original',
+    'Cuota Actual', 'Cuota Total',
+    'Naturaleza (empresarial/personal/financiero)',
+    'Subcategoria', 'Comentario'
+  ];
+
+  const examples = [
+    ['15/01/2026','John Alejandro Morales','3806','ADOBE','COP',93058,1,1,'empresarial','Herramientas Digitales',''],
+    ['20/01/2026','Filiberto Hincapié','4547','SPOTIFY','COP',24500,1,1,'personal','',''],
+    ['01/01/2026','John Alejandro Morales','3806','GOOGLE *Workspace','USD',427.68,1,36,'empresarial','Herramientas Digitales','Google Workspace anual'],
+    ['25/01/2026','Andrés Florez','0304','RAPPI COLOMBIA','COP',45000,1,1,'personal','','Pedido del almuerzo'],
+  ];
+
+  // Build validation lists for dropdowns
+  const titulares = getMiembrosList().map(m => m.nombre).join(',');
+  const tarjetas = getMiembrosList().flatMap(m => m.tarjetas.map(t => t.num)).join(',');
+  const naturalezas = 'empresarial,personal,financiero';
+  const subcats = (config.categorias || []).flatMap(c => c.subcategorias).join(',');
+
+  const ws_data = [headers, ...examples];
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+  // Column widths
+  ws['!cols'] = [
+    {wch:18},{wch:28},{wch:16},{wch:30},{wch:14},
+    {wch:14},{wch:12},{wch:12},{wch:36},{wch:22},{wch:28}
+  ];
+
+  // Style header row (bold + background) — limited in xlsx.js but set bold
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let C = range.s.c; C <= range.e.c; C++) {
+    const cell = ws[XLSX.utils.encode_cell({r:0, c:C})];
+    if (cell) cell.s = { font: { bold: true }, fill: { fgColor: { rgb: 'F0F4FA' } } };
+  }
+
+  // Add instruction sheet
+  const instr_data = [
+    ['INSTRUCCIONES DE USO — TC Monitor Plantilla'],
+    [''],
+    ['CAMPO', 'VALORES VÁLIDOS', 'OBLIGATORIO'],
+    ['Fecha', 'Formato DD/MM/YYYY  ej: 15/01/2026', 'Sí'],
+    ['Titular', titulares || 'Nombre completo del miembro', 'Sí'],
+    ['Num Tarjeta', tarjetas || 'Últimos 4 dígitos', 'Sí'],
+    ['Descripcion', 'Nombre del comercio o concepto', 'Sí'],
+    ['Moneda', 'COP  o  USD', 'Sí'],
+    ['Valor Original', 'Número sin puntos ni comas  ej: 93058 o 427.68', 'Sí'],
+    ['Cuota Actual', 'Número entero  ej: 1', 'Sí'],
+    ['Cuota Total', 'Número entero  ej: 1 (o 36 para 36 cuotas)', 'Sí'],
+    ['Naturaleza', naturalezas, 'Sí'],
+    ['Subcategoria', subcats || 'Ver categorías en Configuración', 'No'],
+    ['Comentario', 'Texto libre', 'No'],
+    [''],
+    ['NOTAS:'],
+    ['- No borrar la fila de encabezados (fila 1)'],
+    ['- Las filas de ejemplo pueden eliminarse'],
+    ['- Guarda como CSV (separado por comas) antes de subir, o sube el .xlsx directamente'],
+  ];
+  const ws_instr = XLSX.utils.aoa_to_sheet(instr_data);
+  ws_instr['!cols'] = [{wch:20},{wch:50},{wch:14}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Transacciones');
+  XLSX.utils.book_append_sheet(wb, ws_instr, 'Instrucciones');
+  XLSX.writeFile(wb, 'tc-monitor-plantilla.xlsx');
+  showToast('Plantilla Excel descargada con instrucciones', 'ok');
+}
+
+function handleTemplateUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const isXLSX = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
+
+  const processRows = (rows) => {
+    importPreviewTxs = rows.map((cols, idx) => {
+      const [fechaRaw, titular, tarjeta, desc, moneda, valor, cuotaA, cuotaT, nat, subcat, comentario] = cols.map(c => String(c || '').trim());
+      // Normalize fecha to DD/MM/YYYY
+      // Handles: "15/01/2026", "2026-01-15", Excel serial number (integer ~45000+)
+      let fecha = fechaRaw;
+      if (/^\d{5,}$/.test(fechaRaw)) {
+        // Excel serial date: days since 1899-12-30
+        const d = new Date(Date.UTC(1899, 11, 30) + parseInt(fechaRaw) * 86400000);
+        fecha = `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
+      } else if (/^\d{4}-\d{2}-\d{2}/.test(fechaRaw)) {
+        // ISO format YYYY-MM-DD
+        const [y, mo, d] = fechaRaw.slice(0,10).split('-');
+        fecha = `${d}/${mo}/${y}`;
+      }
+      // DD/MM/YYYY already correct — keep as is
+
+      const v = parseFloat(String(valor).replace(/[^0-9.]/g,'')) || 0;
+      return {
+        _row: idx + 2, fecha, titular, tarjetaNum: String(tarjeta||'').replace(/[^0-9]/g,'').slice(-4), descripcion: desc,
+        moneda: moneda?.toUpperCase() === 'USD' ? 'USD' : 'COP',
+        valorOriginal: v, cargoMes: v,
+        cuotaActual: parseInt(cuotaA) || 1, cuotaTotal: parseInt(cuotaT) || 1,
+        naturaleza: nat?.toLowerCase().trim() || 'pendiente',
+        subcategoria: subcat || '', comentario: comentario || '',
+        isAbono: false, clasificadoManual: true,
+        id: `tx_import_${Date.now()}_${idx}`, saldoDiferir: 0,
+        _valid: !!(fecha && desc && v > 0)
+      };
+    }).filter(r => r.descripcion && r.descripcion.toLowerCase() !== 'descripcion');
+    renderImportPreview();
+  };
+
+  const reader = new FileReader();
+  if (isXLSX) {
+    reader.onload = ev => {
+      try {
+        const wb = XLSX.read(ev.target.result, { type: 'binary' });
+        const ws = wb.Sheets[wb.SheetNames[0]]; // First sheet = Transacciones
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        processRows(data.slice(1).filter(r => r.some(c => c !== '')));
+      } catch(err) { showToast('Error leyendo Excel: ' + err.message, 'err'); }
+    };
+    reader.readAsBinaryString(file);
+  } else {
+    reader.onload = ev => {
+      try {
+        const text = ev.target.result.replace(/^\uFEFF/, '');
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        const rows = lines.slice(1).map(line =>
+          (line.match(/(".*?"|[^,\n]+)(?=,|$)/g) || []).map(c => c.replace(/^"|"$/g,'').trim())
+        );
+        processRows(rows);
+      } catch(err) { showToast('Error leyendo CSV: ' + err.message, 'err'); }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+  e.target.value = '';
+}
+
+function renderImportPreview() {
+  const tbody = document.getElementById('import-preview-body');
+  const btn = document.getElementById('btn-confirm-import');
+  if (!importPreviewTxs.length) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="10">Sin datos</td></tr>';
+    btn.style.display = 'none';
+    return;
+  }
+  const validCount = importPreviewTxs.filter(t => t._valid).length;
+  btn.style.display = 'inline-flex';
+  btn.textContent = `✓ Importar ${validCount} transacciones`;
+  tbody.innerHTML = importPreviewTxs.map(t => `<tr style="opacity:${t._valid ? 1 : 0.4}">
+    <td class="mono" style="font-size:11px">${t.fecha || '—'}</td>
+    <td style="font-size:12px">${t.titular || '—'}</td>
+    <td class="mono" style="font-size:11px">****${t.tarjetaNum || '?'}</td>
+    <td style="font-size:12px;max-width:180px">${t.descripcion}</td>
+    <td>${t.moneda === 'USD' ? '<span class="tag" style="background:rgba(20,184,166,.1);color:var(--teal)">USD</span>' : '<span style="font-size:11px;color:var(--text3)">COP</span>'}</td>
+    <td class="mono" style="text-align:right">${t.moneda === 'USD' ? '$' + t.valorOriginal.toFixed(2) : fmtCOP(t.valorOriginal)}</td>
+    <td>${natBadge(t.naturaleza)}</td>
+    <td style="font-size:11px;color:var(--text2)">${t.subcategoria || '—'}</td>
+    <td style="font-size:11px;color:var(--text2)">${t.comentario || '—'}</td>
+    <td>${t._valid ? '<span style="color:var(--green);font-size:11px">✓</span>' : '<span style="color:var(--red);font-size:11px">✗</span>'}</td>
+  </tr>`).join('');
+}
+
+function confirmImport() {
+  const valid = importPreviewTxs.filter(t => t._valid);
+  if (!valid.length) return;
+  if (!confirm(`¿Importar ${valid.length} transacciones al período activo (${MONTHS_ES[activePeriod.month-1]} ${activePeriod.year})?`)) return;
+  const pd = getPeriodData();
+  pd.transacciones.push(...valid);
+  saveAllData();
+  importPreviewTxs = [];
+  renderImportPreview();
+  updateBadge();
+  showToast(`${valid.length} transacciones importadas`, 'ok');
+}
+
+// --- MANUAL ENTRY ---
+function populateManualForm() {
+  const selTitular = document.getElementById('man-titular');
+  const selTarjeta = document.getElementById('man-tarjeta');
+  if (!selTitular) return;
+  selTitular.innerHTML = getMiembrosList().map(m =>
+    `<option value="${m.nombre}">${m.nombre}</option>`).join('');
+  selTitular.onchange = () => {
+    const m = getMiembrosList().find(x => x.nombre === selTitular.value);
+    selTarjeta.innerHTML = (m?.tarjetas || []).map(t =>
+      `<option value="${t.num}">****${t.num} (${t.red})</option>`).join('');
+  };
+  selTitular.dispatchEvent(new Event('change'));
+  updateManSubcat();
+}
+
+function updateManSubcat() {
+  const nat = document.getElementById('man-nat')?.value;
+  const sel = document.getElementById('man-subcat');
+  if (!sel) return;
+  const cat = (config.categorias || []).find(c => c.naturaleza === nat);
+  sel.innerHTML = '<option value="">Ninguna</option>' +
+    (cat?.subcategorias || []).map(s => `<option value="${s}">${s}</option>`).join('');
+}
+
+function addManualTransaction() {
+  const fecha = document.getElementById('man-fecha').value;
+  const titular = document.getElementById('man-titular').value;
+  const tarjeta = document.getElementById('man-tarjeta').value;
+  const desc = document.getElementById('man-desc').value.trim();
+  const moneda = document.getElementById('man-moneda').value;
+  const valor = parseFloat(document.getElementById('man-valor').value) || 0;
+  const nat = document.getElementById('man-nat').value;
+  const subcat = document.getElementById('man-subcat').value;
+  const cuotaA = parseInt(document.getElementById('man-cuota-actual').value) || 1;
+  const cuotaT = parseInt(document.getElementById('man-cuota-total').value) || 1;
+  const comentario = document.getElementById('man-comentario').value.trim();
+
+  if (!fecha || !desc || !valor) { showToast('Completa Fecha, Descripción y Valor', 'err'); return; }
+
+  // Convert date from YYYY-MM-DD to DD/MM/YYYY
+  const [y, mo, d] = fecha.split('-');
+  const fechaFmt = `${d}/${mo}/${y}`;
+
+  const tx = {
+    id: `tx_manual_${Date.now()}`,
+    fecha: fechaFmt, descripcion: desc, titular, tarjetaNum: tarjeta,
+    moneda, valorOriginal: valor, cargoMes: valor, saldoDiferir: 0,
+    cuotaActual: cuotaA, cuotaTotal: cuotaT,
+    naturaleza: nat, subcategoria: subcat, comentario,
+    clasificadoManual: true, isAbono: false,
+    _manual: true
+  };
+
+  const pd = getPeriodData();
+  pd.transacciones.push(tx);
+  saveAllData();
+  manualTxs.push(tx);
+  renderManualList();
+  updateBadge();
+  // Clear form fields
+  document.getElementById('man-desc').value = '';
+  document.getElementById('man-valor').value = '';
+  document.getElementById('man-comentario').value = '';
+  document.getElementById('man-cuota-actual').value = '1';
+  document.getElementById('man-cuota-total').value = '1';
+  showToast('Transacción agregada', 'ok');
+}
+
+function renderManualList() {
+  const tbody = document.getElementById('man-tx-body');
+  const count = document.getElementById('man-count');
+  if (!manualTxs.length) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="9">Aún no has agregado transacciones manuales</td></tr>';
+    count.textContent = '0 transacciones';
+    return;
+  }
+  count.textContent = manualTxs.length + ' transacciones';
+  tbody.innerHTML = manualTxs.map(t => `<tr>
+    <td class="mono" style="font-size:11px">${t.fecha}</td>
+    <td style="font-size:12px">${t.titular?.split(' ')[0] || '—'}</td>
+    <td style="font-size:12px;max-width:180px">${t.descripcion}</td>
+    <td><span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${t.moneda}</span></td>
+    <td class="mono" style="text-align:right">${t.moneda === 'USD' ? '$'+t.valorOriginal.toFixed(2) : fmtCOP(t.valorOriginal)}</td>
+    <td>${natBadge(t.naturaleza)}</td>
+    <td style="font-size:11px;color:var(--text2)">${t.subcategoria || '—'}</td>
+    <td style="font-family:var(--font-mono);font-size:11px">${t.cuotaActual}/${t.cuotaTotal}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="removeManualTx('${t.id}')">✕</button></td>
+  </tr>`).join('');
+}
+
+function removeManualTx(txId) {
+  if (!confirm('¿Eliminar esta transacción manual?')) return;
+  if (!confirm('¿Confirmas la eliminación?')) return;
+  manualTxs = manualTxs.filter(t => t.id !== txId);
+  Object.values(allData).forEach(pd => {
+    pd.transacciones = pd.transacciones?.filter(t => t.id !== txId) || [];
+  });
+  saveAllData();
+  renderManualList();
+  showToast('Transacción eliminada', 'info');
+}
+
+// ============================================================
+// CONFIG — CATEGORÍAS
+// ============================================================
+function renderCategoriasConfig() {
+  const wrap = document.getElementById('categorias-config');
+  if (!wrap) return;
+  const cats = config.categorias || [];
+  wrap.innerHTML = cats.map((cat, ci) => `
+    <div style="border-bottom:1px solid var(--border);padding:14px 20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <input type="color" value="${cat.color || '#4f8ef7'}"
+          style="width:28px;height:28px;border:none;background:none;cursor:pointer;border-radius:50%"
+          onchange="updateCatField(${ci},'color',this.value)">
+        <input class="settings-input" style="width:180px;text-align:left;font-weight:600" value="${cat.nombre}"
+          onchange="updateCatField(${ci},'nombre',this.value)">
+        <select class="filter-select" onchange="updateCatField(${ci},'naturaleza',this.value)">
+          <option value="empresarial" ${cat.naturaleza==='empresarial'?'selected':''}>Empresarial</option>
+          <option value="personal" ${cat.naturaleza==='personal'?'selected':''}>Beneficio Socio</option>
+          <option value="financiero" ${cat.naturaleza==='financiero'?'selected':''}>Financiero</option>
+        </select>
+        <button class="btn btn-danger btn-sm" onclick="deleteCat(${ci})">Eliminar</button>
+      </div>
+      <div style="padding-left:16px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Subcategorías</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          ${(cat.subcategorias || []).map((s, si) => `
+            <div style="display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px">
+              <input class="settings-input" style="width:130px;background:transparent;border:none;padding:0;font-size:12px;text-align:left"
+                value="${s}" onchange="updateSubcatName(${ci},${si},this.value)">
+              <button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;line-height:1"
+                onclick="deleteSubcat(${ci},${si})">✕</button>
+            </div>`).join('')}
+          <button class="btn btn-ghost btn-sm" onclick="addSubcat(${ci})">+ Subcategoría</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function updateCatField(ci, field, value) {
+  if (config.categorias[ci]) config.categorias[ci][field] = value;
+}
+function updateSubcatName(ci, si, value) {
+  if (config.categorias[ci]?.subcategorias) config.categorias[ci].subcategorias[si] = value;
+}
+function addSubcat(ci) {
+  if (!config.categorias[ci].subcategorias) config.categorias[ci].subcategorias = [];
+  config.categorias[ci].subcategorias.push('Nueva subcategoría');
+  renderCategoriasConfig();
+}
+function deleteSubcat(ci, si) {
+  if (!confirm('¿Eliminar esta subcategoría?')) return;
+  config.categorias[ci].subcategorias.splice(si, 1);
+  renderCategoriasConfig();
+}
+function addCategoria() {
+  if (!config.categorias) config.categorias = [];
+  config.categorias.push({ id: 'c'+Date.now(), nombre: 'Nueva categoría', naturaleza: 'empresarial', color: '#4f8ef7', subcategorias: [] });
+  renderCategoriasConfig();
+}
+function deleteCat(ci) {
+  if (!confirm('¿Eliminar esta categoría y todas sus subcategorías?')) return;
+  config.categorias.splice(ci, 1);
+  renderCategoriasConfig();
+}
+
+// ============================================================
+// PIN & GUEST MODE
+// ============================================================
+let guestMode = false;
+
+function initPinScreen() {
+  const pin = config.params?.pinAdmin;
+  if (!pin || pin.trim() === '') {
+    // No PIN configured — open directly as admin
+    hidePinOverlay();
+    return;
+  }
+  // Show PIN screen
+  document.getElementById('pin-overlay').style.display = 'flex';
+  document.querySelector('.app').style.display = 'none';
+  setTimeout(() => document.getElementById('pin-input')?.focus(), 100);
+}
+
+function checkPin() {
+  const input = document.getElementById('pin-input').value;
+  const pin = config.params?.pinAdmin || '';
+  if (input === pin) {
+    guestMode = false;
+    hidePinOverlay();
+    applyGuestMode();
+  } else {
+    document.getElementById('pin-error').style.display = 'block';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-input').focus();
+    setTimeout(() => document.getElementById('pin-error').style.display = 'none', 2000);
+  }
+}
+
+function enterGuest() {
+  guestMode = true;
+  hidePinOverlay();
+  applyGuestMode();
+}
+
+function hidePinOverlay() {
+  document.getElementById('pin-overlay').style.display = 'none';
+  document.querySelector('.app').style.display = 'flex';
+}
+
+function applyGuestMode() {
+  if (!guestMode) return;
+  // Hide nav items not available to guests
+  const hideNavs = ['carga', 'configuracion'];
+  document.querySelectorAll('.nav-item').forEach(el => {
+    const onclick = el.getAttribute('onclick') || '';
+    if (hideNavs.some(n => onclick.includes("'" + n + "'"))) {
+      el.style.display = 'none';
+    }
+  });
+  // Show guest badge in sidebar
+  const logo = document.querySelector('.logo');
+  if (logo) {
+    const badge = document.createElement('div');
+    badge.style.cssText = 'font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow);background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:4px;padding:2px 8px;margin-top:6px;display:inline-block';
+    badge.textContent = '👁 Modo invitado';
+    logo.appendChild(badge);
+  }
+}
+
+// Block restricted actions in guest mode
+function guardAdmin(fn) {
+  if (guestMode) {
+    showToast('Modo invitado — acción no disponible', 'info');
+    return false;
+  }
+  return true;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Set period — use current month, but auto-fall-back to last period with data
+const now = new Date();
+activePeriod = { year: now.getFullYear(), month: now.getMonth() + 1 };
+
+// If current period has no data, jump to the most recent period that does
+function autoDetectPeriod() {
+  const currentKey = activePeriodKey();
+  const hasCurrent = allData[currentKey]?.transacciones?.length > 0;
+  if (!hasCurrent) {
+    const keysWithData = Object.keys(allData)
+      .filter(k => allData[k]?.transacciones?.length > 0)
+      .sort();
+    if (keysWithData.length > 0) {
+      const lastKey = keysWithData[keysWithData.length - 1];
+      const [y, m] = lastKey.split('-').map(Number);
+      activePeriod = { year: y, month: m };
+    }
+  }
+  document.getElementById('period-text').textContent =
+    MONTHS_ES[activePeriod.month - 1] + ' ' + activePeriod.year;
+}
+
+autoDetectPeriod();
+initTheme();
+renderCarga();
+updateBadge();
+initPinScreen();
+
+// Wait for Chart.js to be available before rendering charts
+function initDashboard() {
+  if (typeof Chart !== 'undefined') {
+    renderDashboard();
+  } else {
+    // Chart.js not ready yet — retry in 100ms
+    setTimeout(initDashboard, 100);
+  }
+}
+
+// Use window.onload to ensure all scripts (Chart.js CDN) are fully loaded
+if (document.readyState === 'complete') {
+  initDashboard();
+} else {
+  window.addEventListener('load', initDashboard);
+}
+</script>
+</body>
+</html>
