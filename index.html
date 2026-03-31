@@ -9,6 +9,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -936,7 +940,7 @@
 </head>
 <body>
 
-<div class="app">
+<div class="app" style="display:none">
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">
@@ -974,6 +978,14 @@
       </div>
     </nav>
 
+    <div id="sidebar-logout" onclick="doLogout()" title="Cerrar sesión"
+      style="display:none;align-items:center;gap:8px;padding:10px 20px;
+             border-top:1px solid var(--border);cursor:pointer;font-size:12px;
+             color:var(--text3);transition:color .15s"
+      onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text3)'">
+      <span style="font-size:14px">⎋</span>
+      <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase">Cerrar sesión</span>
+    </div>
     <div class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
       <div class="toggle-track"><div class="toggle-thumb"></div></div>
       <span id="theme-label">Modo claro</span>
@@ -1665,6 +1677,39 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- AUTH OVERLAY (Firebase login) -->
+<div id="auth-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:600;
+  flex-direction:column;align-items:center;justify-content:center">
+  <div style="text-align:center;margin-bottom:32px">
+    <div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text);margin-bottom:6px">TC Monitor</div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">Pixel Graphic SAS</div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 40px;width:360px">
+    <div style="font-size:32px;text-align:center;margin-bottom:16px">🔐</div>
+    <div style="font-family:var(--font-display);font-size:16px;font-weight:600;text-align:center;margin-bottom:20px">Acceder</div>
+    <input id="auth-email" type="email" placeholder="Correo electrónico"
+      style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+             color:var(--text);padding:11px 14px;font-size:14px;outline:none;margin-bottom:10px;
+             font-family:var(--font-body);box-sizing:border-box"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <input id="auth-pass" type="password" placeholder="Contraseña"
+      style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+             color:var(--text);padding:11px 14px;font-size:14px;outline:none;margin-bottom:14px;
+             font-family:var(--font-body);box-sizing:border-box"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="auth-error" style="display:none;color:var(--red);font-size:12px;font-family:var(--font-mono);margin-bottom:12px;text-align:center"></div>
+    <button id="auth-btn" onclick="doLogin()"
+      style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;
+             padding:12px;font-size:14px;font-family:var(--font-display);font-weight:600;
+             cursor:pointer;margin-bottom:8px">Entrar</button>
+    <button onclick="doRegister()"
+      style="width:100%;background:transparent;color:var(--text2);border:1px solid var(--border);
+             border-radius:8px;padding:10px;font-size:13px;font-family:var(--font-body);cursor:pointer">
+      Crear cuenta nueva
+    </button>
+  </div>
+</div>
+
 <!-- PIN LOGIN OVERLAY -->
 <div id="pin-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
@@ -1712,16 +1757,149 @@ const MONTHS_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','A
 
 let activePeriod = { year: 2026, month: 1 }; // 1-indexed month
 
-let config = loadConfig();
-loadAvatarsIntoConfig();  // rehydrate avatars from separate storage
-let allData = loadAllData(); // { "2026-01": { extractos: [], transacciones: [] }, ... }
+// config and allData are initialized in auth.onAuthStateChanged below
+let config = loadConfigDefaults();
+loadAvatarsIntoConfig();
+let allData = {};
 
 let modalTxId = null;
 
 // ============================================================
 // PERSISTENCE
 // ============================================================
-function loadConfig() {
+// ============================================================
+// FIREBASE CONFIG & AUTH
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBjSBIz7fln50ldWYqj80irWVrCEkcadoQ",
+  authDomain: "tc-monitor-pixel.firebaseapp.com",
+  projectId: "tc-monitor-pixel",
+  storageBucket: "tc-monitor-pixel.firebasestorage.app",
+  messagingSenderId: "1023587303441",
+  appId: "1:1023587303441:web:58a80ffb648ae7fc98b1b0"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentUser = null;
+let fbSyncTimeout = null;
+
+// Save to Firestore (debounced to avoid excessive writes)
+async function saveToFirebase() {
+  if (!currentUser) return;
+  const uid = currentUser.uid;
+  try {
+    // Split into chunks: config and data per period
+    await db.collection('users').doc(uid).set({
+      config: JSON.stringify(config),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    // Save each period as separate document (avoids 1MB Firestore limit)
+    const batch = db.batch();
+    Object.entries(allData).forEach(([key, pd]) => {
+      const ref = db.collection('users').doc(uid).collection('periods').doc(key);
+      batch.set(ref, { data: JSON.stringify(pd), key });
+    });
+    await batch.commit();
+  } catch(e) {
+    console.warn('Firebase save error:', e);
+  }
+}
+
+// Debounced save — waits 1.5s after last change before saving
+function scheduleFbSave() {
+  if (fbSyncTimeout) clearTimeout(fbSyncTimeout);
+  fbSyncTimeout = setTimeout(saveToFirebase, 1500);
+}
+
+async function loadFromFirebase(uid) {
+  try {
+    // Load config
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (userDoc.exists && userDoc.data().config) {
+      const savedConfig = JSON.parse(userDoc.data().config);
+      config = { ...loadConfigDefaults(), ...savedConfig,
+        rules: { ...loadConfigDefaults().rules, ...savedConfig.rules },
+        params: { ...loadConfigDefaults().params, ...savedConfig.params },
+        categorias: savedConfig.categorias || loadConfigDefaults().categorias
+      };
+      loadAvatarsIntoConfig();
+    }
+    // Load periods
+    const periodsSnap = await db.collection('users').doc(uid).collection('periods').get();
+    allData = {};
+    periodsSnap.forEach(doc => {
+      try {
+        allData[doc.data().key] = JSON.parse(doc.data().data);
+      } catch(e) {}
+    });
+    return true;
+  } catch(e) {
+    console.warn('Firebase load error:', e);
+    return false;
+  }
+}
+
+// ============================================================
+// AUTH UI
+// ============================================================
+function showAuthScreen() {
+  document.getElementById('auth-overlay').style.display = 'flex';
+  document.querySelector('.app').style.display = 'none';
+  document.getElementById('pin-overlay').style.display = 'none';
+}
+
+function hideAuthScreen() {
+  document.getElementById('auth-overlay').style.display = 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.style.display = 'none';
+  try {
+    document.getElementById('auth-btn').textContent = 'Entrando...';
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(e) {
+    errEl.textContent = e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password'
+      ? 'Email o contraseña incorrectos'
+      : e.code === 'auth/too-many-requests' ? 'Demasiados intentos. Espera unos minutos.'
+      : 'Error: ' + e.message;
+    errEl.style.display = 'block';
+    document.getElementById('auth-btn').textContent = 'Entrar';
+  }
+}
+
+async function doRegister() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.style.display = 'none';
+  if (pass.length < 6) { errEl.textContent = 'La contraseña debe tener al menos 6 caracteres'; errEl.style.display = 'block'; return; }
+  try {
+    document.getElementById('auth-btn').textContent = 'Creando cuenta...';
+    await auth.createUserWithEmailAndPassword(email, pass);
+  } catch(e) {
+    errEl.textContent = e.code === 'auth/email-already-in-use'
+      ? 'Este email ya está registrado. Inicia sesión.' : 'Error: ' + e.message;
+    errEl.style.display = 'block';
+    document.getElementById('auth-btn').textContent = 'Entrar';
+  }
+}
+
+async function doLogout() {
+  await auth.signOut();
+  location.reload();
+}
+
+// ============================================================
+// PERSISTENCE — Firebase primary, localStorage fallback
+// ============================================================
+function loadConfigDefaults() {
   const defaults = {
     // miembros: cada persona puede tener N tarjetas históricas
     miembros: [
@@ -1781,6 +1959,7 @@ function loadAvatarsIntoConfig() {
 }
 
 function saveConfigData() {
+  scheduleFbSave(); // sync to Firebase
   try {
     // Split avatars into separate storage key to avoid quota issues
     const avatarMap = {};
@@ -1831,12 +2010,11 @@ function loadAllData() {
 }
 
 function saveAllData() {
+  scheduleFbSave(); // sync to Firebase
   try {
     localStorage.setItem('tcm_data', JSON.stringify(allData));
   } catch(e) {
     if (e.name === 'QuotaExceededError') {
-      // Don't show toast here — let the caller handle it
-      // But do throw so callers know it failed
       throw e;
     }
   }
@@ -4312,11 +4490,34 @@ function autoDetectPeriod() {
     MONTHS_ES[activePeriod.month - 1] + ' ' + activePeriod.year;
 }
 
-autoDetectPeriod();
 initTheme();
-renderCarga();
-updateBadge();
-initPinScreen();
+
+// Firebase auth state listener — main entry point
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    // Load data from Firebase
+    const loaded = await loadFromFirebase(user.uid);
+    if (!loaded) {
+      // Fallback to localStorage if Firebase fails
+      config = loadConfigDefaults();
+      loadAvatarsIntoConfig();
+      allData = loadAllData();
+    }
+    hideAuthScreen();
+    document.querySelector('.app').style.display = 'flex';
+    autoDetectPeriod();
+    renderCarga();
+    updateBadge();
+    initPinScreen();
+    // Show logout button in sidebar
+    const logoutBtn = document.getElementById('sidebar-logout');
+    if (logoutBtn) logoutBtn.style.display = 'flex';
+  } else {
+    currentUser = null;
+    showAuthScreen();
+  }
+});
 
 // Wait for Chart.js to be available before rendering charts
 function initDashboard() {
