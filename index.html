@@ -936,6 +936,62 @@
   .no-data-row td { text-align: center; padding: 40px; color: var(--text3); font-family: var(--font-mono); font-size: 12px; }
 
   input[type=file] { display: none; }
+
+  /* ============================================================
+   RESPONSIVE — MOBILE
+   ============================================================ */
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+      width: 100%; height: 64px; flex-direction: row;
+      border-right: none; border-top: 1px solid var(--border);
+      padding: 0 4px; z-index: 200; overflow-x: auto;
+      justify-content: space-around; align-items: center; gap: 0;
+    }
+    .sidebar .logo, .nav-section-label, #sidebar-logout,
+    .period-selector, .theme-toggle { display: none !important; }
+    .nav-item {
+      flex-direction: column; padding: 6px 8px; font-size: 9px;
+      min-width: 52px; text-align: center; border-radius: 8px;
+      gap: 2px; white-space: nowrap; flex: 1;
+    }
+    .nav-icon { font-size: 20px; }
+    .main { margin-left: 0 !important; padding: 12px 12px 80px !important; }
+    .page-header { flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .page-title { font-size: 20px; }
+    .grid-4, .grid-3 { grid-template-columns: 1fr 1fr !important; }
+    .kpi-ticker { flex-wrap: wrap; }
+    .charts-grid { grid-template-columns: 1fr !important; }
+    .member-cards-grid { grid-template-columns: 1fr !important; }
+    .filters { flex-wrap: wrap; gap: 6px; }
+    .filter-select { font-size: 12px; }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 640px; }
+    .overlay { align-items: flex-end !important; padding: 0 !important; }
+    .modal {
+      width: 100% !important; max-width: 100% !important;
+      border-radius: 20px 20px 0 0 !important;
+      max-height: 90vh; overflow-y: auto;
+    }
+    #auth-overlay > div:last-child,
+    #pin-overlay > div:last-child {
+      width: calc(100% - 32px) !important;
+      padding: 24px 20px !important;
+    }
+    #tx-totals-bar { gap: 10px; flex-wrap: wrap; }
+    .upload-grid { grid-template-columns: 1fr 1fr !important; }
+    .settings-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
+
+  @media (max-width: 480px) {
+    .main { padding: 8px 8px 76px !important; }
+    .grid-4, .grid-3 { grid-template-columns: 1fr !important; }
+    .page-title { font-size: 17px; }
+    .card { padding: 12px !important; }
+    .nav-item { font-size: 8px; min-width: 44px; padding: 5px 4px; }
+    .nav-icon { font-size: 18px; }
+    .upload-grid { grid-template-columns: 1fr !important; }
+  }
 </style>
 </head>
 <body>
@@ -1601,23 +1657,49 @@
 <!-- CLASSIFY MODAL -->
 <div class="overlay" id="modal-overlay">
   <div class="modal">
-    <div class="modal-title">Clasificar transacción</div>
-    <div class="modal-sub">La app sugirió una clasificación. Puedes mantenerla o cambiarla.</div>
+    <div class="modal-title">Editar transacción</div>
+    <div class="modal-sub">Edita los datos si hay errores de lectura, y ajusta la clasificación.</div>
 
     <div class="tx-detail" id="modal-tx-detail">
-      <div class="tx-detail-desc" id="modal-desc">—</div>
+      <!-- Descripción editable -->
+      <div style="margin-bottom:12px">
+        <label style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px">Descripción</label>
+        <input id="modal-desc" type="text"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+                 color:var(--text);padding:8px 12px;font-size:13px;font-weight:600;font-family:var(--font-body);
+                 outline:none;transition:border-color .15s;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
       <div class="tx-detail-grid">
         <div class="tx-detail-item">
-          <label>Fecha</label>
-          <span id="modal-fecha">—</span>
+          <label>Fecha (DD/MM/YYYY)</label>
+          <input id="modal-fecha" type="text" placeholder="DD/MM/YYYY"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                   color:var(--text);padding:6px 10px;font-size:12px;font-family:var(--font-mono);
+                   outline:none;width:100%;transition:border-color .15s;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
         </div>
         <div class="tx-detail-item">
-          <label>Monto</label>
-          <span id="modal-monto">—</span>
+          <label>Valor Original</label>
+          <input id="modal-valor" type="number" step="0.01"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                   color:var(--text);padding:6px 10px;font-size:12px;font-family:var(--font-mono);
+                   outline:none;width:100%;transition:border-color .15s;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div class="tx-detail-item">
+          <label>Moneda</label>
+          <select id="modal-moneda"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+                   color:var(--text);padding:6px 10px;font-size:12px;font-family:var(--font-mono);
+                   outline:none;width:100%">
+            <option value="COP">COP</option>
+            <option value="USD">USD</option>
+          </select>
         </div>
         <div class="tx-detail-item">
           <label>Titular</label>
-          <span id="modal-titular">—</span>
+          <span id="modal-titular" style="font-size:12px;color:var(--text2)">—</span>
         </div>
       </div>
     </div>
@@ -2910,11 +2992,10 @@ function openModal(txId) {
 
   modalTxId = txId;
 
-  document.getElementById('modal-desc').textContent = tx.descripcion;
-  document.getElementById('modal-fecha').textContent = tx.fecha;
-  document.getElementById('modal-monto').textContent = tx.moneda === 'USD'
-    ? `$${tx.valorOriginal.toFixed(2)} USD`
-    : fmtCOP(tx.valorOriginal);
+  document.getElementById('modal-desc').value = tx.descripcion;
+  document.getElementById('modal-fecha').value = tx.fecha;
+  document.getElementById('modal-valor').value = tx.valorOriginal;
+  document.getElementById('modal-moneda').value = tx.moneda || 'COP';
   document.getElementById('modal-titular').textContent = tx.titular;
 
   // Clasificación
@@ -3008,6 +3089,17 @@ function saveClassification() {
 
   if (foundPd && foundIdx >= 0) {
     // Mutate directly in the array (no copy)
+    // Save editable fields
+    const newDesc = document.getElementById('modal-desc').value.trim();
+    const newFecha = document.getElementById('modal-fecha').value.trim();
+    const newValor = parseFloat(document.getElementById('modal-valor').value) || foundPd.transacciones[foundIdx].valorOriginal;
+    const newMoneda = document.getElementById('modal-moneda').value;
+
+    if (newDesc) foundPd.transacciones[foundIdx].descripcion = newDesc;
+    if (newFecha) foundPd.transacciones[foundIdx].fecha = newFecha;
+    foundPd.transacciones[foundIdx].valorOriginal = newValor;
+    foundPd.transacciones[foundIdx].cargoMes = newValor;
+    foundPd.transacciones[foundIdx].moneda = newMoneda;
     foundPd.transacciones[foundIdx].naturaleza = newNat;
     foundPd.transacciones[foundIdx].clasificadoManual = true;
     foundPd.transacciones[foundIdx].subcategoria = document.getElementById('modal-subcat').value || '';
