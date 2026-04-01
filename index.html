@@ -1085,7 +1085,7 @@
             <span style="color:var(--text3)">→</span>
             <input type="month" id="dash-hasta" class="filter-select" style="padding:5px 10px;font-size:12px" onchange="renderDashboard()">
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Excel</button>
         </div>
       </div>
 
@@ -1338,7 +1338,7 @@
           <div class="page-title">Transacciones</div>
           <div class="page-subtitle">Revisa y clasifica cada transacción del período</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Exportar CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Exportar Excel</button>
       </div>
 
       <div class="filters">
@@ -1613,7 +1613,7 @@
             <div class="page-subtitle">Historial completo de transacciones</div>
           </div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="exportDetalle()">↓ Exportar CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportDetalle()">↓ Exportar Excel</button>
       </div>
       <div class="grid-3" id="detalle-kpis" style="margin-bottom:24px"></div>
       <div class="filters" style="margin-bottom:18px">
@@ -3852,18 +3852,27 @@ function renderDetalle() {
 
 function exportDetalle() {
   if (!detallesMiembroId) return;
+  if (typeof XLSX === 'undefined') { showToast('Cargando librería...', 'info'); return; }
   const txs = getAllMiembroTxs(detallesMiembroId);
-  const header = ['Período','Fecha','Descripción','Moneda','Valor Original','Equiv COP','Cuota','Total Cuotas','Naturaleza'];
+  const miembro = getMiembroById(detallesMiembroId);
+  const nombre = miembro?.nombre || detallesMiembroId;
+
+  const header = ['Período','Fecha','Descripción','Moneda','Valor Original',
+    'Equiv. COP','Cuota Actual','Cuotas Total','Naturaleza','Subcategoría','Comentario'];
   const rows = txs.map(t => [
-    t._periodKey, t.fecha, `"${t.descripcion}"`, t.moneda,
-    t.valorOriginal.toFixed(2), copValue(t).toFixed(0),
-    t.cuotaActual, t.cuotaTotal, t.naturaleza
+    t._periodKey, t.fecha, t.descripcion, t.moneda,
+    t.valorOriginal, Math.round(copValue(t)),
+    t.cuotaActual || 1, t.cuotaTotal || 1,
+    t.naturaleza, t.subcategoria || '', t.comentario || ''
   ]);
-  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `detalle-${detallesMiembroId}.csv` });
-  a.click();
-  showToast('CSV exportado', 'ok');
+
+  const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  ws['!cols'] = [{wch:10},{wch:14},{wch:32},{wch:8},{wch:14},{wch:14},{wch:10},{wch:10},{wch:14},{wch:18},{wch:28}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, nombre.split(' ')[0].slice(0,31));
+  XLSX.writeFile(wb, `tc-detalle-${nombre.split(' ')[0]}-${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast('Excel exportado correctamente', 'ok');
 }
 
 // ============================================================
@@ -3924,25 +3933,94 @@ function updateBadge() {
 }
 
 function exportCSV() {
+  if (typeof XLSX === 'undefined') { showToast('Cargando librería...', 'info'); return; }
   const pd = getPeriodData();
   const txs = pd.transacciones.filter(t => !t.isAbono);
   if (!txs.length) { showToast('No hay datos para exportar', 'err'); return; }
 
-  const header = ['Fecha','Titular','Descripción','Moneda','Valor Original','Cargo COP','Cuota','Cuotas Total','Naturaleza','Clasificado Manual'];
+  const trm = getTRM(activePeriodKey());
+  const header = ['Fecha','Titular','Tarjeta','Descripción','Moneda',
+    'Valor Original','Equiv. COP','Cuota Actual','Cuotas Total',
+    'Naturaleza','Subcategoría','Comentario','Clasificado Manual'];
+
   const rows = txs.map(t => [
-    t.fecha, t.titular, `"${t.descripcion}"`, t.moneda,
-    t.valorOriginal.toFixed(2), copValue(t).toFixed(0),
-    t.cuotaActual, t.cuotaTotal, t.naturaleza, t.clasificadoManual ? 'Sí' : 'No'
+    t.fecha, t.titular, '****' + (t.tarjetaNum || ''), t.descripcion,
+    t.moneda,
+    t.moneda === 'USD' ? t.valorOriginal : t.valorOriginal,
+    Math.round(copValue(t)),
+    t.cuotaActual || 1, t.cuotaTotal || 1,
+    t.naturaleza, t.subcategoria || '', t.comentario || '',
+    t.clasificadoManual ? 'Sí' : 'No'
   ]);
 
-  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `tc-monitor-${activePeriodKey()}.csv`;
-  a.click();
-  showToast('CSV exportado', 'ok');
+  const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+
+  // Column widths
+  ws['!cols'] = [
+    {wch:14},{wch:24},{wch:10},{wch:32},{wch:8},
+    {wch:14},{wch:14},{wch:10},{wch:10},
+    {wch:14},{wch:18},{wch:28},{wch:14}
+  ];
+
+  // Bold header row
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let C = range.s.c; C <= range.e.c; C++) {
+    const cell = ws[XLSX.utils.encode_cell({r:0, c:C})];
+    if (cell) cell.s = { font: { bold: true } };
+  }
+
+  const wb = XLSX.utils.book_new();
+  const [y, m] = activePeriodKey().split('-');
+  const sheetName = MONTHS_FULL[parseInt(m)-1] + ' ' + y;
+  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0,31));
+  XLSX.writeFile(wb, `tc-monitor-${activePeriodKey()}.xlsx`);
+  showToast('Excel exportado correctamente', 'ok');
+}
+
+function checkBackupReminder() {
+  const today = new Date();
+  const day = today.getDate();
+  const monthKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  const reminderKey = `tcm_backup_reminder_${monthKey}`;
+
+  // Only show on days 1-3 of the month, and only once per month
+  if (day <= 3 && !localStorage.getItem(reminderKey)) {
+    setTimeout(() => {
+      // Show custom reminder banner
+      const banner = document.createElement('div');
+      banner.id = 'backup-reminder';
+      banner.style.cssText = `
+        position:fixed;top:20px;left:50%;transform:translateX(-50%);
+        background:var(--surface);border:1px solid var(--accent);border-radius:12px;
+        padding:16px 20px;z-index:999;display:flex;align-items:center;gap:14px;
+        box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:420px;width:calc(100% - 40px)
+      `;
+      banner.innerHTML = `
+        <span style="font-size:24px">☁️</span>
+        <div style="flex:1">
+          <div style="font-family:var(--font-display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">
+            Inicio de mes — descarga tu backup
+          </div>
+          <div style="font-size:11px;color:var(--text2)">
+            Guárdalo en Google Drive como respaldo adicional a Firebase.
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button onclick="backupData();document.getElementById('backup-reminder').remove();localStorage.setItem('${reminderKey}','1')"
+            style="background:var(--accent);color:#fff;border:none;border-radius:7px;
+                   padding:6px 12px;font-size:11px;cursor:pointer;white-space:nowrap;font-family:var(--font-body)">
+            ↓ Descargar
+          </button>
+          <button onclick="document.getElementById('backup-reminder').remove();localStorage.setItem('${reminderKey}','1')"
+            style="background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:7px;
+                   padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--font-body)">
+            Recordar después
+          </button>
+        </div>
+      `;
+      document.body.appendChild(banner);
+    }, 2000); // show 2s after load
+  }
 }
 
 function showToast(msg, type = 'info') {
@@ -4671,28 +4749,28 @@ auth.onAuthStateChanged(async (user) => {
     // Show logout button in sidebar
     const logoutBtn = document.getElementById('sidebar-logout');
     if (logoutBtn) logoutBtn.style.display = 'flex';
+    // Render dashboard NOW that data is loaded (not before)
+    if (typeof Chart !== 'undefined') {
+      renderDashboard();
+    } else {
+      // Chart.js not ready yet — wait for it
+      const waitChart = setInterval(() => {
+        if (typeof Chart !== 'undefined') {
+          clearInterval(waitChart);
+          renderDashboard();
+        }
+      }, 100);
+    }
+    // Show backup reminder if first day of month
+    checkBackupReminder();
   } else {
     currentUser = null;
     showAuthScreen();
   }
 });
 
-// Wait for Chart.js to be available before rendering charts
-function initDashboard() {
-  if (typeof Chart !== 'undefined') {
-    renderDashboard();
-  } else {
-    // Chart.js not ready yet — retry in 100ms
-    setTimeout(initDashboard, 100);
-  }
-}
-
-// Use window.onload to ensure all scripts (Chart.js CDN) are fully loaded
-if (document.readyState === 'complete') {
-  initDashboard();
-} else {
-  window.addEventListener('load', initDashboard);
-}
+// initDashboard is now called after Firebase loads data (inside onAuthStateChanged)
+// This prevents showing empty charts before data is ready
 </script>
 </body>
 </html>
