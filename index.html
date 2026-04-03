@@ -962,6 +962,7 @@
     .grid-4, .grid-3 { grid-template-columns: 1fr 1fr !important; }
     .kpi-ticker { flex-wrap: wrap; }
     .charts-grid { grid-template-columns: 1fr !important; }
+    .charts-grid > div { grid-column: 1 !important; }
     .member-cards-grid { grid-template-columns: 1fr !important; }
     .filters { flex-wrap: wrap; gap: 6px; }
     .filter-select { font-size: 12px; }
@@ -1091,7 +1092,7 @@
       <div id="alert-pendientes-wrap"></div>
 
       <!-- CHARTS ROW -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px;margin-bottom:14px" class="charts-grid">
 
         <!-- Chart 1: Gasto histórico por mes (líneas por miembro) -->
         <div class="dash-chart-card">
@@ -1112,7 +1113,7 @@
           </div>
         </div>
 
-        <!-- Chart 2: Distribución por naturaleza (barras apiladas) -->
+        <!-- Chart 2: Distribución por categoría (barras apiladas) -->
         <div class="dash-chart-card">
           <div class="dash-chart-header">
             <span class="dash-chart-title">Distribución por categoría</span>
@@ -1120,6 +1121,17 @@
           </div>
           <div style="position:relative;height:200px">
             <canvas id="chart-categorias"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Distribución por titular (barras) -->
+        <div class="dash-chart-card">
+          <div class="dash-chart-header">
+            <span class="dash-chart-title">Distribución por titular</span>
+            <span class="dash-chart-sub" id="dash-chart-titular-sub"></span>
+          </div>
+          <div style="position:relative;height:200px">
+            <canvas id="chart-titulares"></canvas>
           </div>
         </div>
 
@@ -2911,6 +2923,7 @@ function renderDashboard() {
   // Charts
   renderChartHistorico();
   renderChartCategorias();
+  renderChartTitulares();
 
   // USD KPI
   const totalUSD = txs.filter(t => t.moneda === 'USD' && t.naturaleza !== 'financiero').reduce((s, t) => s + t.cargoMes, 0);
@@ -4390,6 +4403,7 @@ function initTheme() {
 // ============================================================
 let chartHistorico = null;
 let chartCategorias = null;
+let chartTitulares = null;
 
 // Member color palette — consistent per member index
 const MEMBER_COLORS = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#f97316'];
@@ -4588,6 +4602,67 @@ function renderChartCategorias() {
 
   if (chartCategorias) chartCategorias.destroy();
   chartCategorias = new Chart(canvas, { type: 'bar', data: { labels, datasets }, options: opts });
+}
+
+function renderChartTitulares() {
+  if (typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('chart-titulares');
+  if (!canvas) return;
+
+  const keys = getDashPeriodKeys().filter(k => allData[k]);
+  if (!keys.length) { if (chartTitulares) { chartTitulares.destroy(); chartTitulares = null; } return; }
+
+  const miembros = getMiembrosList();
+  const labels = miembros.map(m => m.nombre.split(' ')[0]);
+
+  const data = miembros.map(m => {
+    const nums = getNums(m);
+    let total = 0;
+    keys.forEach(k => {
+      const pd = allData[k];
+      if (!pd) return;
+      total += pd.transacciones
+        .filter(t => !t.isAbono && nums.includes(t.tarjetaNum) && t.naturaleza !== 'financiero')
+        .reduce((s, t) => s + copValue(t), 0);
+    });
+    return total;
+  });
+
+  // Update sub label
+  const subEl = document.getElementById('dash-chart-titular-sub');
+  if (subEl) subEl.textContent = labels.join(' · ');
+
+  if (chartTitulares) chartTitulares.destroy();
+  chartTitulares = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Equiv. COP',
+        data,
+        backgroundColor: MEMBER_COLORS.slice(0, miembros.length).map(c => c + 'cc'),
+        borderColor: MEMBER_COLORS.slice(0, miembros.length),
+        borderWidth: 1,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      ...chartDefaults(),
+      maintainAspectRatio: false,
+      plugins: {
+        ...chartDefaults().plugins,
+        legend: { display: false },
+        tooltip: {
+          ...chartDefaults().plugins.tooltip,
+          callbacks: { label: ctx => ` ${fmtCOP(ctx.parsed.y)}` }
+        }
+      },
+      scales: {
+        x: { grid:{color:'#2a3547'}, ticks:{color:'#6b82a0', font:{family:'JetBrains Mono',size:9}} },
+        y: { grid:{color:'#2a3547'}, ticks:{color:'#6b82a0', font:{family:'JetBrains Mono',size:9}, callback: v=>fmtCOPShort(v)} }
+      }
+    }
+  });
 }
 
 // ============================================================
