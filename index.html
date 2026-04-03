@@ -1404,9 +1404,9 @@
 
       <!-- TX CHARTS PANEL -->
       <div id="tx-charts-panel" style="display:none;margin-bottom:16px">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px">
           <!-- Chart 1: Historical line -->
-          <div class="card" style="padding:16px;grid-column:1/3">
+          <div class="card" style="padding:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
               <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">Evolución histórica</div>
               <span id="tx-chart-label" style="font-family:var(--font-mono);font-size:10px;color:var(--accent)"></span>
@@ -1422,12 +1422,12 @@
               <canvas id="tx-chart-naturaleza"></canvas>
             </div>
           </div>
-        </div>
-        <!-- Chart 3: Bar by titular -->
-        <div class="card" style="padding:16px;margin-top:14px">
-          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Distribución por titular</div>
-          <div style="position:relative;height:120px">
-            <canvas id="tx-chart-titulares"></canvas>
+          <!-- Chart 3: Bar by titular -->
+          <div class="card" style="padding:16px">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Distribución por titular</div>
+            <div style="position:relative;height:160px">
+              <canvas id="tx-chart-titulares"></canvas>
+            </div>
           </div>
         </div>
       </div>
