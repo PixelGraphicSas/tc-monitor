@@ -1334,9 +1334,24 @@
       <div class="page-header">
         <div>
           <div class="page-title">Transacciones</div>
-          <div class="page-subtitle">Revisa y clasifica cada transacción del período</div>
+          <div class="page-subtitle" id="tx-period-subtitle">Revisa y clasifica cada transacción del período</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Exportar Excel</button>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <!-- Period selector -->
+          <div style="display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px">
+            <button class="dash-filter-btn active" data-txfilter="mes" onclick="setTxFilter('mes',this)">Mes</button>
+            <button class="dash-filter-btn" data-txfilter="trimestre" onclick="setTxFilter('trimestre',this)">Trimestre</button>
+            <button class="dash-filter-btn" data-txfilter="semestre" onclick="setTxFilter('semestre',this)">Semestre</button>
+            <button class="dash-filter-btn" data-txfilter="anio" onclick="setTxFilter('anio',this)">Año</button>
+            <button class="dash-filter-btn" data-txfilter="rango" onclick="setTxFilter('rango',this)">Rango</button>
+          </div>
+          <div id="tx-rango-wrap" style="display:none;gap:6px;align-items:center">
+            <input type="month" id="tx-desde" class="filter-select" style="padding:5px 10px;font-size:12px" onchange="renderTransacciones()">
+            <span style="color:var(--text3)">→</span>
+            <input type="month" id="tx-hasta" class="filter-select" style="padding:5px 10px;font-size:12px" onchange="renderTransacciones()">
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ Exportar Excel</button>
+        </div>
       </div>
 
       <div class="filters">
@@ -1384,6 +1399,36 @@
             <span style="font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Transacciones </span>
             <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text2)" id="tx-total-count">0</span>
           </div>
+        </div>
+      </div>
+
+      <!-- TX CHARTS PANEL -->
+      <div id="tx-charts-panel" style="display:none;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+          <!-- Chart 1: Historical line -->
+          <div class="card" style="padding:16px;grid-column:1/3">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">
+                Evolución histórica
+              </div>
+              <span id="tx-chart-label" style="font-family:var(--font-mono);font-size:10px;color:var(--accent)"></span>
+            </div>
+            <canvas id="tx-chart-historico" height="110"></canvas>
+          </div>
+          <!-- Chart 2: Donut naturaleza -->
+          <div class="card" style="padding:16px">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">
+              Distribución naturaleza
+            </div>
+            <canvas id="tx-chart-naturaleza" height="110"></canvas>
+          </div>
+        </div>
+        <!-- Chart 3: Bar by titular -->
+        <div class="card" style="padding:16px;margin-top:14px">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">
+            Distribución por titular — períodos filtrados
+          </div>
+          <canvas id="tx-chart-titulares" height="80"></canvas>
         </div>
       </div>
 
@@ -2894,11 +2939,234 @@ function renderDashboard() {
 }
 
 // ============================================================
+// TRANSACCIONES — PERIOD FILTER & CHARTS
+// ============================================================
+let txFilter = 'mes';
+let txChartHistorico = null;
+let txChartNaturaleza = null;
+let txChartTitulares = null;
+
+function setTxFilter(filter, btn) {
+  txFilter = filter;
+  document.querySelectorAll('[data-txfilter]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tx-rango-wrap').style.display = filter === 'rango' ? 'flex' : 'none';
+  renderTransacciones();
+}
+
+function getTxPeriodKeys() {
+  const y = activePeriod.year, m = activePeriod.month;
+  if (txFilter === 'mes') return [periodKey(y, m)];
+  if (txFilter === 'anio') return Array.from({length:12}, (_, i) => periodKey(y, i+1));
+  if (txFilter === 'trimestre') {
+    const q = Math.ceil(m/3), start = (q-1)*3+1;
+    return [periodKey(y,start), periodKey(y,start+1), periodKey(y,start+2)];
+  }
+  if (txFilter === 'semestre') {
+    const start = m<=6 ? 1 : 7;
+    return Array.from({length:6}, (_, i) => periodKey(y, start+i));
+  }
+  if (txFilter === 'rango') {
+    const desde = document.getElementById('tx-desde')?.value;
+    const hasta = document.getElementById('tx-hasta')?.value;
+    if (!desde || !hasta) return [periodKey(y, m)];
+    const keys = [];
+    let [dy, dm] = desde.split('-').map(Number);
+    const [hy, hm] = hasta.split('-').map(Number);
+    while (dy < hy || (dy===hy && dm<=hm)) {
+      keys.push(periodKey(dy, dm));
+      dm++; if (dm>12) { dm=1; dy++; }
+    }
+    return keys;
+  }
+  return [periodKey(y, m)];
+}
+
+function getTxFilterLabel() {
+  if (txFilter==='mes') return `${MONTHS_FULL[activePeriod.month-1]} ${activePeriod.year}`;
+  if (txFilter==='trimestre') return `T${Math.ceil(activePeriod.month/3)} ${activePeriod.year}`;
+  if (txFilter==='semestre') return `${activePeriod.month<=6?'1er':'2do'} Semestre ${activePeriod.year}`;
+  if (txFilter==='anio') return `Año ${activePeriod.year}`;
+  if (txFilter==='rango') {
+    const d = document.getElementById('tx-desde')?.value;
+    const h = document.getElementById('tx-hasta')?.value;
+    return d&&h ? `${d} → ${h}` : 'Rango';
+  }
+  return '';
+}
+
+function renderTxCharts(allFilteredTxs, appliedKeys) {
+  if (typeof Chart === 'undefined') return;
+
+  const panel = document.getElementById('tx-charts-panel');
+  if (!panel) return;
+
+  if (!allFilteredTxs.length) { panel.style.display='none'; return; }
+  panel.style.display = 'block';
+
+  // Update label
+  const labelEl = document.getElementById('tx-chart-label');
+  if (labelEl) labelEl.textContent = getTxFilterLabel();
+
+  const textColor = '#6b82a0';
+  const gridColor = '#2a3547';
+  const fontMono = 'JetBrains Mono';
+
+  // ── CHART 1: Historical line (equiv COP per period) ─────────
+  const historicCanvas = document.getElementById('tx-chart-historico');
+  if (historicCanvas) {
+    // Get active row filters (tarjeta, naturaleza, moneda, subcat, buscar)
+    const fTarjeta = document.getElementById('filter-tarjeta')?.value || '';
+    const fNat = document.getElementById('filter-naturaleza')?.value || '';
+    const fMoneda = document.getElementById('filter-moneda')?.value || '';
+    const fSubcat = document.getElementById('filter-subcat')?.value || '';
+    const fBuscar = document.getElementById('filter-buscar')?.value.toLowerCase() || '';
+
+    const histLabels = appliedKeys.map(k => {
+      const [y, m] = k.split('-');
+      return MONTHS_ES[parseInt(m)-1] + ' ' + y.slice(2);
+    });
+
+    const histData = appliedKeys.map(k => {
+      const pd = allData[k];
+      if (!pd) return 0;
+      let txs = pd.transacciones.filter(t => !t.isAbono);
+      if (fTarjeta) { const nums = fTarjeta.split('|'); txs = txs.filter(t => nums.includes(t.tarjetaNum)); }
+      if (fNat) txs = txs.filter(t => t.naturaleza === fNat);
+      if (fMoneda) txs = txs.filter(t => t.moneda === fMoneda);
+      if (fSubcat) txs = txs.filter(t => t.subcategoria === fSubcat);
+      if (fBuscar) txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
+      return txs.reduce((s, t) => s + copValue(t), 0);
+    });
+
+    if (txChartHistorico) txChartHistorico.destroy();
+    txChartHistorico = new Chart(historicCanvas, {
+      type: 'line',
+      data: {
+        labels: histLabels,
+        datasets: [{
+          label: 'Equiv. COP',
+          data: histData,
+          borderColor: '#4f8ef7',
+          backgroundColor: 'rgba(79,142,247,0.1)',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        ...chartDefaults(),
+        interaction: { mode:'index', intersect:false },
+        plugins: {
+          ...chartDefaults().plugins,
+          tooltip: {
+            ...chartDefaults().plugins.tooltip,
+            callbacks: { label: ctx => ` ${fmtCOP(ctx.parsed.y)}` }
+          }
+        },
+        scales: {
+          x: { grid:{color:gridColor}, ticks:{color:textColor, font:{family:fontMono,size:9}} },
+          y: { grid:{color:gridColor}, ticks:{color:textColor, font:{family:fontMono,size:9}, callback: v=>fmtCOPShort(v)} }
+        }
+      }
+    });
+  }
+
+  // ── CHART 2: Donut naturaleza ────────────────────────────────
+  const natCanvas = document.getElementById('tx-chart-naturaleza');
+  if (natCanvas) {
+    const empVal = allFilteredTxs.filter(t=>t.naturaleza==='empresarial').reduce((s,t)=>s+copValue(t),0);
+    const perVal = allFilteredTxs.filter(t=>t.naturaleza==='personal').reduce((s,t)=>s+copValue(t),0);
+    const finVal = allFilteredTxs.filter(t=>t.naturaleza==='financiero').reduce((s,t)=>s+copValue(t),0);
+    const penVal = allFilteredTxs.filter(t=>t.naturaleza==='pendiente').reduce((s,t)=>s+copValue(t),0);
+
+    const natData = [], natLabels = [], natColors = [];
+    if (empVal>0){natData.push(empVal);natLabels.push('Empresarial');natColors.push('#4f8ef7');}
+    if (perVal>0){natData.push(perVal);natLabels.push('Beneficio Socio');natColors.push('#10b981');}
+    if (finVal>0){natData.push(finVal);natLabels.push('Financiero');natColors.push('#f59e0b');}
+    if (penVal>0){natData.push(penVal);natLabels.push('Pendiente');natColors.push('#ef4444');}
+
+    if (txChartNaturaleza) txChartNaturaleza.destroy();
+    txChartNaturaleza = new Chart(natCanvas, {
+      type: 'doughnut',
+      data: { labels: natLabels, datasets: [{ data: natData, backgroundColor: natColors, borderWidth: 0, hoverOffset: 4 }] },
+      options: {
+        ...chartDefaults(),
+        cutout: '62%',
+        plugins: {
+          ...chartDefaults().plugins,
+          legend: { display:true, position:'bottom', labels:{color:textColor, font:{family:fontMono,size:9}, boxWidth:10, padding:10} },
+          tooltip: {
+            ...chartDefaults().plugins.tooltip,
+            callbacks: { label: ctx => ` ${ctx.label}: ${fmtCOP(ctx.parsed)}` }
+          }
+        }
+      }
+    });
+  }
+
+  // ── CHART 3: Bars by titular ─────────────────────────────────
+  const titCanvas = document.getElementById('tx-chart-titulares');
+  if (titCanvas) {
+    const miembros = getMiembrosList();
+    const titLabels = miembros.map(m => m.nombre.split(' ')[0]);
+    const titData = miembros.map(m => {
+      const nums = getNums(m);
+      return allFilteredTxs
+        .filter(t => nums.includes(t.tarjetaNum) && t.naturaleza !== 'financiero')
+        .reduce((s,t) => s+copValue(t), 0);
+    });
+
+    if (txChartTitulares) txChartTitulares.destroy();
+    txChartTitulares = new Chart(titCanvas, {
+      type: 'bar',
+      data: {
+        labels: titLabels,
+        datasets: [{
+          label: 'Equiv. COP',
+          data: titData,
+          backgroundColor: MEMBER_COLORS.slice(0, miembros.length).map(c => c+'cc'),
+          borderColor: MEMBER_COLORS.slice(0, miembros.length),
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        ...chartDefaults(),
+        indexAxis: 'x',
+        plugins: {
+          ...chartDefaults().plugins,
+          legend: { display:false },
+          tooltip: {
+            ...chartDefaults().plugins.tooltip,
+            callbacks: { label: ctx => ` ${fmtCOP(ctx.parsed.y)}` }
+          }
+        },
+        scales: {
+          x: { grid:{color:gridColor}, ticks:{color:textColor, font:{family:fontMono,size:9}} },
+          y: { grid:{color:gridColor}, ticks:{color:textColor, font:{family:fontMono,size:9}, callback: v=>fmtCOPShort(v)} }
+        }
+      }
+    });
+  }
+}
+
+// ============================================================
 // TRANSACCIONES
 // ============================================================
 function renderTransacciones() {
-  const pd = getPeriodData();
-  let txs = pd.transacciones.filter(t => !t.isAbono);
+  // Gather txs from ALL periods covered by txFilter
+  const txPeriodKeys = getTxPeriodKeys().filter(k => allData[k]);
+  let txs = [];
+  txPeriodKeys.forEach(k => {
+    txs.push(...(allData[k]?.transacciones || []).filter(t => !t.isAbono));
+  });
+
+  // Update subtitle
+  const sub = document.getElementById('tx-period-subtitle');
+  if (sub) sub.textContent = getTxFilterLabel() + ' — Revisa y clasifica transacciones';
 
   // Populate filter — one option per miembro (matches all their nums)
   const filterTarjeta = document.getElementById('filter-tarjeta');
@@ -2942,6 +3210,9 @@ function renderTransacciones() {
   if (fBuscar) txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
 
   txs.sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
+
+  // Render charts with filtered data
+  renderTxCharts(txs, txPeriodKeys);
 
   // Totals = ALL filtered txs (no exclusions — if user filters by financiero, show those totals)
   const filteredCOP = txs.filter(t => t.moneda === 'COP').reduce((s, t) => s + t.cargoMes, 0);
