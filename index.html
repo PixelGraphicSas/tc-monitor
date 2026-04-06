@@ -2882,7 +2882,7 @@ function renderDashboard() {
     return `<div class="card" style="padding:18px 20px;cursor:pointer;transition:border-color .2s" onclick="openMiembroDetalle('${m.id}')" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:9px">
-          <div style="width:28px;height:28px;border-radius:50%;overflow:hidden;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surface3);font-size:11px;font-weight:700;color:var(--text2)">
+          <div style="width:84px;height:84px;border-radius:50%;overflow:hidden;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surface3);font-size:28px;font-weight:700;color:var(--text2)">
             ${m.avatar ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover">` : m.nombre.split(' ').map(p=>p[0]).slice(0,2).join('')}
           </div>
           <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">${m.nombre.split(' ')[0]} ****${activaNum}${activaTc?.cupo ? ' · cupo ' + fmtCOPShort(activaTc.cupo) : ''}</span>
