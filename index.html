@@ -3180,6 +3180,22 @@ function renderTransacciones() {
     txs.push(...(allData[k]?.transacciones || []).filter(t => !t.isAbono));
   });
 
+  // When filter is 'mes', also filter by the transaction's REAL date
+  // (some txs are stored in a period but have dates from a different month)
+  if (txFilter === 'mes') {
+    const y = activePeriod.year;
+    const m = String(activePeriod.month).padStart(2, '0');
+    txs = txs.filter(t => {
+      if (!t.fecha) return true; // keep if no date
+      // fecha is DD/MM/YYYY — extract MM/YYYY
+      const parts = t.fecha.split('/');
+      if (parts.length !== 3) return true;
+      const txMonth = parts[1]; // MM
+      const txYear = parts[2];  // YYYY
+      return txMonth === m && txYear === String(y);
+    });
+  }
+
   // Update subtitle
   const sub = document.getElementById('tx-period-subtitle');
   if (sub) sub.textContent = getTxFilterLabel() + ' — Revisa y clasifica transacciones';
