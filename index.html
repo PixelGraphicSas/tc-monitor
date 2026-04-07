@@ -4219,7 +4219,28 @@ function renderDetalle() {
 function exportDetalle() {
   if (!detallesMiembroId) return;
   if (typeof XLSX === 'undefined') { showToast('Cargando librería...', 'info'); return; }
-  const txs = getAllMiembroTxs(detallesMiembroId);
+
+  // Get ALL txs for member
+  let txs = getAllMiembroTxs(detallesMiembroId);
+
+  // Apply SAME filters as renderDetalle
+  const fMes    = document.getElementById('detalle-filter-mes')?.value || '';
+  const fNat    = document.getElementById('detalle-filter-nat')?.value || '';
+  const fMoneda = document.getElementById('detalle-filter-moneda')?.value || '';
+  const fSubcat = document.getElementById('detalle-filter-subcat')?.value || '';
+  const fCuotas = document.getElementById('detalle-filter-cuotas')?.value || '';
+  const fBuscar = document.getElementById('detalle-filter-buscar')?.value.toLowerCase() || '';
+
+  if (fMes)    txs = txs.filter(t => t._periodKey === fMes);
+  if (fNat)    txs = txs.filter(t => t.naturaleza === fNat);
+  if (fMoneda) txs = txs.filter(t => t.moneda === fMoneda);
+  if (fSubcat) txs = txs.filter(t => t.subcategoria === fSubcat);
+  if (fCuotas === '1')     txs = txs.filter(t => t.cuotaTotal <= 1);
+  if (fCuotas === 'multi') txs = txs.filter(t => t.cuotaTotal > 1);
+  if (fBuscar) txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
+
+  if (!txs.length) { showToast('No hay datos con los filtros actuales', 'err'); return; }
+
   const miembro = getMiembroById(detallesMiembroId);
   const nombre = miembro?.nombre || detallesMiembroId;
 
@@ -4235,10 +4256,20 @@ function exportDetalle() {
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
   ws['!cols'] = [{wch:10},{wch:14},{wch:32},{wch:8},{wch:14},{wch:14},{wch:10},{wch:10},{wch:14},{wch:18},{wch:28}];
 
+  // Bold header
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let C = range.s.c; C <= range.e.c; C++) {
+    const cell = ws[XLSX.utils.encode_cell({r:0, c:C})];
+    if (cell) cell.s = { font: { bold: true } };
+  }
+
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, nombre.split(' ')[0].slice(0,31));
-  XLSX.writeFile(wb, `tc-detalle-${nombre.split(' ')[0]}-${new Date().toISOString().slice(0,10)}.xlsx`);
-  showToast('Excel exportado correctamente', 'ok');
+  // Sheet name: member first name + filter info
+  const sheetLabel = (nombre.split(' ')[0] + (fMes ? ' ' + fMes : '')).slice(0, 31);
+  XLSX.utils.book_append_sheet(wb, ws, sheetLabel);
+  const filterSuffix = [fMes, fNat, fSubcat].filter(Boolean).join('-') || 'completo';
+  XLSX.writeFile(wb, `tc-${nombre.split(' ')[0]}-${filterSuffix}-${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast(`Excel exportado — ${txs.length} transacciones`, 'ok');
 }
 
 // ============================================================
