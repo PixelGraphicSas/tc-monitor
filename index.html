@@ -4184,20 +4184,9 @@ function renderDetalle() {
   }
 
   tbody.innerHTML = txs.map(t => {
-    // Use REAL transaction date for MES column, not storage period
-    let mesLabel;
-    if (t.fecha) {
-      const fp = t.fecha.split('/');
-      if (fp.length === 3) {
-        mesLabel = `${MONTHS_ES[parseInt(fp[1])-1]} ${fp[2]}`;
-      } else {
-        const [y, mo] = t._periodKey.split('-');
-        mesLabel = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
-      }
-    } else {
-      const [y, mo] = t._periodKey.split('-');
-      mesLabel = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
-    }
+    // MES column = billing period (extracto), not individual transaction date
+    const [y, mo] = t._periodKey.split('-');
+    const mesLabel = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
     const cuotasText = t.cuotaTotal > 1 ? `<span class="cuotas-badge">${t.cuotaActual}/${t.cuotaTotal}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>';
     const monedaTag = t.moneda === 'USD'
       ? `<span class="tag" style="background:rgba(20,184,166,.1);color:var(--teal);border-color:rgba(20,184,166,.2)">USD</span>`
