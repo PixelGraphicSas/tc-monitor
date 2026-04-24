@@ -4138,6 +4138,14 @@ function openMiembroDetalle(miembroId) {
     opt.textContent = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
     selMes.appendChild(opt);
   });
+  // Pre-select the active period month by default using real date format
+  const activeKey = periodKey(activePeriod.year, activePeriod.month); // YYYY-MM
+  if (selMes && selMes.querySelector(`option[value="${activeKey}"]`)) {
+    selMes.value = activeKey;
+  } else if (selMes && selMes.options.length > 1) {
+    // fallback: select the most recent available month
+    selMes.value = selMes.options[1].value;
+  }
   navigate('miembro-detalle');
 }
 
@@ -4200,7 +4208,8 @@ function renderDetalle() {
   if (fCuotas === 'multi') txs = txs.filter(t => t.cuotaTotal > 1);
   if (fBuscar) txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
 
-  txs.sort((a, b) => b._periodKey.localeCompare(a._periodKey) || parseDate(b.fecha) - parseDate(a.fecha));
+  // Sort by real transaction date (most recent first)
+  txs.sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
 
   // KPIs
   const totalCOP = txs.filter(t => t.moneda === 'COP' && t.naturaleza !== 'financiero').reduce((s, t) => s + t.cargoMes, 0);
@@ -4226,8 +4235,20 @@ function renderDetalle() {
   }
 
   tbody.innerHTML = txs.map(t => {
-    const [y, mo] = t._periodKey.split('-');
-    const mesLabel = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
+    // Use REAL transaction date for MES column, not storage period
+    let mesLabel;
+    if (t.fecha) {
+      const fp = t.fecha.split('/');
+      if (fp.length === 3) {
+        mesLabel = `${MONTHS_ES[parseInt(fp[1])-1]} ${fp[2]}`;
+      } else {
+        const [y, mo] = t._periodKey.split('-');
+        mesLabel = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
+      }
+    } else {
+      const [y, mo] = t._periodKey.split('-');
+      mesLabel = `${MONTHS_ES[parseInt(mo)-1]} ${y}`;
+    }
     const cuotasText = t.cuotaTotal > 1 ? `<span class="cuotas-badge">${t.cuotaActual}/${t.cuotaTotal}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>';
     const monedaTag = t.moneda === 'USD'
       ? `<span class="tag" style="background:rgba(20,184,166,.1);color:var(--teal);border-color:rgba(20,184,166,.2)">USD</span>`
