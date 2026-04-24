@@ -2817,7 +2817,8 @@ function getDashPeriodKeys() {
   return [periodKey(y, m)];
 }
 
-// Get all transactions across filtered periods — using REAL transaction date
+// Get all transactions across filtered periods
+// Period = billing period (extracto), not individual transaction date
 function getDashTxs() {
   const keys = getDashPeriodKeys();
   const txs = [];
@@ -2825,32 +2826,6 @@ function getDashTxs() {
     const pd = allData[k];
     if (pd) txs.push(...pd.transacciones.filter(t => !t.isAbono));
   });
-
-  // When filter is 'mes', also validate by real transaction date
-  // (some txs are stored in a period but have dates from adjacent months)
-  if (dashFilter === 'mes') {
-    const y = String(activePeriod.year);
-    const m = String(activePeriod.month).padStart(2, '0');
-    return txs.filter(t => {
-      if (!t.fecha) return true;
-      const parts = t.fecha.split('/');
-      if (parts.length !== 3) return true;
-      return parts[1] === m && parts[2] === y;
-    });
-  }
-
-  // For multi-period filters, filter by real date within the selected range
-  if (dashFilter === 'trimestre' || dashFilter === 'semestre' || dashFilter === 'anio' || dashFilter === 'rango') {
-    const validKeys = new Set(keys);
-    return txs.filter(t => {
-      if (!t.fecha) return true;
-      const parts = t.fecha.split('/');
-      if (parts.length !== 3) return true;
-      const txKey = `${parts[2]}-${parts[1]}`; // YYYY-MM from DD/MM/YYYY
-      return validKeys.has(txKey);
-    });
-  }
-
   return txs;
 }
 
@@ -3206,21 +3181,8 @@ function renderTransacciones() {
     txs.push(...(allData[k]?.transacciones || []).filter(t => !t.isAbono));
   });
 
-  // When filter is 'mes', also filter by the transaction's REAL date
-  // (some txs are stored in a period but have dates from a different month)
-  if (txFilter === 'mes') {
-    const y = activePeriod.year;
-    const m = String(activePeriod.month).padStart(2, '0');
-    txs = txs.filter(t => {
-      if (!t.fecha) return true; // keep if no date
-      // fecha is DD/MM/YYYY — extract MM/YYYY
-      const parts = t.fecha.split('/');
-      if (parts.length !== 3) return true;
-      const txMonth = parts[1]; // MM
-      const txYear = parts[2];  // YYYY
-      return txMonth === m && txYear === String(y);
-    });
-  }
+  // Period filter: use billing period (extracto), not individual transaction date
+  // A transaction with date 31/01 inside the Feb extracto belongs to Feb billing period
 
   // Update subtitle
   const sub = document.getElementById('tx-period-subtitle');
@@ -4118,20 +4080,15 @@ function openMiembroDetalle(miembroId) {
   document.getElementById('detalle-nombre').textContent = m.nombre;
   document.getElementById('nav-miembro-nombre').textContent = m.nombre.split(' ')[0];
   document.getElementById('nav-miembro-detalle').style.display = 'flex';
-  // Populate month filter using REAL transaction dates (DD/MM/YYYY → YYYY-MM)
+  // Populate month filter using billing periods (extracto periods)
   const selMes = document.getElementById('detalle-filter-mes');
   while (selMes.options.length > 1) selMes.remove(1);
-  // Collect unique months from real transaction dates of this member
+  // Show periods that have transactions for this member
   const nums = getNums(m);
-  const realMonths = new Set();
-  Object.values(allData).forEach(pd => {
-    (pd.transacciones || []).forEach(t => {
-      if (!nums.includes(t.tarjetaNum) || !t.fecha) return;
-      const parts = t.fecha.split('/');
-      if (parts.length === 3) realMonths.add(`${parts[2]}-${parts[1]}`); // YYYY-MM
-    });
-  });
-  [...realMonths].sort().reverse().forEach(k => {
+  const memberPeriods = Object.keys(allData)
+    .filter(k => allData[k]?.transacciones?.some(t => nums.includes(t.tarjetaNum)))
+    .sort().reverse();
+  memberPeriods.forEach(k => {
     const [y, mo] = k.split('-');
     const opt = document.createElement('option');
     opt.value = k;
@@ -4191,16 +4148,8 @@ function renderDetalle() {
   }
   const fSubcat = detalleSubcatSel?.value || '';
 
-  // Filter by REAL transaction date (DD/MM/YYYY), not storage period
-  if (fMes) {
-    const [fy, fm] = fMes.split('-');
-    txs = txs.filter(t => {
-      if (!t.fecha) return false;
-      const parts = t.fecha.split('/');
-      if (parts.length !== 3) return false;
-      return parts[1] === fm && parts[2] === fy;
-    });
-  }
+  // Filter by billing period (extracto period), not individual transaction date
+  if (fMes) txs = txs.filter(t => t._periodKey === fMes);
   if (fNat) txs = txs.filter(t => t.naturaleza === fNat);
   if (fMoneda) txs = txs.filter(t => t.moneda === fMoneda);
   if (fSubcat) txs = txs.filter(t => t.subcategoria === fSubcat);
@@ -4296,16 +4245,8 @@ function exportDetalle() {
   const fCuotas = document.getElementById('detalle-filter-cuotas')?.value || '';
   const fBuscar = document.getElementById('detalle-filter-buscar')?.value.toLowerCase() || '';
 
-  // Filter by REAL transaction date
-  if (fMes) {
-    const [fy, fm] = fMes.split('-');
-    txs = txs.filter(t => {
-      if (!t.fecha) return false;
-      const parts = t.fecha.split('/');
-      if (parts.length !== 3) return false;
-      return parts[1] === fm && parts[2] === fy;
-    });
-  }
+  // Filter by billing period (extracto period)
+  if (fMes) txs = txs.filter(t => t._periodKey === fMes);
   if (fNat)    txs = txs.filter(t => t.naturaleza === fNat);
   if (fMoneda) txs = txs.filter(t => t.moneda === fMoneda);
   if (fSubcat) txs = txs.filter(t => t.subcategoria === fSubcat);
