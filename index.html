@@ -1448,6 +1448,11 @@
         <table>
           <thead>
             <tr>
+              <th style="width:36px;text-align:center">
+                <input type="checkbox" id="tx-select-all" title="Seleccionar todas"
+                  style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent)"
+                  onchange="toggleSelectAllTx(this.checked)">
+              </th>
               <th>Fecha</th>
               <th>Titular</th>
               <th>Descripción</th>
@@ -1465,6 +1470,70 @@
         </table>
       </div>
     </section>
+
+    <!-- BULK ACTION BAR -->
+    <div id="bulk-action-bar" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--accent);border-radius:14px;padding:12px 20px;align-items:center;gap:16px;box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(0,229,160,.15);z-index:400;min-width:360px;max-width:90vw;backdrop-filter:blur(8px)">
+      <span id="bulk-count-label" style="font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;white-space:nowrap"></span>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost btn-sm" onclick="clearTxSelection()" style="font-size:12px">✕ Deseleccionar</button>
+      <button class="btn btn-primary btn-sm" onclick="openBulkModal()" style="font-size:12px;background:var(--accent);color:#0D1117;font-weight:700">&#9889; Clasificar selección</button>
+    </div>
+
+    <!-- MODAL EDICIÓN EN LOTE -->
+    <div class="overlay" id="bulk-modal-overlay">
+      <div class="modal" style="max-width:480px">
+        <div class="modal-title">Clasificación en lote</div>
+        <div class="modal-sub">Aplicar a <strong id="bulk-modal-count">0</strong> transacciones seleccionadas</div>
+
+        <div class="classify-options">
+          <label class="classify-opt" id="bulk-opt-empresarial">
+            <input type="radio" name="bulk-nat" value="empresarial" onchange="bulkSelectNat(this)">
+            <span class="classify-opt-icon">&#127970;</span>
+            <div class="classify-opt-info">
+              <strong>Empresarial</strong>
+              <span>Gasto operativo de la empresa</span>
+            </div>
+          </label>
+          <label class="classify-opt" id="bulk-opt-personal">
+            <input type="radio" name="bulk-nat" value="personal" onchange="bulkSelectNat(this)">
+            <span class="classify-opt-icon">&#128100;</span>
+            <div class="classify-opt-info">
+              <strong>Beneficio Socio</strong>
+              <span>Gasto personal del socio</span>
+            </div>
+          </label>
+          <label class="classify-opt" id="bulk-opt-financiero">
+            <input type="radio" name="bulk-nat" value="financiero" onchange="bulkSelectNat(this)">
+            <span class="classify-opt-icon">&#127970;</span>
+            <div class="classify-opt-info">
+              <strong>Costo Financiero</strong>
+              <span>GMF, cuota de manejo, intereses</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Subcategoría bulk -->
+        <div id="bulk-subcat-wrap" style="margin-bottom:16px;display:none">
+          <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px">Subcategoría</label>
+          <select id="bulk-subcat" class="filter-select" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;outline:none">
+            <option value="">Sin subcategoría</option>
+          </select>
+        </div>
+
+        <!-- Comentario bulk -->
+        <div style="margin-bottom:16px">
+          <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px">Comentario <span style="color:var(--text3);font-weight:400">(opcional)</span></label>
+          <textarea id="bulk-comentario" placeholder="Nota para todas las transacciones seleccionadas..."
+            style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:12px;font-family:var(--font-body);resize:vertical;min-height:56px;outline:none;transition:border-color .15s;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeBulkModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="saveBulkClassification()">&#10003; Aplicar a todas</button>
+        </div>
+      </div>
+    </div>
 
     <!-- SOCIOS -->
     <section class="page" id="page-socios">
@@ -2310,6 +2379,7 @@ function navigate(page) {
     }
   });
 
+  if (page !== 'transacciones') clearTxSelection();
   if (page === 'dashboard') renderDashboard();
   if (page === 'transacciones') renderTransacciones();
   if (page === 'socios') renderSocios();
@@ -3259,7 +3329,7 @@ function renderTransacciones() {
 
   const tbody = document.getElementById('tx-body');
   if (!txs.length) {
-    tbody.innerHTML = '<tr class="no-data-row"><td colspan="9">No hay transacciones con los filtros aplicados</td></tr>';
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="10">No hay transacciones con los filtros aplicados</td></tr>';
     return;
   }
 
@@ -3302,6 +3372,11 @@ function txRow(t, withAction) {
     : `<span style="color:var(--text3);font-size:11px">—</span>`;
 
   return `<tr>
+    <td style="width:36px;text-align:center;padding:0 8px">
+      ${withAction ? `<input type="checkbox" class="tx-select-cb" data-txid="${t.id.replace(/'/g, '&#39;')}"
+        style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent)"
+        onchange="onTxCheckChange()">` : ''}
+    </td>
     <td class="mono" style="font-size:12px">${t.fecha}</td>
     <td style="font-size:12px">${t.titular || t.tarjetaNum}</td>
     <td style="max-width:200px;font-size:12px">${t.descripcion}</td>
@@ -5287,6 +5362,137 @@ auth.onAuthStateChanged(async (user) => {
 
 // initDashboard is now called after Firebase loads data (inside onAuthStateChanged)
 // This prevents showing empty charts before data is ready
+
+// ============================================================
+// BULK SELECTION (Edición en lote — módulo Transacciones)
+// ============================================================
+var selectedTxIds = new Set();
+
+function onTxCheckChange() {
+  var bar = document.getElementById('bulk-action-bar');
+  // Rebuild set from current checked boxes
+  selectedTxIds = new Set();
+  document.querySelectorAll('.tx-select-cb:checked').forEach(function(cb) {
+    selectedTxIds.add(cb.getAttribute('data-txid'));
+  });
+  // Sync select-all checkbox state
+  var all = document.querySelectorAll('.tx-select-cb');
+  var checked = document.querySelectorAll('.tx-select-cb:checked');
+  var selAll = document.getElementById('tx-select-all');
+  if (selAll) {
+    selAll.indeterminate = checked.length > 0 && checked.length < all.length;
+    selAll.checked = all.length > 0 && checked.length === all.length;
+  }
+  // Show/hide bulk action bar
+  if (selectedTxIds.size > 0) {
+    document.getElementById('bulk-count-label').textContent = selectedTxIds.size + ' transacción(es) seleccionada(s)';
+    bar.style.display = 'flex';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function toggleSelectAllTx(checked) {
+  document.querySelectorAll('.tx-select-cb').forEach(function(cb) {
+    cb.checked = checked;
+  });
+  onTxCheckChange();
+}
+
+function clearTxSelection() {
+  document.querySelectorAll('.tx-select-cb').forEach(function(cb) { cb.checked = false; });
+  var selAll = document.getElementById('tx-select-all');
+  if (selAll) { selAll.checked = false; selAll.indeterminate = false; }
+  selectedTxIds = new Set();
+  document.getElementById('bulk-action-bar').style.display = 'none';
+}
+
+function openBulkModal() {
+  if (!guardAdmin()) return;
+  if (selectedTxIds.size === 0) { showToast('No hay transacciones seleccionadas', 'err'); return; }
+  // Reset modal state
+  document.querySelectorAll('input[name="bulk-nat"]').forEach(function(r) { r.checked = false; });
+  ['bulk-opt-empresarial','bulk-opt-personal','bulk-opt-financiero'].forEach(function(id) {
+    document.getElementById(id).classList.remove('selected');
+  });
+  document.getElementById('bulk-subcat-wrap').style.display = 'none';
+  document.getElementById('bulk-subcat').innerHTML = '<option value="">Sin subcategoría</option>';
+  document.getElementById('bulk-comentario').value = '';
+  document.getElementById('bulk-modal-count').textContent = selectedTxIds.size;
+  document.getElementById('bulk-modal-overlay').classList.add('show');
+}
+
+function closeBulkModal() {
+  document.getElementById('bulk-modal-overlay').classList.remove('show');
+}
+
+function bulkSelectNat(input) {
+  ['bulk-opt-empresarial','bulk-opt-personal','bulk-opt-financiero'].forEach(function(id) {
+    document.getElementById(id).classList.remove('selected');
+  });
+  document.getElementById('bulk-opt-' + input.value).classList.add('selected');
+  // Populate subcategorías
+  var wrap = document.getElementById('bulk-subcat-wrap');
+  var sel = document.getElementById('bulk-subcat');
+  var cat = (config.categorias || []).find(function(c) { return c.naturaleza === input.value; });
+  var subs = cat ? (cat.subcategorias || []) : [];
+  if (subs.length > 0) {
+    sel.innerHTML = '<option value="">Sin subcategoría</option>' +
+      subs.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+    wrap.style.display = 'block';
+  } else {
+    sel.innerHTML = '<option value="">Sin subcategoría</option>';
+    wrap.style.display = 'none';
+  }
+}
+
+function saveBulkClassification() {
+  var selected = document.querySelector('input[name="bulk-nat"]:checked');
+  if (!selected) { showToast('Selecciona una clasificación', 'err'); return; }
+  var newNat = selected.value;
+  var newSubcat = document.getElementById('bulk-subcat').value || '';
+  var newComentario = document.getElementById('bulk-comentario').value.trim();
+  var count = 0;
+  selectedTxIds.forEach(function(txId) {
+    Object.values(allData).forEach(function(pd) {
+      var idx = pd.transacciones ? pd.transacciones.findIndex(function(t) { return t.id === txId; }) : -1;
+      if (idx >= 0) {
+        pd.transacciones[idx].naturaleza = newNat;
+        pd.transacciones[idx].clasificadoManual = true;
+        pd.transacciones[idx].subcategoria = newSubcat;
+        if (newComentario) pd.transacciones[idx].comentario = newComentario;
+        count++;
+      }
+    });
+  });
+  if (count > 0) {
+    try {
+      saveAllData();
+    } catch(e) {
+      if (e.name !== 'QuotaExceededError') { showToast('Error al guardar: ' + e.message, 'err'); return; }
+      showToast('⚠ Guardado en memoria (almacenamiento lleno). Descarga backup.', 'err');
+    }
+    closeBulkModal();
+    clearTxSelection();
+    updateBadge();
+    // Reset filter if it was showing only pendientes
+    var natFilter = document.getElementById('filter-naturaleza');
+    if (natFilter && natFilter.value === 'pendiente') natFilter.value = '';
+    renderActivePage();
+    showToast('✓ ' + count + ' transacciones clasificadas como: ' + newNat, 'ok');
+  } else {
+    showToast('No se encontraron las transacciones seleccionadas', 'err');
+  }
+}
+
+// Clear bulk selection when changing pages
+var _origShowPage = typeof showPage === 'function' ? showPage : null;
+document.addEventListener('DOMContentLoaded', function() {
+  // Escape key also closes bulk modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeBulkModal();
+  });
+});
 </script>
 </body>
 </html>
