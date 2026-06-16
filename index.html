@@ -1954,7 +1954,7 @@
 
 <!-- PIN LOGIN OVERLAY -->
 <div id="pin-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
+  flex-direction:column;align-items:center;justify-content:center;gap:0">
   <div style="text-align:center;margin-bottom:32px">
     <div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text);margin-bottom:6px">TC Monitor</div>
     <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">Pixel Graphic SAS</div>
@@ -5275,8 +5275,23 @@ function initPinScreen() {
   const pin = config.params?.pinAdmin;
   if (!pin || pin.trim() === '') {
     // No PIN configured — open directly as admin
+    guestMode = false;
     hidePinOverlay();
     return;
+  }
+  // Check if PIN was already verified in this session (within 8 hours)
+  const stored = localStorage.getItem('tcm_pin_session');
+  if (stored) {
+    try {
+      const { verified, ts } = JSON.parse(stored);
+      const eightHours = 8 * 60 * 60 * 1000;
+      if (verified && (Date.now() - ts) < eightHours) {
+        guestMode = false;
+        hidePinOverlay();
+        return;
+      }
+    } catch(e) {}
+    localStorage.removeItem('tcm_pin_session');
   }
   // Show PIN screen
   document.getElementById('pin-overlay').style.display = 'flex';
@@ -5289,6 +5304,8 @@ function checkPin() {
   const pin = config.params?.pinAdmin || '';
   if (input === pin) {
     guestMode = false;
+    // Remember verified PIN for 8 hours
+    localStorage.setItem('tcm_pin_session', JSON.stringify({ verified: true, ts: Date.now() }));
     hidePinOverlay();
     applyGuestMode();
   } else {
