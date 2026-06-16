@@ -5272,31 +5272,50 @@ function deleteCat(ci) {
 let guestMode = false;
 
 function initPinScreen() {
-  const pin = config.params?.pinAdmin;
-  if (!pin || pin.trim() === '') {
-    // No PIN configured — open directly as admin
-    guestMode = false;
-    hidePinOverlay();
-    return;
-  }
-  // Check if PIN was already verified in this session (within 8 hours)
-  const stored = localStorage.getItem('tcm_pin_session');
-  if (stored) {
+  try {
+    var pin = (config && config.params && config.params.pinAdmin) ? config.params.pinAdmin : '';
+    if (!pin || pin.trim() === '') {
+      // No PIN configured — open directly as admin
+      guestMode = false;
+      // .app already visible at this point — just ensure pin-overlay is hidden
+      var po = document.getElementById('pin-overlay');
+      if (po) po.style.display = 'none';
+      return;
+    }
+    // Check if PIN was already verified in this session (within 8 hours)
     try {
-      const { verified, ts } = JSON.parse(stored);
-      const eightHours = 8 * 60 * 60 * 1000;
-      if (verified && (Date.now() - ts) < eightHours) {
-        guestMode = false;
-        hidePinOverlay();
-        return;
+      var stored = localStorage.getItem('tcm_pin_session');
+      if (stored) {
+        var sess = JSON.parse(stored);
+        var eightHours = 8 * 60 * 60 * 1000;
+        if (sess && sess.verified && (Date.now() - sess.ts) < eightHours) {
+          guestMode = false;
+          var po2 = document.getElementById('pin-overlay');
+          if (po2) po2.style.display = 'none';
+          return;
+        }
+        localStorage.removeItem('tcm_pin_session');
       }
-    } catch(e) {}
-    localStorage.removeItem('tcm_pin_session');
+    } catch(e2) {
+      localStorage.removeItem('tcm_pin_session');
+    }
+    // Show PIN screen — hide .app, show pin-overlay
+    var appEl = document.querySelector('.app');
+    if (appEl) appEl.style.display = 'none';
+    var pinEl = document.getElementById('pin-overlay');
+    if (pinEl) pinEl.style.display = 'flex';
+    setTimeout(function() {
+      var inp = document.getElementById('pin-input');
+      if (inp) inp.focus();
+    }, 100);
+  } catch(e) {
+    // Safety net: if anything fails, ensure app is visible
+    console.error('initPinScreen error:', e);
+    var appEl2 = document.querySelector('.app');
+    if (appEl2) appEl2.style.display = 'flex';
+    var po3 = document.getElementById('pin-overlay');
+    if (po3) po3.style.display = 'none';
   }
-  // Show PIN screen
-  document.getElementById('pin-overlay').style.display = 'flex';
-  document.querySelector('.app').style.display = 'none';
-  setTimeout(() => document.getElementById('pin-input')?.focus(), 100);
 }
 
 function checkPin() {
@@ -5323,8 +5342,10 @@ function enterGuest() {
 }
 
 function hidePinOverlay() {
-  document.getElementById('pin-overlay').style.display = 'none';
-  document.querySelector('.app').style.display = 'flex';
+  var po = document.getElementById('pin-overlay');
+  if (po) po.style.display = 'none';
+  var appEl = document.querySelector('.app');
+  if (appEl) appEl.style.display = 'flex';
 }
 
 function applyGuestMode() {
@@ -5436,6 +5457,19 @@ auth.onAuthStateChanged(async (user) => {
 
 // initDashboard is now called after Firebase loads data (inside onAuthStateChanged)
 // This prevents showing empty charts before data is ready
+
+// Safety net: if .app is still hidden after 6 seconds, something went wrong — show it
+setTimeout(function() {
+  var appEl = document.querySelector('.app');
+  var authEl = document.getElementById('auth-overlay');
+  var pinEl = document.getElementById('pin-overlay');
+  var authVisible = authEl && authEl.style.display === 'flex';
+  var pinVisible = pinEl && pinEl.style.display === 'flex';
+  if (appEl && appEl.style.display === 'none' && !authVisible && !pinVisible) {
+    console.warn('TC Monitor: safety net triggered — forcing .app visible');
+    appEl.style.display = 'flex';
+  }
+}, 6000);
 
 // ============================================================
 // BULK SELECTION (Edición en lote — módulo Transacciones)
