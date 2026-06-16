@@ -2766,6 +2766,35 @@ async function processFile(file, tcId) {
     let totalTx = 0;
     const titulares = [];
 
+    // Check for existing extractos that would be overwritten
+    const conflictos = extractos.filter(extracto =>
+      pd.extractos.some(e => e.tarjetaNum === extracto.tarjetaNum)
+    );
+
+    if (conflictos.length > 0) {
+      const periodo = activePeriodKey();
+      const nombres = conflictos.map(ex => {
+        const m = getMiembro(ex.tarjetaNum);
+        return (m ? m.nombre.split(' ')[0] : '****' + ex.tarjetaNum) + ' (****' + ex.tarjetaNum + ')';
+      });
+      const msg = '⚠️ Ya existe un extracto para este período (' + periodo + '):
+
+' +
+        nombres.join('
+') +
+        '
+
+¿Deseas reemplazar los datos existentes con el nuevo extracto?
+
+' +
+        'Esta acción no se puede deshacer.';
+      if (!confirm(msg)) {
+        statEl.className = 'upload-status show';
+        statEl.innerHTML = 'ℹ️ Carga cancelada — los datos existentes no fueron modificados.';
+        return;
+      }
+    }
+
     for (const extracto of extractos) {
       // Remove existing data for this card number before inserting
       pd.extractos = pd.extractos.filter(e => e.tarjetaNum !== extracto.tarjetaNum);
@@ -4410,19 +4439,43 @@ function updateBadge() {
 
 function exportCSV() {
   if (typeof XLSX === 'undefined') { showToast('Cargando librería...', 'info'); return; }
-  const pd = getPeriodData();
-  const txs = pd.transacciones.filter(t => !t.isAbono);
-  if (!txs.length) { showToast('No hay datos para exportar', 'err'); return; }
 
-  const trm = getTRM(activePeriodKey());
-  const header = ['Fecha','Titular','Tarjeta','Descripción','Moneda',
+  // Gather txs from ALL periods covered by the active tx filter (same logic as renderTransacciones)
+  const txPeriodKeys = getTxPeriodKeys().filter(k => allData[k]);
+  let txs = [];
+  txPeriodKeys.forEach(k => {
+    txs.push(...(allData[k]?.transacciones || []).filter(t => !t.isAbono));
+  });
+
+  // Apply SAME filters as renderTransacciones
+  const fTarjeta = document.getElementById('filter-tarjeta')?.value || '';
+  const fNat     = document.getElementById('filter-naturaleza')?.value || '';
+  const fMoneda  = document.getElementById('filter-moneda')?.value || '';
+  const fSubcat  = document.getElementById('filter-subcat')?.value || '';
+  const fBuscar  = (document.getElementById('filter-buscar')?.value || '').toLowerCase();
+
+  if (fTarjeta) { const nums = fTarjeta.split('|'); txs = txs.filter(t => nums.includes(t.tarjetaNum)); }
+  if (fNat)     txs = txs.filter(t => t.naturaleza === fNat);
+  if (fMoneda)  txs = txs.filter(t => t.moneda === fMoneda);
+  if (fSubcat)  txs = txs.filter(t => t.subcategoria === fSubcat);
+  if (fBuscar)  txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
+
+  txs.sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
+
+  if (!txs.length) { showToast('No hay datos con los filtros actuales', 'err'); return; }
+
+  const filterLabel = getTxFilterLabel();
+
+  // Add Período column so multi-month exports are self-explanatory
+  const header = ['Período','Fecha','Titular','Tarjeta','Descripción','Moneda',
     'Valor Original','Equiv. COP','Cuota Actual','Cuotas Total',
     'Naturaleza','Subcategoría','Comentario','Clasificado Manual'];
 
   const rows = txs.map(t => [
+    txPeriodoKey(t),
     t.fecha, t.titular, '****' + (t.tarjetaNum || ''), t.descripcion,
     t.moneda,
-    t.moneda === 'USD' ? t.valorOriginal : t.valorOriginal,
+    t.valorOriginal,
     Math.round(copValue(t)),
     t.cuotaActual || 1, t.cuotaTotal || 1,
     t.naturaleza, t.subcategoria || '', t.comentario || '',
@@ -4430,15 +4483,13 @@ function exportCSV() {
   ]);
 
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
-
-  // Column widths
   ws['!cols'] = [
-    {wch:14},{wch:24},{wch:10},{wch:32},{wch:8},
+    {wch:10},{wch:14},{wch:24},{wch:10},{wch:32},{wch:8},
     {wch:14},{wch:14},{wch:10},{wch:10},
     {wch:14},{wch:18},{wch:28},{wch:14}
   ];
 
-  // Bold header row
+  // Bold header
   const range = XLSX.utils.decode_range(ws['!ref']);
   for (let C = range.s.c; C <= range.e.c; C++) {
     const cell = ws[XLSX.utils.encode_cell({r:0, c:C})];
@@ -4446,11 +4497,17 @@ function exportCSV() {
   }
 
   const wb = XLSX.utils.book_new();
-  const [y, m] = activePeriodKey().split('-');
-  const sheetName = MONTHS_FULL[parseInt(m)-1] + ' ' + y;
-  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0,31));
-  XLSX.writeFile(wb, `tc-monitor-${activePeriodKey()}.xlsx`);
-  showToast('Excel exportado correctamente', 'ok');
+  // Sheet name: filter label (truncated to 31 chars for Excel)
+  const sheetName = filterLabel.replace(/[:\/?*\[\]]/g, '-').slice(0, 31);
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+  // File name: safe version of filter label + date
+  const safeName = filterLabel.replace(/[^a-zA-Z0-9À-ɏ\s]/g, '').trim().replace(/\s+/g, '-');
+  const fileSuffix = [fNat, fSubcat].filter(Boolean).join('-');
+  const fileName = 'tc-monitor-' + safeName + (fileSuffix ? '-' + fileSuffix : '') + '-' + new Date().toISOString().slice(0,10) + '.xlsx';
+
+  XLSX.writeFile(wb, fileName);
+  showToast('Excel exportado — ' + txs.length + ' transacciones (' + filterLabel + ')', 'ok');
 }
 
 function checkBackupReminder() {
