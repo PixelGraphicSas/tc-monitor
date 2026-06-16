@@ -2777,17 +2777,7 @@ async function processFile(file, tcId) {
         const m = getMiembro(ex.tarjetaNum);
         return (m ? m.nombre.split(' ')[0] : '****' + ex.tarjetaNum) + ' (****' + ex.tarjetaNum + ')';
       });
-      const msg = '⚠️ Ya existe un extracto para este período (' + periodo + '):
-
-' +
-        nombres.join('
-') +
-        '
-
-¿Deseas reemplazar los datos existentes con el nuevo extracto?
-
-' +
-        'Esta acción no se puede deshacer.';
+      var msg = "[AVISO] Ya existe un extracto para este periodo (" + periodo + "):\n\n" + nombres.join("\n") + "\n\n¿Deseas reemplazar los datos existentes con el nuevo extracto?\n\nEsta acción no se puede deshacer.";
       if (!confirm(msg)) {
         statEl.className = 'upload-status show';
         statEl.innerHTML = 'ℹ️ Carga cancelada — los datos existentes no fueron modificados.';
