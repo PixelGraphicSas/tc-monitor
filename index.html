@@ -1466,6 +1466,41 @@
       </div>
     </section>
 
+    <!-- MODAL NUEVO USUARIO -->
+    <div class="overlay" id="new-user-modal-overlay">
+      <div class="modal" style="max-width:440px">
+        <div class="modal-title">Nuevo usuario</div>
+        <div class="modal-sub">El usuario recibirá acceso inmediato a TC Monitor</div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+          <div>
+            <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px">Nombre completo</label>
+            <input id="nu-nombre" type="text" placeholder="Ej: Maria Gomez" class="settings-input" style="width:100%;text-align:left;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px">Correo electrónico</label>
+            <input id="nu-email" type="email" placeholder="usuario@empresa.com" class="settings-input" style="width:100%;text-align:left;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px">Contraseña temporal</label>
+            <input id="nu-pass" type="password" placeholder="Mínimo 6 caracteres" class="settings-input" style="width:100%;text-align:left;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px">Rol</label>
+            <select id="nu-rol" class="filter-select" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;outline:none">
+              <option value="admin">Administrador — acceso completo</option>
+              <option value="contador">Contador — puede cargar extractos y clasificar</option>
+              <option value="viewer">Visor — solo lectura</option>
+            </select>
+          </div>
+          <div id="nu-error" style="display:none;font-size:12px;color:var(--red);padding:8px 12px;background:rgba(239,68,68,.08);border-radius:6px;border:1px solid rgba(239,68,68,.2)"></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeNewUserModal()">Cancelar</button>
+          <button class="btn btn-primary" id="nu-submit-btn" onclick="createNewUser()">Crear usuario</button>
+        </div>
+      </div>
+    </div>
+
     <!-- SOCIOS -->
     <section class="page" id="page-socios">
       <div class="page-header">
@@ -1559,6 +1594,17 @@
           <div class="page-subtitle">Administra tarjetas, reglas y parámetros del sistema</div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="saveConfig()">Guardar cambios</button>
+      </div>
+
+      <!-- USUARIOS DEL SISTEMA -->
+      <div class="settings-section">
+        <div class="settings-section-title" style="justify-content:space-between">
+          <span>&#128101; Usuarios del sistema</span>
+          <button class="btn btn-primary btn-sm" onclick="openNewUserModal()">+ Nuevo usuario</button>
+        </div>
+        <div id="users-list-wrap" style="padding:8px 0">
+          <div style="padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--text3)">Cargando usuarios...</div>
+        </div>
       </div>
 
       <div class="settings-section">
@@ -3623,6 +3669,8 @@ function renderCuotas() {
 // CONFIG PAGE
 // ============================================================
 function renderConfig() {
+  // Load users list async
+  loadUsers();
   const wrap = document.getElementById('tarjetas-config');
   wrap.innerHTML = getMiembrosList().map(m => `
     <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px;border-bottom:1px solid var(--border);padding-bottom:20px">
@@ -5250,6 +5298,36 @@ auth.onAuthStateChanged(async (user) => {
 
     // Load data from Firebase
     const loaded = await loadFromFirebase(user.uid);
+    // Verify user is active in Firestore (blocks deactivated users)
+    try {
+      var userDoc = await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(user.uid).get();
+      if (userDoc.exists && userDoc.data().activo === false) {
+        // Deactivated user — sign out and show error
+        await auth.signOut();
+        var errEl = document.getElementById('auth-error');
+        if (errEl) { errEl.textContent = 'Tu cuenta ha sido desactivada. Contacta al administrador.'; errEl.style.display = 'block'; }
+        document.getElementById('auth-btn').textContent = 'Entrar';
+        document.getElementById('auth-email').style.display = '';
+        document.getElementById('auth-pass').style.display = '';
+        document.getElementById('auth-overlay').style.display = 'flex';
+        document.querySelector('.app').style.display = 'none';
+        return;
+      }
+      // Auto-register user in Firestore if not yet registered (e.g. first admin)
+      if (!userDoc.exists) {
+        await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(user.uid).set({
+          uid:      user.uid,
+          nombre:   user.displayName || user.email.split('@')[0],
+          email:    user.email,
+          rol:      'admin',
+          activo:   true,
+          creadoEn: firebase.firestore.FieldValue.serverTimestamp(),
+          creadoPor: 'auto-registro'
+        });
+      }
+    } catch(eAuth) {
+      console.warn('User status check error:', eAuth);
+    }
     if (!loaded) {
       // Fallback to localStorage if Firebase fails
       config = loadConfigDefaults();
@@ -5286,6 +5364,228 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
+// ============================================================
+// USUARIOS DEL SISTEMA
+// ============================================================
+
+// Roles legibles
+var ROL_LABELS = {
+  admin:    'Administrador',
+  contador: 'Contador',
+  viewer:   'Visor'
+};
+
+var ROL_COLORS = {
+  admin:    '#4f8ef7',
+  contador: '#C87941',
+  viewer:   '#6B7280'
+};
+
+// Cargar usuarios desde Firestore
+async function loadUsers() {
+  var wrap = document.getElementById('users-list-wrap');
+  if (!wrap) return;
+  try {
+    var snap = await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').get();
+    var users = [];
+    snap.forEach(function(d) { users.push(Object.assign({ id: d.id }, d.data())); });
+    // Sort: activos primero, luego por nombre
+    users.sort(function(a, b) {
+      if (a.activo === b.activo) return (a.nombre || '').localeCompare(b.nombre || '');
+      return b.activo ? 1 : -1;
+    });
+    renderUsersList(users);
+  } catch(e) {
+    wrap.innerHTML = '<div style="padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--red)">Error al cargar usuarios: ' + e.message + '</div>';
+  }
+}
+
+function renderUsersList(users) {
+  var wrap = document.getElementById('users-list-wrap');
+  if (!wrap) return;
+  if (!users.length) {
+    wrap.innerHTML = '<div style="padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No hay usuarios registrados.</div>';
+    return;
+  }
+
+  var html = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:1px solid var(--border)">'
+    + '<th style="padding:10px 16px;text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Nombre</th>'
+    + '<th style="padding:10px 16px;text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Correo</th>'
+    + '<th style="padding:10px 16px;text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Rol</th>'
+    + '<th style="padding:10px 16px;text-align:center;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Estado</th>'
+    + '<th style="padding:10px 16px;text-align:right;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Acciones</th>'
+    + '</tr></thead><tbody>';
+
+  users.forEach(function(u) {
+    var activo = u.activo !== false;
+    var esCuentaActual = currentUser && u.email === currentUser.email;
+    var rolLabel = ROL_LABELS[u.rol] || u.rol || 'Sin rol';
+    var rolColor = ROL_COLORS[u.rol] || '#6B7280';
+
+    html += '<tr style="border-bottom:1px solid var(--border);transition:background .15s" '
+    html += '<tr style="border-bottom:1px solid var(--border)">';
+    // row content
+      + '<td style="padding:12px 16px">'
+      + '<div style="font-size:13px;font-weight:500;color:var(--text)">' + escHtml(u.nombre || '—') + '</div>'
+      + (esCuentaActual ? '<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);margin-top:2px">Tu cuenta</div>' : '')
+      + '</td>'
+      // Email
+      + '<td style="padding:12px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">' + escHtml(u.email || '—') + '</td>'
+      // Rol
+      + '<td style="padding:12px 16px">'
+      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;background:' + rolColor + '22;color:' + rolColor + ';border:1px solid ' + rolColor + '44">'
+      + rolLabel + '</span></td>'
+      // Estado
+      + '<td style="padding:12px 16px;text-align:center">'
+      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:10px;'
+      + (activo ? 'background:rgba(0,200,100,.12);color:#00C864;border:1px solid rgba(0,200,100,.25)' : 'background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)')
+      + '">' + (activo ? 'Activo' : 'Inactivo') + '</span></td>'
+      // Acciones
+      + '<td style="padding:12px 16px;text-align:right">';
+
+    if (!esCuentaActual) {
+      var toggleLabel = activo ? 'Desactivar' : 'Activar';
+      var toggleClass = activo ? 'btn btn-danger btn-sm' : 'btn btn-ghost btn-sm';
+      html += '<button class="' + toggleClass + '" style="font-size:11px;margin-right:6px" '
+      html += '<button class="' + toggleClass + '" style="font-size:11px;margin-right:6px" '
+        + 'data-uid="' + u.id + '" data-email="' + escHtml(u.email) + '" data-activo="' + activo + '" '
+        + 'onclick="handleToggleUser(this)">' + toggleLabel + '</button>';
+      html += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">—</span>';
+    }
+    html += '</td></tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Abrir/cerrar modal nuevo usuario
+function openNewUserModal() {
+  if (!guardAdmin()) return;
+  document.getElementById('nu-nombre').value = '';
+  document.getElementById('nu-email').value = '';
+  document.getElementById('nu-pass').value = '';
+  document.getElementById('nu-rol').value = 'admin';
+  document.getElementById('nu-error').style.display = 'none';
+  document.getElementById('nu-submit-btn').textContent = 'Crear usuario';
+  document.getElementById('nu-submit-btn').disabled = false;
+  document.getElementById('new-user-modal-overlay').classList.add('show');
+  setTimeout(function() { document.getElementById('nu-nombre').focus(); }, 100);
+}
+
+function closeNewUserModal() {
+  document.getElementById('new-user-modal-overlay').classList.remove('show');
+}
+
+// Crear usuario via Firebase Auth REST API
+async function createNewUser() {
+  var nombre  = document.getElementById('nu-nombre').value.trim();
+  var email   = document.getElementById('nu-email').value.trim();
+  var pass    = document.getElementById('nu-pass').value;
+  var rol     = document.getElementById('nu-rol').value;
+  var errEl   = document.getElementById('nu-error');
+  var btn     = document.getElementById('nu-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!nombre) { showNuError('Escribe el nombre del usuario'); return; }
+  if (!email || !email.includes('@')) { showNuError('Ingresa un correo válido'); return; }
+  if (pass.length < 6) { showNuError('La contraseña debe tener mínimo 6 caracteres'); return; }
+
+  btn.textContent = 'Creando...';
+  btn.disabled = true;
+
+  try {
+    // 1. Crear en Firebase Auth via REST API
+    var apiKey = firebaseConfig.apiKey;
+    var resp = await fetch(
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apiKey,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pass, returnSecureToken: true })
+      }
+    );
+    var data = await resp.json();
+
+    if (data.error) {
+      var errMsg = data.error.message;
+      if (errMsg === 'EMAIL_EXISTS') errMsg = 'Este correo ya está registrado en el sistema';
+      else if (errMsg === 'INVALID_EMAIL') errMsg = 'Correo electrónico inválido';
+      else if (errMsg === 'WEAK_PASSWORD : Password should be at least 6 characters') errMsg = 'La contraseña debe tener mínimo 6 caracteres';
+      showNuError(errMsg);
+      btn.textContent = 'Crear usuario';
+      btn.disabled = false;
+      return;
+    }
+
+    var newUid = data.localId;
+
+    // 2. Registrar en Firestore con uid como doc ID
+    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(newUid).set({
+      uid:       newUid,
+      nombre:    nombre,
+      email:     email,
+      rol:       rol,
+      activo:    true,
+      creadoEn:  firebase.firestore.FieldValue.serverTimestamp(),
+      creadoPor: currentUser ? currentUser.email : 'sistema'
+    });
+
+    closeNewUserModal();
+    showToast('✓ Usuario creado: ' + nombre, 'ok');
+    await loadUsers(); // Refrescar lista
+
+  } catch(e) {
+    showNuError('Error inesperado: ' + e.message);
+    btn.textContent = 'Crear usuario';
+    btn.disabled = false;
+  }
+}
+
+function showNuError(msg) {
+  var el = document.getElementById('nu-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// Activar / desactivar usuario
+function handleToggleUser(btn) {
+  var uid    = btn.getAttribute('data-uid');
+  var email  = btn.getAttribute('data-email');
+  var activo = btn.getAttribute('data-activo') === 'true';
+  toggleUserStatus(uid, email, activo);
+}
+
+async function toggleUserStatus(uid, email, currentlyActive) {
+  if (!guardAdmin()) return;
+  var action = currentlyActive ? 'desactivar' : 'activar';
+  if (!confirm('¿Seguro que deseas ' + action + ' al usuario ' + email + '?')) return;
+
+  try {
+    var newStatus = !currentlyActive;
+
+    // Actualizar en Firestore
+    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(uid).update({
+      activo: newStatus
+    });
+
+    // Si se desactiva: deshabilitar en Firebase Auth via REST (requiere token del usuario actual)
+    // Solo actualiza Firestore — la verificación de estado se hace en el login
+    showToast((newStatus ? '✓ Usuario activado' : '✓ Usuario desactivado') + ': ' + email, 'ok');
+    await loadUsers(); // Refrescar lista
+
+  } catch(e) {
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ============================================================
 // initDashboard is now called after Firebase loads data (inside onAuthStateChanged)
 // This prevents showing empty charts before data is ready
 </script>
