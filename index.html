@@ -5455,11 +5455,15 @@ function renderUsersList(users) {
     } else {
       var toggleLabel = activo ? 'Desactivar' : 'Activar';
       var toggleClass = activo ? 'btn btn-danger btn-sm' : 'btn btn-ghost btn-sm';
-      tdAcciones += '<button class="' + toggleClass + '" style="font-size:11px"'
+      tdAcciones += '<button class="' + toggleClass + '" style="font-size:11px;margin-right:6px"'
         + ' data-uid="' + u.id + '"'
         + ' data-email="' + escHtml(u.email) + '"'
         + ' data-activo="' + activo + '"'
         + ' onclick="handleToggleUser(this)">' + toggleLabel + '</button>';
+      tdAcciones += '<button class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--text3)"'
+        + ' data-uid="' + u.id + '"'
+        + ' data-email="' + escHtml(u.email) + '"'
+        + ' onclick="handleDeleteUser(this)">Eliminar</button>';
     }
     tdAcciones += '</td>';
 
@@ -5470,6 +5474,24 @@ function renderUsersList(users) {
 
   html += '</tbody></table>';
   wrap.innerHTML = html;
+}
+
+function handleDeleteUser(btn) {
+  var uid   = btn.getAttribute('data-uid');
+  var email = btn.getAttribute('data-email');
+  deleteUser(uid, email);
+}
+
+async function deleteUser(uid, email) {
+  if (!guardAdmin()) return;
+  if (!confirm('¿Eliminar a ' + email + ' de la lista de usuarios?\n\nEsta acción solo lo elimina del registro de la app. Si necesitas revocar el acceso permanentemente, desactívalo primero.')) return;
+  try {
+    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(uid).delete();
+    showToast('✓ Usuario eliminado de la lista: ' + email, 'ok');
+    await loadUsers();
+  } catch(e) {
+    showToast('Error al eliminar: ' + e.message, 'err');
+  }
 }
 
 function escHtml(str) {
