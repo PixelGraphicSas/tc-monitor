@@ -5408,13 +5408,14 @@ function renderUsersList(users) {
     return;
   }
 
+  var TH = 'padding:10px 16px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500';
   var html = '<table style="width:100%;border-collapse:collapse">'
-    + '<thead><tr style="border-bottom:1px solid var(--border)">'
-    + '<th style="padding:10px 16px;text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Nombre</th>'
-    + '<th style="padding:10px 16px;text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Correo</th>'
-    + '<th style="padding:10px 16px;text-align:left;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Rol</th>'
-    + '<th style="padding:10px 16px;text-align:center;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Estado</th>'
-    + '<th style="padding:10px 16px;text-align:right;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500">Acciones</th>'
+    + '<thead><tr style="border-bottom:2px solid var(--border)">'
+    + '<th style="' + TH + ';text-align:left">Nombre</th>'
+    + '<th style="' + TH + ';text-align:left">Correo</th>'
+    + '<th style="' + TH + ';text-align:left">Rol</th>'
+    + '<th style="' + TH + ';text-align:center">Estado</th>'
+    + '<th style="' + TH + ';text-align:right">Acciones</th>'
     + '</tr></thead><tbody>';
 
   users.forEach(function(u) {
@@ -5423,37 +5424,48 @@ function renderUsersList(users) {
     var rolLabel = ROL_LABELS[u.rol] || u.rol || 'Sin rol';
     var rolColor = ROL_COLORS[u.rol] || '#6B7280';
 
-    html += '<tr style="border-bottom:1px solid var(--border);transition:background .15s" '
-    html += '<tr style="border-bottom:1px solid var(--border)">';
-    // row content
-      + '<td style="padding:12px 16px">'
+    // Nombre cell
+    var tdNombre = '<td style="padding:12px 16px">'
       + '<div style="font-size:13px;font-weight:500;color:var(--text)">' + escHtml(u.nombre || '—') + '</div>'
       + (esCuentaActual ? '<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);margin-top:2px">Tu cuenta</div>' : '')
-      + '</td>'
-      // Email
-      + '<td style="padding:12px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">' + escHtml(u.email || '—') + '</td>'
-      // Rol
-      + '<td style="padding:12px 16px">'
-      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;background:' + rolColor + '22;color:' + rolColor + ';border:1px solid ' + rolColor + '44">'
-      + rolLabel + '</span></td>'
-      // Estado
-      + '<td style="padding:12px 16px;text-align:center">'
-      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:10px;'
-      + (activo ? 'background:rgba(0,200,100,.12);color:#00C864;border:1px solid rgba(0,200,100,.25)' : 'background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)')
-      + '">' + (activo ? 'Activo' : 'Inactivo') + '</span></td>'
-      // Acciones
-      + '<td style="padding:12px 16px;text-align:right">';
+      + '</td>';
 
-    if (!esCuentaActual) {
+    // Email cell
+    var tdEmail = '<td style="padding:12px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">'
+      + escHtml(u.email || '—') + '</td>';
+
+    // Rol cell
+    var tdRol = '<td style="padding:12px 16px">'
+      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;'
+      + 'background:' + rolColor + '22;color:' + rolColor + ';border:1px solid ' + rolColor + '44">'
+      + rolLabel + '</span></td>';
+
+    // Estado cell
+    var tdEstado = '<td style="padding:12px 16px;text-align:center">'
+      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:10px;'
+      + (activo
+          ? 'background:rgba(0,200,100,.12);color:#00C864;border:1px solid rgba(0,200,100,.25)'
+          : 'background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)')
+      + '">' + (activo ? 'Activo' : 'Inactivo') + '</span></td>';
+
+    // Acciones cell
+    var tdAcciones = '<td style="padding:12px 16px;text-align:right">';
+    if (esCuentaActual) {
+      tdAcciones += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">—</span>';
+    } else {
       var toggleLabel = activo ? 'Desactivar' : 'Activar';
       var toggleClass = activo ? 'btn btn-danger btn-sm' : 'btn btn-ghost btn-sm';
-      html += '<button class="' + toggleClass + '" style="font-size:11px;margin-right:6px" '
-      html += '<button class="' + toggleClass + '" style="font-size:11px;margin-right:6px" '
-        + 'data-uid="' + u.id + '" data-email="' + escHtml(u.email) + '" data-activo="' + activo + '" '
-        + 'onclick="handleToggleUser(this)">' + toggleLabel + '</button>';
-      html += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">—</span>';
+      tdAcciones += '<button class="' + toggleClass + '" style="font-size:11px"'
+        + ' data-uid="' + u.id + '"'
+        + ' data-email="' + escHtml(u.email) + '"'
+        + ' data-activo="' + activo + '"'
+        + ' onclick="handleToggleUser(this)">' + toggleLabel + '</button>';
     }
-    html += '</td></tr>';
+    tdAcciones += '</td>';
+
+    html += '<tr style="border-bottom:1px solid var(--border)">'
+      + tdNombre + tdEmail + tdRol + tdEstado + tdAcciones
+      + '</tr>';
   });
 
   html += '</tbody></table>';
