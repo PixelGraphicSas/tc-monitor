@@ -1515,6 +1515,7 @@
         </div>
         <div class="modal-actions">
           <button class="btn btn-ghost" onclick="closeBulkModal()">Cancelar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteBulkTx()" style="margin-right:auto">&#128465; Eliminar selección</button>
           <button class="btn btn-primary" onclick="saveBulkClassification()">&#10003; Aplicar a todas</button>
         </div>
       </div>
@@ -5512,6 +5513,32 @@ function openBulkModal() {
 
 function closeBulkModal() {
   document.getElementById('bulk-modal-overlay').classList.remove('show');
+}
+
+function deleteBulkTx() {
+  if (!guardAdmin()) return;
+  var count = selectedTxIds.size;
+  if (count === 0) return;
+  if (!confirm('¿Eliminar ' + count + ' transacción(es) seleccionada(s)?\n\nEsta acción no se puede deshacer.')) return;
+  var deleted = 0;
+  selectedTxIds.forEach(function(txId) {
+    Object.keys(allData).forEach(function(key) {
+      var pd = allData[key];
+      var before = (pd.transacciones || []).length;
+      pd.transacciones = (pd.transacciones || []).filter(function(t) { return t.id !== txId; });
+      if (pd.transacciones.length < before) deleted++;
+    });
+  });
+  if (deleted > 0) {
+    saveAllData();
+    closeBulkModal();
+    clearTxSelection();
+    updateBadge();
+    renderActivePage();
+    showToast('✓ ' + deleted + ' transacción(es) eliminada(s)', 'ok');
+  } else {
+    showToast('No se encontraron las transacciones', 'err');
+  }
 }
 
 function bulkSelectNat(input) {
