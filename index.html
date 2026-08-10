@@ -1448,6 +1448,11 @@
         <table>
           <thead>
             <tr>
+              <th style="width:36px;text-align:center">
+                <input type="checkbox" id="tx-select-all" title="Seleccionar todas"
+                  style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent)"
+                  onchange="toggleSelectAllTx(this.checked)">
+              </th>
               <th>Fecha</th>
               <th>Titular</th>
               <th>Descripción</th>
@@ -1465,6 +1470,55 @@
         </table>
       </div>
     </section>
+
+    <!-- BULK ACTION BAR -->
+    <div id="bulk-action-bar" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--accent);border-radius:14px;padding:12px 20px;align-items:center;gap:16px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:400;min-width:360px;max-width:90vw">
+      <span id="bulk-count-label" style="font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;white-space:nowrap"></span>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost btn-sm" onclick="clearTxSelection()" style="font-size:12px">&#10005; Deseleccionar</button>
+      <button class="btn btn-primary btn-sm" onclick="openBulkModal()" style="font-size:12px;background:var(--accent);color:#0D1117;font-weight:700">&#9889; Clasificar selección</button>
+    </div>
+
+    <!-- MODAL EDICIÓN EN LOTE -->
+    <div class="overlay" id="bulk-modal-overlay">
+      <div class="modal" style="max-width:480px">
+        <div class="modal-title">Clasificación en lote</div>
+        <div class="modal-sub">Aplicar a <strong id="bulk-modal-count">0</strong> transacciones seleccionadas</div>
+        <div class="classify-options">
+          <label class="classify-opt" id="bulk-opt-empresarial">
+            <input type="radio" name="bulk-nat" value="empresarial" onchange="bulkSelectNat(this)">
+            <span class="classify-opt-icon">&#127970;</span>
+            <div class="classify-opt-info"><strong>Empresarial</strong><span>Gasto operativo de la empresa</span></div>
+          </label>
+          <label class="classify-opt" id="bulk-opt-personal">
+            <input type="radio" name="bulk-nat" value="personal" onchange="bulkSelectNat(this)">
+            <span class="classify-opt-icon">&#128100;</span>
+            <div class="classify-opt-info"><strong>Beneficio Socio</strong><span>Gasto personal del socio</span></div>
+          </label>
+          <label class="classify-opt" id="bulk-opt-financiero">
+            <input type="radio" name="bulk-nat" value="financiero" onchange="bulkSelectNat(this)">
+            <span class="classify-opt-icon">&#127970;</span>
+            <div class="classify-opt-info"><strong>Costo Financiero</strong><span>GMF, cuota de manejo, intereses</span></div>
+          </label>
+        </div>
+        <div id="bulk-subcat-wrap" style="margin-bottom:16px;display:none">
+          <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:block;margin-bottom:6px">Subcategoría</label>
+          <select id="bulk-subcat" class="filter-select" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;outline:none">
+            <option value="">Sin subcategoría</option>
+          </select>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px">Comentario <span style="color:var(--text3);font-weight:400">(opcional)</span></label>
+          <textarea id="bulk-comentario" placeholder="Nota para todas las transacciones seleccionadas..."
+            style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:12px;font-family:var(--font-body);resize:vertical;min-height:56px;outline:none;box-sizing:border-box"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" onclick="closeBulkModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="saveBulkClassification()">&#10003; Aplicar a todas</button>
+        </div>
+      </div>
+    </div>
 
     <!-- MODAL NUEVO USUARIO -->
     <div class="overlay" id="new-user-modal-overlay">
@@ -1931,7 +1985,7 @@
 
 <!-- PIN LOGIN OVERLAY -->
 <div id="pin-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
+  flex-direction:column;align-items:center;justify-content:center;gap:0">
   <div style="text-align:center;margin-bottom:32px">
     <div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text);margin-bottom:6px">TC Monitor</div>
     <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">Pixel Graphic SAS</div>
@@ -2008,10 +2062,8 @@ let fbSyncTimeout = null;
 // Save to Firestore (debounced to avoid excessive writes)
 async function saveToFirebase() {
   if (!currentUser) return;
-  // Ruta compartida — todos los usuarios autenticados leen/escriben los mismos datos
   var ORG_REF = db.collection('org').doc('pixel-tc-monitor');
   try {
-    // Save config (strip avatars to stay under 1MB limit)
     const configToSave = {
       ...config,
       miembros: config.miembros.map(m => ({ ...m, avatar: m.avatar ? '__avatar__' : null }))
@@ -2022,7 +2074,6 @@ async function saveToFirebase() {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    // Save avatars separately (one doc per member with avatar)
     const avatarBatch = db.batch();
     config.miembros.forEach(m => {
       if (m.avatar && m.avatar !== '__avatar__') {
@@ -2032,26 +2083,21 @@ async function saveToFirebase() {
     });
     await avatarBatch.commit();
 
-    // Save each period — split transactions into chunks of 50 to avoid 1MB doc limit
     for (const [key, pd] of Object.entries(allData)) {
       const txs = pd.transacciones || [];
       const extractos = pd.extractos || [];
 
-      // Save period metadata + extractos
       await ORG_REF.collection('periods').doc(key)
         .set({ key, extractos: JSON.stringify(extractos), txCount: txs.length });
 
-      // Save transactions in chunks of 50
       const chunkSize = 50;
       const existingChunks = await ORG_REF
         .collection('periods').doc(key).collection('txChunks').get();
-      // Delete old chunks first
       if (!existingChunks.empty) {
         const delBatch = db.batch();
         existingChunks.forEach(d => delBatch.delete(d.ref));
         await delBatch.commit();
       }
-      // Write new chunks
       for (let i = 0; i < txs.length; i += chunkSize) {
         const chunk = txs.slice(i, i + chunkSize);
         const chunkId = `chunk_${Math.floor(i / chunkSize)}`;
@@ -2078,10 +2124,8 @@ function scheduleFbSave() {
 }
 
 async function loadFromFirebase(uid) {
-  // uid solo se usa para identificar al usuario logueado — los datos son compartidos
   var ORG_REF = db.collection('org').doc('pixel-tc-monitor');
   try {
-    // Load config
     const orgDoc = await ORG_REF.get();
     if (orgDoc.exists && orgDoc.data().config) {
       const savedConfig = JSON.parse(orgDoc.data().config);
@@ -2090,36 +2134,26 @@ async function loadFromFirebase(uid) {
         params: { ...loadConfigDefaults().params, ...savedConfig.params },
         categorias: savedConfig.categorias || loadConfigDefaults().categorias
       };
-      // Restore logo from Firebase
-      if (orgDoc.data().logoUrl) {
-        config.logoUrl = orgDoc.data().logoUrl;
-      }
+      if (orgDoc.data().logoUrl) config.logoUrl = orgDoc.data().logoUrl;
     }
-    // Load avatars
     const avatarsSnap = await ORG_REF.collection('avatars').get();
     avatarsSnap.forEach(doc => {
       const m = config.miembros.find(x => x.id === doc.data().miembroId);
       if (m) m.avatar = doc.data().avatar;
     });
-
-    // Load periods + transaction chunks
     const periodsSnap = await ORG_REF.collection('periods').get();
     allData = {};
     for (const periodDoc of periodsSnap.docs) {
       const key = periodDoc.data().key;
       const extractos = JSON.parse(periodDoc.data().extractos || '[]');
-      // Load all tx chunks for this period
       const chunksSnap = await ORG_REF
         .collection('periods').doc(key).collection('txChunks').get();
       let transacciones = [];
-      // Sort chunks by idx client-side (avoids Firestore composite index requirement)
       const chunkDocs = [];
       chunksSnap.forEach(d => chunkDocs.push(d));
       chunkDocs.sort((a, b) => (a.data().idx || 0) - (b.data().idx || 0));
       chunkDocs.forEach(chunkDoc => {
-        try {
-          transacciones = transacciones.concat(JSON.parse(chunkDoc.data().txs));
-        } catch(e) {}
+        try { transacciones = transacciones.concat(JSON.parse(chunkDoc.data().txs)); } catch(e) {}
       });
       allData[key] = { extractos, transacciones };
     }
@@ -2357,6 +2391,7 @@ function navigate(page) {
     }
   });
 
+  if (page !== 'transacciones') clearTxSelection();
   if (page === 'dashboard') renderDashboard();
   if (page === 'transacciones') renderTransacciones();
   if (page === 'socios') renderSocios();
@@ -2742,6 +2777,27 @@ async function processFile(file, tcId) {
     const pd = getPeriodData();
     let totalTx = 0;
     const titulares = [];
+
+    // Check for existing extractos that would be overwritten
+    const conflictos = extractos.filter(extracto =>
+      pd.extractos.some(e => e.tarjetaNum === extracto.tarjetaNum)
+    );
+
+    if (conflictos.length > 0) {
+      const periodo = activePeriodKey();
+      const nombres = conflictos.map(ex => {
+        const m = getMiembro(ex.tarjetaNum);
+        return (m ? m.nombre.split(' ')[0] : '****' + ex.tarjetaNum) + ' (****' + ex.tarjetaNum + ')';
+      });
+      var msg = '[AVISO] Ya existe un extracto para este periodo (' + periodo + '):\n\n' +
+        nombres.join('\n') +
+        '\n\n\u00bfDeseas reemplazar los datos existentes con el nuevo extracto?\n\nEsta acci\u00f3n no se puede deshacer.';
+      if (!confirm(msg)) {
+        statEl.className = 'upload-status show';
+        statEl.innerHTML = '\u2139\ufe0f Carga cancelada \u2014 los datos existentes no fueron modificados.';
+        return;
+      }
+    }
 
     for (const extracto of extractos) {
       // Remove existing data for this card number before inserting
@@ -3306,7 +3362,7 @@ function renderTransacciones() {
 
   const tbody = document.getElementById('tx-body');
   if (!txs.length) {
-    tbody.innerHTML = '<tr class="no-data-row"><td colspan="9">No hay transacciones con los filtros aplicados</td></tr>';
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="10">No hay transacciones con los filtros aplicados</td></tr>';
     return;
   }
 
@@ -3349,6 +3405,11 @@ function txRow(t, withAction) {
     : `<span style="color:var(--text3);font-size:11px">—</span>`;
 
   return `<tr>
+    <td style="width:36px;text-align:center;padding:0 8px">
+      ${withAction ? `<input type="checkbox" class="tx-select-cb" data-txid="${t.id.replace(/'/g, '&#39;')}"
+        style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent)"
+        onchange="onTxCheckChange()">` : ''}
+    </td>
     <td class="mono" style="font-size:12px">${t.fecha}</td>
     <td style="font-size:12px">${t.titular || t.tarjetaNum}</td>
     <td style="max-width:200px;font-size:12px">${t.descripcion}</td>
@@ -3669,7 +3730,6 @@ function renderCuotas() {
 // CONFIG PAGE
 // ============================================================
 function renderConfig() {
-  // Load users list async
   loadUsers();
   const wrap = document.getElementById('tarjetas-config');
   wrap.innerHTML = getMiembrosList().map(m => `
@@ -4384,35 +4444,46 @@ function updateBadge() {
 
 function exportCSV() {
   if (typeof XLSX === 'undefined') { showToast('Cargando librería...', 'info'); return; }
-  const pd = getPeriodData();
-  const txs = pd.transacciones.filter(t => !t.isAbono);
-  if (!txs.length) { showToast('No hay datos para exportar', 'err'); return; }
 
-  const trm = getTRM(activePeriodKey());
-  const header = ['Fecha','Titular','Tarjeta','Descripción','Moneda',
+  const txPeriodKeys = getTxPeriodKeys().filter(k => allData[k]);
+  let txs = [];
+  txPeriodKeys.forEach(k => {
+    txs.push(...(allData[k]?.transacciones || []).filter(t => !t.isAbono));
+  });
+
+  const fTarjeta = document.getElementById('filter-tarjeta')?.value || '';
+  const fNat     = document.getElementById('filter-naturaleza')?.value || '';
+  const fMoneda  = document.getElementById('filter-moneda')?.value || '';
+  const fSubcat  = document.getElementById('filter-subcat')?.value || '';
+  const fBuscar  = (document.getElementById('filter-buscar')?.value || '').toLowerCase();
+
+  if (fTarjeta) { const nums = fTarjeta.split('|'); txs = txs.filter(t => nums.includes(t.tarjetaNum)); }
+  if (fNat)     txs = txs.filter(t => t.naturaleza === fNat);
+  if (fMoneda)  txs = txs.filter(t => t.moneda === fMoneda);
+  if (fSubcat)  txs = txs.filter(t => t.subcategoria === fSubcat);
+  if (fBuscar)  txs = txs.filter(t => t.descripcion.toLowerCase().includes(fBuscar));
+  txs.sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
+
+  if (!txs.length) { showToast('No hay datos con los filtros actuales', 'err'); return; }
+
+  const filterLabel = getTxFilterLabel();
+  const header = ['Periodo','Fecha','Titular','Tarjeta','Descripcion','Moneda',
     'Valor Original','Equiv. COP','Cuota Actual','Cuotas Total',
-    'Naturaleza','Subcategoría','Comentario','Clasificado Manual'];
+    'Naturaleza','Subcategoria','Comentario','Clasificado Manual'];
 
   const rows = txs.map(t => [
+    txPeriodKeys.find(k => (allData[k]?.transacciones || []).some(tx => tx.id === t.id)) || '',
     t.fecha, t.titular, '****' + (t.tarjetaNum || ''), t.descripcion,
-    t.moneda,
-    t.moneda === 'USD' ? t.valorOriginal : t.valorOriginal,
-    Math.round(copValue(t)),
+    t.moneda, t.valorOriginal, Math.round(copValue(t)),
     t.cuotaActual || 1, t.cuotaTotal || 1,
     t.naturaleza, t.subcategoria || '', t.comentario || '',
-    t.clasificadoManual ? 'Sí' : 'No'
+    t.clasificadoManual ? 'Si' : 'No'
   ]);
 
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  ws['!cols'] = [{wch:10},{wch:14},{wch:24},{wch:10},{wch:32},{wch:8},
+    {wch:14},{wch:14},{wch:10},{wch:10},{wch:14},{wch:18},{wch:28},{wch:14}];
 
-  // Column widths
-  ws['!cols'] = [
-    {wch:14},{wch:24},{wch:10},{wch:32},{wch:8},
-    {wch:14},{wch:14},{wch:10},{wch:10},
-    {wch:14},{wch:18},{wch:28},{wch:14}
-  ];
-
-  // Bold header row
   const range = XLSX.utils.decode_range(ws['!ref']);
   for (let C = range.s.c; C <= range.e.c; C++) {
     const cell = ws[XLSX.utils.encode_cell({r:0, c:C})];
@@ -4420,11 +4491,11 @@ function exportCSV() {
   }
 
   const wb = XLSX.utils.book_new();
-  const [y, m] = activePeriodKey().split('-');
-  const sheetName = MONTHS_FULL[parseInt(m)-1] + ' ' + y;
-  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0,31));
-  XLSX.writeFile(wb, `tc-monitor-${activePeriodKey()}.xlsx`);
-  showToast('Excel exportado correctamente', 'ok');
+  const sheetName = filterLabel.replace(/[:\/?*[\]]/g, '-').slice(0, 31);
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  const safeName = filterLabel.replace(/[^a-zA-Z0-9À-ɏ ]/g, '').trim().replace(/\s+/g, '-');
+  XLSX.writeFile(wb, 'tc-monitor-' + safeName + '-' + new Date().toISOString().slice(0,10) + '.xlsx');
+  showToast('Excel exportado — ' + txs.length + ' transacciones (' + filterLabel + ')', 'ok');
 }
 
 function checkBackupReminder() {
@@ -5189,16 +5260,39 @@ function deleteCat(ci) {
 let guestMode = false;
 
 function initPinScreen() {
-  const pin = config.params?.pinAdmin;
-  if (!pin || pin.trim() === '') {
-    // No PIN configured — open directly as admin
-    hidePinOverlay();
-    return;
+  try {
+    var pin = (config && config.params && config.params.pinAdmin) ? config.params.pinAdmin : '';
+    if (!pin || pin.trim() === '') {
+      guestMode = false;
+      var po = document.getElementById('pin-overlay');
+      if (po) po.style.display = 'none';
+      return;
+    }
+    try {
+      var stored = localStorage.getItem('tcm_pin_session');
+      if (stored) {
+        var sess = JSON.parse(stored);
+        if (sess && sess.verified && (Date.now() - sess.ts) < 8 * 60 * 60 * 1000) {
+          guestMode = false;
+          var po2 = document.getElementById('pin-overlay');
+          if (po2) po2.style.display = 'none';
+          return;
+        }
+        localStorage.removeItem('tcm_pin_session');
+      }
+    } catch(e2) { localStorage.removeItem('tcm_pin_session'); }
+    var appEl = document.querySelector('.app');
+    if (appEl) appEl.style.display = 'none';
+    var pinEl = document.getElementById('pin-overlay');
+    if (pinEl) pinEl.style.display = 'flex';
+    setTimeout(function() { var inp = document.getElementById('pin-input'); if (inp) inp.focus(); }, 100);
+  } catch(e) {
+    console.error('initPinScreen error:', e);
+    var appEl2 = document.querySelector('.app');
+    if (appEl2) appEl2.style.display = 'flex';
+    var po3 = document.getElementById('pin-overlay');
+    if (po3) po3.style.display = 'none';
   }
-  // Show PIN screen
-  document.getElementById('pin-overlay').style.display = 'flex';
-  document.querySelector('.app').style.display = 'none';
-  setTimeout(() => document.getElementById('pin-input')?.focus(), 100);
 }
 
 function checkPin() {
@@ -5206,6 +5300,7 @@ function checkPin() {
   const pin = config.params?.pinAdmin || '';
   if (input === pin) {
     guestMode = false;
+    localStorage.setItem('tcm_pin_session', JSON.stringify({ verified: true, ts: Date.now() }));
     hidePinOverlay();
     applyGuestMode();
   } else {
@@ -5223,8 +5318,10 @@ function enterGuest() {
 }
 
 function hidePinOverlay() {
-  document.getElementById('pin-overlay').style.display = 'none';
-  document.querySelector('.app').style.display = 'flex';
+  var po = document.getElementById('pin-overlay');
+  if (po) po.style.display = 'none';
+  var appEl = document.querySelector('.app');
+  if (appEl) appEl.style.display = 'flex';
 }
 
 function applyGuestMode() {
@@ -5298,36 +5395,28 @@ auth.onAuthStateChanged(async (user) => {
 
     // Load data from Firebase
     const loaded = await loadFromFirebase(user.uid);
-    // Verify user is active in Firestore (blocks deactivated users)
     try {
       var userDoc = await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(user.uid).get();
       if (userDoc.exists && userDoc.data().activo === false) {
-        // Deactivated user — sign out and show error
         await auth.signOut();
         var errEl = document.getElementById('auth-error');
         if (errEl) { errEl.textContent = 'Tu cuenta ha sido desactivada. Contacta al administrador.'; errEl.style.display = 'block'; }
-        document.getElementById('auth-btn').textContent = 'Entrar';
-        document.getElementById('auth-email').style.display = '';
-        document.getElementById('auth-pass').style.display = '';
         document.getElementById('auth-overlay').style.display = 'flex';
         document.querySelector('.app').style.display = 'none';
         return;
       }
-      // Auto-register user in Firestore if not yet registered (e.g. first admin)
       if (!userDoc.exists) {
         await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(user.uid).set({
-          uid:      user.uid,
-          nombre:   user.displayName || user.email.split('@')[0],
-          email:    user.email,
-          rol:      'admin',
-          activo:   true,
+          uid: user.uid,
+          nombre: user.displayName || user.email.split('@')[0],
+          email: user.email,
+          rol: 'admin',
+          activo: true,
           creadoEn: firebase.firestore.FieldValue.serverTimestamp(),
           creadoPor: 'auto-registro'
         });
       }
-    } catch(eAuth) {
-      console.warn('User status check error:', eAuth);
-    }
+    } catch(eAuth) { console.warn('User status check error:', eAuth); }
     if (!loaded) {
       // Fallback to localStorage if Firebase fails
       config = loadConfigDefaults();
@@ -5364,24 +5453,137 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
+// initDashboard is now called after Firebase loads data (inside onAuthStateChanged)
+// This prevents showing empty charts before data is ready
+
+// ============================================================
+// BULK SELECTION
+// ============================================================
+var selectedTxIds = new Set();
+
+function onTxCheckChange() {
+  selectedTxIds = new Set();
+  document.querySelectorAll('.tx-select-cb:checked').forEach(function(cb) {
+    selectedTxIds.add(cb.getAttribute('data-txid'));
+  });
+  var all = document.querySelectorAll('.tx-select-cb');
+  var checked = document.querySelectorAll('.tx-select-cb:checked');
+  var selAll = document.getElementById('tx-select-all');
+  if (selAll) {
+    selAll.indeterminate = checked.length > 0 && checked.length < all.length;
+    selAll.checked = all.length > 0 && checked.length === all.length;
+  }
+  var bar = document.getElementById('bulk-action-bar');
+  if (selectedTxIds.size > 0) {
+    document.getElementById('bulk-count-label').textContent = selectedTxIds.size + ' transacción(es) seleccionada(s)';
+    bar.style.display = 'flex';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function toggleSelectAllTx(checked) {
+  document.querySelectorAll('.tx-select-cb').forEach(function(cb) { cb.checked = checked; });
+  onTxCheckChange();
+}
+
+function clearTxSelection() {
+  document.querySelectorAll('.tx-select-cb').forEach(function(cb) { cb.checked = false; });
+  var selAll = document.getElementById('tx-select-all');
+  if (selAll) { selAll.checked = false; selAll.indeterminate = false; }
+  selectedTxIds = new Set();
+  var bar = document.getElementById('bulk-action-bar');
+  if (bar) bar.style.display = 'none';
+}
+
+function openBulkModal() {
+  if (!guardAdmin()) return;
+  if (selectedTxIds.size === 0) { showToast('No hay transacciones seleccionadas', 'err'); return; }
+  document.querySelectorAll('input[name="bulk-nat"]').forEach(function(r) { r.checked = false; });
+  ['bulk-opt-empresarial','bulk-opt-personal','bulk-opt-financiero'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.classList.remove('selected');
+  });
+  document.getElementById('bulk-subcat-wrap').style.display = 'none';
+  document.getElementById('bulk-subcat').innerHTML = '<option value="">Sin subcategoría</option>';
+  document.getElementById('bulk-comentario').value = '';
+  document.getElementById('bulk-modal-count').textContent = selectedTxIds.size;
+  document.getElementById('bulk-modal-overlay').classList.add('show');
+}
+
+function closeBulkModal() {
+  document.getElementById('bulk-modal-overlay').classList.remove('show');
+}
+
+function bulkSelectNat(input) {
+  ['bulk-opt-empresarial','bulk-opt-personal','bulk-opt-financiero'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.classList.remove('selected');
+  });
+  var selEl = document.getElementById('bulk-opt-' + input.value);
+  if (selEl) selEl.classList.add('selected');
+  var cat = (config.categorias || []).find(function(c) { return c.naturaleza === input.value; });
+  var subs = cat ? (cat.subcategorias || []) : [];
+  var sel = document.getElementById('bulk-subcat');
+  var wrap = document.getElementById('bulk-subcat-wrap');
+  if (subs.length > 0) {
+    sel.innerHTML = '<option value="">Sin subcategoría</option>' +
+      subs.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+    wrap.style.display = 'block';
+  } else {
+    sel.innerHTML = '<option value="">Sin subcategoría</option>';
+    wrap.style.display = 'none';
+  }
+}
+
+function saveBulkClassification() {
+  var selected = document.querySelector('input[name="bulk-nat"]:checked');
+  if (!selected) { showToast('Selecciona una clasificación', 'err'); return; }
+  var newNat = selected.value;
+  var newSubcat = document.getElementById('bulk-subcat').value || '';
+  var newComentario = document.getElementById('bulk-comentario').value.trim();
+  var count = 0;
+  selectedTxIds.forEach(function(txId) {
+    Object.values(allData).forEach(function(pd) {
+      var idx = pd.transacciones ? pd.transacciones.findIndex(function(t) { return t.id === txId; }) : -1;
+      if (idx >= 0) {
+        pd.transacciones[idx].naturaleza = newNat;
+        pd.transacciones[idx].clasificadoManual = true;
+        pd.transacciones[idx].subcategoria = newSubcat;
+        if (newComentario) pd.transacciones[idx].comentario = newComentario;
+        count++;
+      }
+    });
+  });
+  if (count > 0) {
+    saveAllData();
+    closeBulkModal();
+    clearTxSelection();
+    updateBadge();
+    renderActivePage();
+    showToast('✓ ' + count + ' transacciones clasificadas como: ' + newNat, 'ok');
+  } else {
+    showToast('No se encontraron las transacciones seleccionadas', 'err');
+  }
+}
+
+// Safety net: if .app still hidden after 6s, force visible
+setTimeout(function() {
+  var appEl = document.querySelector('.app');
+  var authEl = document.getElementById('auth-overlay');
+  var pinEl = document.getElementById('pin-overlay');
+  var authVisible = authEl && authEl.style.display === 'flex';
+  var pinVisible = pinEl && pinEl.style.display === 'flex';
+  if (appEl && appEl.style.display === 'none' && !authVisible && !pinVisible) {
+    console.warn('TC Monitor: safety net triggered');
+    appEl.style.display = 'flex';
+  }
+}, 6000);
+
 // ============================================================
 // USUARIOS DEL SISTEMA
 // ============================================================
+var ROL_LABELS = { admin: 'Administrador', contador: 'Contador', viewer: 'Visor' };
+var ROL_COLORS = { admin: '#4f8ef7', contador: '#C87941', viewer: '#6B7280' };
 
-// Roles legibles
-var ROL_LABELS = {
-  admin:    'Administrador',
-  contador: 'Contador',
-  viewer:   'Visor'
-};
-
-var ROL_COLORS = {
-  admin:    '#4f8ef7',
-  contador: '#C87941',
-  viewer:   '#6B7280'
-};
-
-// Cargar usuarios desde Firestore
 async function loadUsers() {
   var wrap = document.getElementById('users-list-wrap');
   if (!wrap) return;
@@ -5389,7 +5591,6 @@ async function loadUsers() {
     var snap = await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').get();
     var users = [];
     snap.forEach(function(d) { users.push(Object.assign({ id: d.id }, d.data())); });
-    // Sort: activos primero, luego por nombre
     users.sort(function(a, b) {
       if (a.activo === b.activo) return (a.nombre || '').localeCompare(b.nombre || '');
       return b.activo ? 1 : -1;
@@ -5407,7 +5608,6 @@ function renderUsersList(users) {
     wrap.innerHTML = '<div style="padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No hay usuarios registrados.</div>';
     return;
   }
-
   var TH = 'padding:10px 16px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500';
   var html = '<table style="width:100%;border-collapse:collapse">'
     + '<thead><tr style="border-bottom:2px solid var(--border)">'
@@ -5424,31 +5624,16 @@ function renderUsersList(users) {
     var rolLabel = ROL_LABELS[u.rol] || u.rol || 'Sin rol';
     var rolColor = ROL_COLORS[u.rol] || '#6B7280';
 
-    // Nombre cell
     var tdNombre = '<td style="padding:12px 16px">'
       + '<div style="font-size:13px;font-weight:500;color:var(--text)">' + escHtml(u.nombre || '—') + '</div>'
       + (esCuentaActual ? '<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);margin-top:2px">Tu cuenta</div>' : '')
       + '</td>';
-
-    // Email cell
-    var tdEmail = '<td style="padding:12px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">'
-      + escHtml(u.email || '—') + '</td>';
-
-    // Rol cell
-    var tdRol = '<td style="padding:12px 16px">'
-      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;'
-      + 'background:' + rolColor + '22;color:' + rolColor + ';border:1px solid ' + rolColor + '44">'
-      + rolLabel + '</span></td>';
-
-    // Estado cell
-    var tdEstado = '<td style="padding:12px 16px;text-align:center">'
-      + '<span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:10px;'
-      + (activo
-          ? 'background:rgba(0,200,100,.12);color:#00C864;border:1px solid rgba(0,200,100,.25)'
-          : 'background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)')
+    var tdEmail = '<td style="padding:12px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">' + escHtml(u.email || '—') + '</td>';
+    var tdRol = '<td style="padding:12px 16px"><span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;background:' + rolColor + '22;color:' + rolColor + ';border:1px solid ' + rolColor + '44">' + rolLabel + '</span></td>';
+    var tdEstado = '<td style="padding:12px 16px;text-align:center"><span style="font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:10px;'
+      + (activo ? 'background:rgba(0,200,100,.12);color:#00C864;border:1px solid rgba(0,200,100,.25)' : 'background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)')
       + '">' + (activo ? 'Activo' : 'Inactivo') + '</span></td>';
 
-    // Acciones cell
     var tdAcciones = '<td style="padding:12px 16px;text-align:right">';
     if (esCuentaActual) {
       tdAcciones += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">—</span>';
@@ -5456,49 +5641,25 @@ function renderUsersList(users) {
       var toggleLabel = activo ? 'Desactivar' : 'Activar';
       var toggleClass = activo ? 'btn btn-danger btn-sm' : 'btn btn-ghost btn-sm';
       tdAcciones += '<button class="' + toggleClass + '" style="font-size:11px;margin-right:6px"'
-        + ' data-uid="' + u.id + '"'
-        + ' data-email="' + escHtml(u.email) + '"'
-        + ' data-activo="' + activo + '"'
+        + ' data-uid="' + u.id + '" data-email="' + escHtml(u.email) + '" data-activo="' + activo + '"'
         + ' onclick="handleToggleUser(this)">' + toggleLabel + '</button>';
       tdAcciones += '<button class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--text3)"'
-        + ' data-uid="' + u.id + '"'
-        + ' data-email="' + escHtml(u.email) + '"'
+        + ' data-uid="' + u.id + '" data-email="' + escHtml(u.email) + '"'
         + ' onclick="handleDeleteUser(this)">Eliminar</button>';
     }
     tdAcciones += '</td>';
 
-    html += '<tr style="border-bottom:1px solid var(--border)">'
-      + tdNombre + tdEmail + tdRol + tdEstado + tdAcciones
-      + '</tr>';
+    html += '<tr style="border-bottom:1px solid var(--border)">' + tdNombre + tdEmail + tdRol + tdEstado + tdAcciones + '</tr>';
   });
 
   html += '</tbody></table>';
   wrap.innerHTML = html;
 }
 
-function handleDeleteUser(btn) {
-  var uid   = btn.getAttribute('data-uid');
-  var email = btn.getAttribute('data-email');
-  deleteUser(uid, email);
-}
-
-async function deleteUser(uid, email) {
-  if (!guardAdmin()) return;
-  if (!confirm('¿Eliminar a ' + email + ' de la lista de usuarios?\n\nEsta acción solo lo elimina del registro de la app. Si necesitas revocar el acceso permanentemente, desactívalo primero.')) return;
-  try {
-    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(uid).delete();
-    showToast('✓ Usuario eliminado de la lista: ' + email, 'ok');
-    await loadUsers();
-  } catch(e) {
-    showToast('Error al eliminar: ' + e.message, 'err');
-  }
-}
-
 function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Abrir/cerrar modal nuevo usuario
 function openNewUserModal() {
   if (!guardAdmin()) return;
   document.getElementById('nu-nombre').value = '';
@@ -5516,17 +5677,14 @@ function closeNewUserModal() {
   document.getElementById('new-user-modal-overlay').classList.remove('show');
 }
 
-// Crear usuario via Firebase Auth REST API
 async function createNewUser() {
-  var nombre  = document.getElementById('nu-nombre').value.trim();
-  var email   = document.getElementById('nu-email').value.trim();
-  var pass    = document.getElementById('nu-pass').value;
-  var rol     = document.getElementById('nu-rol').value;
-  var errEl   = document.getElementById('nu-error');
-  var btn     = document.getElementById('nu-submit-btn');
+  var nombre = document.getElementById('nu-nombre').value.trim();
+  var email  = document.getElementById('nu-email').value.trim();
+  var pass   = document.getElementById('nu-pass').value;
+  var rol    = document.getElementById('nu-rol').value;
+  var btn    = document.getElementById('nu-submit-btn');
 
-  errEl.style.display = 'none';
-
+  document.getElementById('nu-error').style.display = 'none';
   if (!nombre) { showNuError('Escribe el nombre del usuario'); return; }
   if (!email || !email.includes('@')) { showNuError('Ingresa un correo válido'); return; }
   if (pass.length < 6) { showNuError('La contraseña debe tener mínimo 6 caracteres'); return; }
@@ -5535,50 +5693,31 @@ async function createNewUser() {
   btn.disabled = true;
 
   try {
-    // 1. Crear en Firebase Auth via REST API
-    var apiKey = firebaseConfig.apiKey;
-    var resp = await fetch(
-      'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apiKey,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: pass, returnSecureToken: true })
-      }
-    );
+    var resp = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + firebaseConfig.apiKey, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pass, returnSecureToken: true })
+    });
     var data = await resp.json();
-
     if (data.error) {
       var errMsg = data.error.message;
-      if (errMsg === 'EMAIL_EXISTS') errMsg = 'Este correo ya está registrado en el sistema';
+      if (errMsg === 'EMAIL_EXISTS') errMsg = 'Este correo ya está registrado';
       else if (errMsg === 'INVALID_EMAIL') errMsg = 'Correo electrónico inválido';
-      else if (errMsg === 'WEAK_PASSWORD : Password should be at least 6 characters') errMsg = 'La contraseña debe tener mínimo 6 caracteres';
       showNuError(errMsg);
-      btn.textContent = 'Crear usuario';
-      btn.disabled = false;
+      btn.textContent = 'Crear usuario'; btn.disabled = false;
       return;
     }
-
-    var newUid = data.localId;
-
-    // 2. Registrar en Firestore con uid como doc ID
-    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(newUid).set({
-      uid:       newUid,
-      nombre:    nombre,
-      email:     email,
-      rol:       rol,
-      activo:    true,
-      creadoEn:  firebase.firestore.FieldValue.serverTimestamp(),
+    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(data.localId).set({
+      uid: data.localId, nombre: nombre, email: email, rol: rol, activo: true,
+      creadoEn: firebase.firestore.FieldValue.serverTimestamp(),
       creadoPor: currentUser ? currentUser.email : 'sistema'
     });
-
     closeNewUserModal();
     showToast('✓ Usuario creado: ' + nombre, 'ok');
-    await loadUsers(); // Refrescar lista
-
+    await loadUsers();
   } catch(e) {
     showNuError('Error inesperado: ' + e.message);
-    btn.textContent = 'Crear usuario';
-    btn.disabled = false;
+    btn.textContent = 'Crear usuario'; btn.disabled = false;
   }
 }
 
@@ -5588,40 +5727,35 @@ function showNuError(msg) {
   el.style.display = 'block';
 }
 
-// Activar / desactivar usuario
 function handleToggleUser(btn) {
-  var uid    = btn.getAttribute('data-uid');
-  var email  = btn.getAttribute('data-email');
-  var activo = btn.getAttribute('data-activo') === 'true';
-  toggleUserStatus(uid, email, activo);
+  toggleUserStatus(btn.getAttribute('data-uid'), btn.getAttribute('data-email'), btn.getAttribute('data-activo') === 'true');
 }
 
 async function toggleUserStatus(uid, email, currentlyActive) {
   if (!guardAdmin()) return;
   var action = currentlyActive ? 'desactivar' : 'activar';
   if (!confirm('¿Seguro que deseas ' + action + ' al usuario ' + email + '?')) return;
-
   try {
-    var newStatus = !currentlyActive;
-
-    // Actualizar en Firestore
-    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(uid).update({
-      activo: newStatus
-    });
-
-    // Si se desactiva: deshabilitar en Firebase Auth via REST (requiere token del usuario actual)
-    // Solo actualiza Firestore — la verificación de estado se hace en el login
-    showToast((newStatus ? '✓ Usuario activado' : '✓ Usuario desactivado') + ': ' + email, 'ok');
-    await loadUsers(); // Refrescar lista
-
-  } catch(e) {
-    showToast('Error: ' + e.message, 'err');
-  }
+    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(uid).update({ activo: !currentlyActive });
+    showToast((!currentlyActive ? '✓ Usuario activado' : '✓ Usuario desactivado') + ': ' + email, 'ok');
+    await loadUsers();
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
 }
 
-// ============================================================
-// initDashboard is now called after Firebase loads data (inside onAuthStateChanged)
-// This prevents showing empty charts before data is ready
+function handleDeleteUser(btn) {
+  deleteUser(btn.getAttribute('data-uid'), btn.getAttribute('data-email'));
+}
+
+async function deleteUser(uid, email) {
+  if (!guardAdmin()) return;
+  if (!confirm('¿Eliminar a ' + email + ' de la lista de usuarios?\n\nSolo lo elimina del registro de la app.')) return;
+  try {
+    await db.collection('org').doc('pixel-tc-monitor').collection('usuarios').doc(uid).delete();
+    showToast('✓ Usuario eliminado: ' + email, 'ok');
+    await loadUsers();
+  } catch(e) { showToast('Error al eliminar: ' + e.message, 'err'); }
+}
+
 </script>
 </body>
 </html>
