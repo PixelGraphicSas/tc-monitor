@@ -6309,16 +6309,7 @@ function exportRecibosExcel() {
 }
 
 // ----- Configuracion: Render asignaciones -----
-async function renderAsignacionesConfig() {
-  // Rellenar inputs de configuracion de notificaciones
-  var emailRemEl = document.getElementById('recibos-email-remitente');
-  var diasEl = document.getElementById('recibos-dias-recordatorio');
-  var portalEl = document.getElementById('recibos-portal-url');
-  if (emailRemEl && config.params.recibosEmailRemitente) emailRemEl.value = config.params.recibosEmailRemitente;
-  if (diasEl && config.params.recibosDiasRecordatorio) diasEl.value = config.params.recibosDiasRecordatorio;
-  if (portalEl && config.params.recibosPortalUrl) portalEl.value = config.params.recibosPortalUrl;
-
-  await cargarAsignaciones();
+function _renderAsignacionesTable() {
   var container = document.getElementById('asignaciones-recibos-list');
   if (!container) return;
 
@@ -6341,9 +6332,22 @@ async function renderAsignacionesConfig() {
   container.innerHTML = html;
 }
 
+async function renderAsignacionesConfig() {
+  // Rellenar inputs de configuracion de notificaciones
+  var emailRemEl = document.getElementById('recibos-email-remitente');
+  var diasEl = document.getElementById('recibos-dias-recordatorio');
+  var portalEl = document.getElementById('recibos-portal-url');
+  if (emailRemEl && config.params.recibosEmailRemitente) emailRemEl.value = config.params.recibosEmailRemitente;
+  if (diasEl && config.params.recibosDiasRecordatorio) diasEl.value = config.params.recibosDiasRecordatorio;
+  if (portalEl && config.params.recibosPortalUrl) portalEl.value = config.params.recibosPortalUrl;
+
+  await cargarAsignaciones();
+  _renderAsignacionesTable();
+}
+
 function agregarAsignacionRecibo() {
   asignacionesRecibos.push({ id: '', descripcion: '', nombreResponsable: '', emailResponsable: '' });
-  renderAsignacionesConfig();
+  _renderAsignacionesTable();
 }
 
 async function eliminarAsignacion(firestoreId, idx) {
@@ -6355,7 +6359,7 @@ async function eliminarAsignacion(firestoreId, idx) {
     } catch(e) { showToast('Error: ' + e.message, 'err'); return; }
   }
   asignacionesRecibos.splice(idx, 1);
-  renderAsignacionesConfig();
+  _renderAsignacionesTable();
 }
 
 async function guardarAsignaciones() {
