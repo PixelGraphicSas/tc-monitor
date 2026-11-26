@@ -1028,6 +1028,10 @@
         <span class="nav-icon">⊞</span> Cuotas Diferidas
       </div>
       <div class="nav-section">Sistema</div>
+      <div class="nav-item" onclick="navigate('recibos')">
+        <span class="nav-icon">&#128247;</span> Recibos
+        <span class="badge" id="badge-recibos" style="display:none;background:var(--orange)">0</span>
+      </div>
       <div class="nav-item" onclick="navigate('configuracion')">
         <span class="nav-icon">⚙</span> Configuración
       </div>
@@ -1792,8 +1796,113 @@
           <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3)" id="stored-periods-count">—</span>
         </div>
       </div>
+
+      <!-- RECIBOS: ASIGNACIONES -->
+      <div class="settings-section">
+        <div class="settings-section-title" style="justify-content:space-between">
+          <span>&#128247; Recibos y Soportes — Asignaciones</span>
+          <button class="btn btn-ghost btn-sm" onclick="agregarAsignacionRecibo()">+ Agregar asignaci&#243;n</button>
+        </div>
+        <div style="font-size:12px;color:var(--text3);padding:0 20px 12px">
+          Define qu&#233; descripci&#243;n de transacci&#243;n corresponde a qu&#233; colaborador. El sistema las aplicar&#225; autom&#225;ticamente al subir extractos.
+        </div>
+        <div id="asignaciones-recibos-list">
+          <div style="padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--text3)">Cargando asignaciones...</div>
+        </div>
+        <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="guardarAsignaciones()">Guardar asignaciones</button>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text3);align-self:center" id="asignaciones-save-status"></span>
+        </div>
+      </div>
+
+      <!-- RECIBOS: EMAIL REMITENTE -->
+      <div class="settings-section">
+        <div class="settings-section-title">&#128231; Configuraci&#243;n de notificaciones</div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>Email remitente</strong>
+            <span>Cuenta @pixel-g.com desde la que se enviar&#225;n las notificaciones</span>
+          </div>
+          <input type="email" id="recibos-email-remitente" class="settings-input" placeholder="contabilidad@pixel-g.com" style="width:260px">
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>D&#237;as antes del recordatorio</strong>
+            <span>Si el colaborador no ha subido el recibo, se le recuerda despu&#233;s de N d&#237;as</span>
+          </div>
+          <input type="number" id="recibos-dias-recordatorio" class="settings-input" value="7" min="1" max="30" style="width:80px">
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-info">
+            <strong>URL del portal de subida</strong>
+            <span>Link que se incluir&#225; en el correo para que el colaborador suba su PDF</span>
+          </div>
+          <input type="text" id="recibos-portal-url" class="settings-input" placeholder="https://pixelgraphicsas.github.io/tc-portal" style="width:320px">
+        </div>
+      </div>
     </section>
 
+
+    <!-- RECIBOS / SOPORTES -->
+    <section class="page" id="page-recibos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Recibos y Soportes</div>
+          <div class="page-subtitle">Seguimiento de facturas y comprobantes de gastos empresariales</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="recibos-periodo-label" style="font-family:var(--font-mono);font-size:11px;color:var(--text3)"></span>
+          <button class="btn btn-ghost btn-sm" onclick="exportRecibosExcel()">&#8595; Exportar</button>
+          <button class="btn btn-primary btn-sm" onclick="enviarRecordatoriosRecibos()">&#9993; Reenviar recordatorios</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="grid-4" id="recibos-kpis" style="margin-bottom:24px"></div>
+
+      <!-- Alert si hay faltantes -->
+      <div id="recibos-alert-wrap" style="margin-bottom:16px"></div>
+
+      <!-- Tabla de seguimiento -->
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Transacciones que requieren soporte</div>
+          <div style="display:flex;gap:8px">
+            <select class="filter-select" id="recibos-filter-estado" onchange="renderRecibosPage()">
+              <option value="">Todos</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="recibido">Recibido</option>
+            </select>
+            <select class="filter-select" id="recibos-filter-persona" onchange="renderRecibosPage()">
+              <option value="">Todas las personas</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Persona responsable</th>
+                <th>Descripci&#243;n transacci&#243;n</th>
+                <th style="text-align:right">Valor</th>
+                <th>Fecha</th>
+                <th style="text-align:center">Estado</th>
+                <th style="text-align:center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="recibos-body">
+              <tr class="no-data-row"><td colspan="6">Sin datos de recibos en este per&#237;odo</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Historial de notificaciones enviadas -->
+      <div class="card" style="padding:20px">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px">Historial de notificaciones</div>
+        <div id="recibos-notif-log" style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">Sin notificaciones enviadas a&#250;n.</div>
+      </div>
+    </section>
 
     <!-- MIEMBRO DETALLE -->
     <section class="page" id="page-miembro-detalle">
@@ -2248,7 +2357,10 @@ function loadConfigDefaults() {
       topePersonal: 1500000,
       trm: 4200,
       trmPorPeriodo: {},
-      pinAdmin: ''
+      pinAdmin: '',
+      recibosEmailRemitente: '',
+      recibosDiasRecordatorio: 7,
+      recibosPortalUrl: ''
     },
     logoUrl: '',   // base64 PNG logo — empty = show text only
     categorias: [
@@ -2400,6 +2512,7 @@ function navigate(page) {
   if (page === 'cuotas') renderCuotas();
   if (page === 'carga') renderCarga();
   if (page === 'configuracion') renderConfig();
+  if (page === 'recibos') renderRecibosPage();
 }
 
 function changePeriod(dir) {
@@ -2829,6 +2942,9 @@ async function processFile(file, tcId) {
     renderExtractosTable();
     updateBadge();
 
+    // Disparar workflow de recibos en segundo plano
+    triggerRecibosWorkflow(extractos);
+
     const multiMsg = extractos.length > 1
       ? `✓ PDF con ${extractos.length} tarjetas detectadas: ${titulares.join(' y ')}. ${totalTx} transacciones en total.`
       : `✓ ${totalTx} transacciones extraídas de ${titulares[0]}`;
@@ -2862,17 +2978,21 @@ function renderExtractosTable() {
 
   tbody.innerHTML = pd.extractos.map(ext => {
     const tc = config.tarjetas.find(t => t.num === ext.tarjetaNum);
-    const pendientes = ext.transacciones.filter(t => t.naturaleza === 'pendiente').length;
-    return `<tr>
-      <td>${ext.titular || ext.tarjetaNum}</td>
-      <td class="mono">****${ext.tarjetaNum}</td>
-      <td>${ext.red}</td>
-      <td class="mono" style="font-size:11px">${ext.periodoDesde} → ${ext.periodoHasta}</td>
-      <td class="mono" style="text-align:right">${fmtCOP(ext.totalCOP)}</td>
-      <td class="mono" style="text-align:right">$${ext.totalUSD.toFixed(2)}</td>
-      <td class="mono" style="text-align:center">${ext.transacciones.length}</td>
-      <td>${pendientes > 0 ? `<span class="tag tag-pendiente">⚠ ${pendientes} pendientes</span>` : '<span class="tag tag-empresarial">✓ Clasificado</span>'}</td>
-    </tr>`;
+    var extTxNoAbono = ext.transacciones.filter(function(t) { return !t.isAbono; });
+    var pendientes = extTxNoAbono.filter(function(t) { return t.naturaleza === 'pendiente'; }).length;
+    return '<tr>'
+      + '<td>' + (ext.titular || ext.tarjetaNum) + '</td>'
+      + '<td class="mono">****' + ext.tarjetaNum + '</td>'
+      + '<td>' + ext.red + '</td>'
+      + '<td class="mono" style="font-size:11px">' + ext.periodoDesde + ' → ' + ext.periodoHasta + '</td>'
+      + '<td class="mono" style="text-align:right">' + fmtCOP(ext.totalCOP) + '</td>'
+      + '<td class="mono" style="text-align:right">$' + ext.totalUSD.toFixed(2) + '</td>'
+      + '<td class="mono" style="text-align:center">' + extTxNoAbono.length + '</td>'
+      + '<td>' + (pendientes > 0
+          ? '<span class="tag tag-pendiente">⚠ ' + pendientes + ' pendientes</span>'
+          : '<span class="tag tag-empresarial">✓ Clasificado</span>')
+      + '</td>'
+      + '</tr>';
   }).join('');
 }
 
@@ -2955,8 +3075,13 @@ function renderDashboard() {
   const total = txs.reduce((s, t) => s + copValue(t), 0);
   const empresarial = txs.filter(t => t.naturaleza === 'empresarial').reduce((s, t) => s + copValue(t), 0);
   const personal = txs.filter(t => t.naturaleza === 'personal').reduce((s, t) => s + copValue(t), 0);
-  // Pendientes: only count from active period (not all time) to avoid noise
-  const pendientes = getPeriodData().transacciones.filter(t => t.naturaleza === 'pendiente' && !t.isAbono).length;
+  // Pendientes: count across ALL periods so the number is consistent with the badge
+  var pendientes = 0;
+  Object.values(allData).forEach(function(p) {
+    if (p && p.transacciones) {
+      pendientes += p.transacciones.filter(function(t) { return t.naturaleza === 'pendiente' && !t.isAbono; }).length;
+    }
+  });
 
   // Show empty state hint if no data for this period
   const hasData = txs.length > 0;
@@ -3039,7 +3164,7 @@ function renderDashboard() {
   // Alert
   const alertWrap = document.getElementById('alert-pendientes-wrap');
   if (pendientes > 0) {
-    alertWrap.innerHTML = `<div class="alert alert-warn">⚠️ <div><strong>${pendientes} transacción(es) requieren clasificación manual.</strong> Ve a la sección Transacciones y revísalas. <button class="btn btn-ghost btn-sm" style="margin-left:12px" onclick="navigate('transacciones')">Ir a clasificar →</button></div></div>`;
+    alertWrap.innerHTML = '<div class="alert alert-warn">[!] <div><strong>' + pendientes + ' transacción(es) requieren clasificación manual</strong> (en todos los períodos). Ve a la sección Transacciones y revísalas. <button class="btn btn-ghost btn-sm" style="margin-left:12px" onclick="navigate(\'transacciones\')">Ir a clasificar →</button></div></div>';
   } else {
     alertWrap.innerHTML = '';
   }
@@ -3950,6 +4075,13 @@ function saveConfig() {
     if (per && val > 0) newTRM[per] = val;
   });
   config.params.trmPorPeriodo = newTRM;
+  // Recibos params
+  var emailRemEl = document.getElementById('recibos-email-remitente');
+  var diasEl = document.getElementById('recibos-dias-recordatorio');
+  var portalEl = document.getElementById('recibos-portal-url');
+  if (emailRemEl) config.params.recibosEmailRemitente = emailRemEl.value.trim();
+  if (diasEl) config.params.recibosDiasRecordatorio = parseInt(diasEl.value) || 7;
+  if (portalEl) config.params.recibosPortalUrl = portalEl.value.trim();
   // Save category edits inline (already mutating config.categorias directly)
   saveConfigData();
   showToast('Configuración guardada', 'ok');
@@ -4432,9 +4564,16 @@ function parseDate(str) {
 }
 
 function updateBadge() {
-  const pd = getPeriodData();
-  const pending = pd.transacciones.filter(t => t.naturaleza === 'pendiente' && !t.isAbono).length;
-  const badge = document.getElementById('badge-pendientes');
+  // Count pendientes across ALL periods, not just the active one
+  var pending = 0;
+  Object.values(allData).forEach(function(pd) {
+    if (pd && pd.transacciones) {
+      pending += pd.transacciones.filter(function(t) {
+        return t.naturaleza === 'pendiente' && !t.isAbono;
+      }).length;
+    }
+  });
+  var badge = document.getElementById('badge-pendientes');
   if (pending > 0) {
     badge.textContent = pending;
     badge.style.display = 'inline-flex';
@@ -5782,6 +5921,510 @@ async function deleteUser(uid, email) {
     await loadUsers();
   } catch(e) { showToast('Error al eliminar: ' + e.message, 'err'); }
 }
+
+// ============================================================
+// MODULO RECIBOS Y SOPORTES
+// ============================================================
+
+// Colecciones Firestore:
+//   org/pixel-tc-monitor/asignaciones-recibos/{id}
+//     { descripcion, emailResponsable, nombreResponsable, creadoEn }
+//   org/pixel-tc-monitor/recibos-tracking/{periodoKey}_{txId}
+//     { periodoKey, txId, descripcion, valor, fecha, emailResponsable,
+//       nombreResponsable, estado ('pendiente'|'recibido'), urlDrive,
+//       notificadoEn, recordadoEn }
+
+var asignacionesRecibos = []; // cache en memoria
+var recibosTracking = {};     // key: periodoKey_txId
+
+// ----- Carga de asignaciones desde Firestore -----
+async function cargarAsignaciones() {
+  try {
+    var snap = await db.collection('org').doc('pixel-tc-monitor')
+      .collection('asignaciones-recibos').get();
+    asignacionesRecibos = [];
+    snap.forEach(function(doc) {
+      asignacionesRecibos.push(Object.assign({ id: doc.id }, doc.data()));
+    });
+  } catch(e) {
+    console.warn('Error cargando asignaciones:', e);
+  }
+}
+
+// ----- Carga del tracking de recibos del periodo activo -----
+async function cargarRecibosTracking(periodoKey) {
+  recibosTracking = {};
+  try {
+    var snap = await db.collection('org').doc('pixel-tc-monitor')
+      .collection('recibos-tracking')
+      .where('periodoKey', '==', periodoKey).get();
+    snap.forEach(function(doc) {
+      recibosTracking[doc.id] = Object.assign({ id: doc.id }, doc.data());
+    });
+  } catch(e) {
+    console.warn('Error cargando tracking recibos:', e);
+  }
+}
+
+// ----- Buscar email asignado para una descripcion -----
+function buscarAsignacion(descripcion) {
+  if (!descripcion) return null;
+  var desc = descripcion.toLowerCase().trim();
+  var encontrada = null;
+  var mejorScore = 0;
+  asignacionesRecibos.forEach(function(a) {
+    var keyword = (a.descripcion || '').toLowerCase().trim();
+    if (!keyword) return;
+    // Match exacto o contenido
+    if (desc === keyword || desc.indexOf(keyword) !== -1 || keyword.indexOf(desc) !== -1) {
+      var score = keyword.length;
+      if (score > mejorScore) {
+        mejorScore = score;
+        encontrada = a;
+      }
+    }
+  });
+  return encontrada;
+}
+
+// ----- Workflow disparado al subir extracto -----
+async function triggerRecibosWorkflow(extractos) {
+  try {
+    var pd = getPeriodData();
+    var periodoKey = getPeriodKey();
+
+    // Obtener solo transacciones empresariales sin abono
+    var txEmpresariales = (pd.transacciones || []).filter(function(t) {
+      return t.naturaleza === 'empresarial' && !t.isAbono;
+    });
+
+    if (txEmpresariales.length === 0) return;
+
+    await cargarAsignaciones();
+    await cargarRecibosTracking(periodoKey);
+
+    var nuevos = [];
+    var ORG_REF = db.collection('org').doc('pixel-tc-monitor');
+    var ahora = new Date().toISOString();
+
+    for (var i = 0; i < txEmpresariales.length; i++) {
+      var tx = txEmpresariales[i];
+      var txId = tx.id || (tx.fecha + '_' + tx.descripcion).replace(/\s+/g, '_').substring(0, 60);
+      var trackKey = periodoKey + '_' + txId;
+
+      // Si ya existe tracking, no crear de nuevo
+      if (recibosTracking[trackKey]) continue;
+
+      var asignacion = buscarAsignacion(tx.descripcion);
+
+      var trackDoc = {
+        periodoKey: periodoKey,
+        txId: txId,
+        descripcion: tx.descripcion || '',
+        valor: tx.monto || tx.montoCOP || 0,
+        moneda: tx.moneda || 'COP',
+        fecha: tx.fecha || '',
+        emailResponsable: asignacion ? asignacion.emailResponsable : '',
+        nombreResponsable: asignacion ? (asignacion.nombreResponsable || '') : '',
+        estado: 'pendiente',
+        urlDrive: '',
+        notificadoEn: asignacion ? ahora : '',
+        recordadoEn: ''
+      };
+
+      await ORG_REF.collection('recibos-tracking').doc(trackKey).set(trackDoc);
+      recibosTracking[trackKey] = Object.assign({ id: trackKey }, trackDoc);
+      if (asignacion) nuevos.push(trackDoc);
+    }
+
+    // Registrar en log de notificaciones
+    if (nuevos.length > 0) {
+      var logEntry = {
+        periodoKey: periodoKey,
+        tipo: 'notificacion-inicial',
+        cantidad: nuevos.length,
+        fecha: ahora,
+        detalle: nuevos.map(function(n) { return n.descripcion + ' -> ' + n.emailResponsable; }).join('; ')
+      };
+      await ORG_REF.collection('recibos-notif-log').add(logEntry);
+
+      showToast('📧 ' + nuevos.length + ' notificaciones de recibos registradas. Enviar desde la sección Recibos.', 'info');
+    }
+
+    updateBadgeRecibos();
+  } catch(e) {
+    console.warn('Error en triggerRecibosWorkflow:', e);
+  }
+}
+
+// ----- Enviar notificaciones manualmente (boton en pagina Recibos) -----
+async function enviarRecordatoriosRecibos() {
+  var pendientes = Object.values(recibosTracking).filter(function(r) {
+    return r.estado === 'pendiente' && r.emailResponsable;
+  });
+  if (pendientes.length === 0) {
+    showToast('No hay recibos pendientes con responsable asignado.', 'info');
+    return;
+  }
+
+  // Agrupar por email
+  var porEmail = {};
+  pendientes.forEach(function(r) {
+    if (!porEmail[r.emailResponsable]) {
+      porEmail[r.emailResponsable] = { nombre: r.nombreResponsable, items: [] };
+    }
+    porEmail[r.emailResponsable].items.push(r);
+  });
+
+  var portalUrl = document.getElementById('recibos-portal-url') ? (document.getElementById('recibos-portal-url').value || '#') : '#';
+  var ahora = new Date().toISOString();
+  var enviados = 0;
+
+  for (var email in porEmail) {
+    var grupo = porEmail[email];
+    var nombre = grupo.nombre || email.split('@')[0];
+    var itemsHtml = grupo.items.map(function(r) {
+      return '- ' + r.descripcion + ' (' + (r.moneda === 'USD' ? '$' + r.valor : fmtCOP(r.valor)) + ') fecha: ' + r.fecha;
+    }).join('\n');
+
+    var asunto = 'Recordatorio: Recibos pendientes TC ' + getPeriodKey();
+    var cuerpo = 'Hola ' + nombre + ',\n\n'
+      + 'Te recordamos que tienes ' + grupo.items.length + ' recibo(s) pendiente(s) por subir al sistema:\n\n'
+      + itemsHtml + '\n\n'
+      + 'Por favor sube los PDFs en el siguiente enlace:\n' + portalUrl + '\n\n'
+      + 'Si ya los subiste, puedes ignorar este mensaje.\n\n'
+      + 'Contabilidad Pixel Graphic';
+
+    // Registrar el envio en Firestore (el envio real se hace via Gmail MCP o Google Script)
+    try {
+      await db.collection('org').doc('pixel-tc-monitor').collection('recibos-notif-log').add({
+        periodoKey: getPeriodKey(),
+        tipo: 'recordatorio-manual',
+        emailDestinatario: email,
+        asunto: asunto,
+        cuerpo: cuerpo,
+        fecha: ahora
+      });
+
+      // Actualizar campo recordadoEn en cada tracking
+      for (var j = 0; j < grupo.items.length; j++) {
+        var r = grupo.items[j];
+        await db.collection('org').doc('pixel-tc-monitor')
+          .collection('recibos-tracking').doc(r.id)
+          .update({ recordadoEn: ahora });
+        if (recibosTracking[r.id]) recibosTracking[r.id].recordadoEn = ahora;
+      }
+      enviados++;
+    } catch(e) {
+      console.warn('Error registrando notificacion para ' + email + ':', e);
+    }
+  }
+
+  showToast('✓ ' + enviados + ' recordatorio(s) registrado(s). Revisa el log de notificaciones.', 'ok');
+  renderRecibosPage();
+}
+
+// ----- Marcar recibo como recibido -----
+async function marcarReciboRecibido(trackKey, urlDrive) {
+  try {
+    await db.collection('org').doc('pixel-tc-monitor')
+      .collection('recibos-tracking').doc(trackKey)
+      .update({ estado: 'recibido', urlDrive: urlDrive || '', recibiidoEn: new Date().toISOString() });
+    if (recibosTracking[trackKey]) {
+      recibosTracking[trackKey].estado = 'recibido';
+      recibosTracking[trackKey].urlDrive = urlDrive || '';
+    }
+    showToast('✓ Recibo marcado como recibido', 'ok');
+    updateBadgeRecibos();
+    renderRecibosPage();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'err');
+  }
+}
+
+// ----- Badge recibos en nav -----
+function updateBadgeRecibos() {
+  var pendientes = Object.values(recibosTracking).filter(function(r) {
+    return r.estado === 'pendiente';
+  }).length;
+  var badge = document.getElementById('badge-recibos');
+  if (!badge) return;
+  if (pendientes > 0) {
+    badge.textContent = pendientes;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ----- Render de la pagina Recibos -----
+async function renderRecibosPage() {
+  var periodoKey = getPeriodKey();
+  var label = document.getElementById('recibos-periodo-label');
+  if (label) label.textContent = 'Período: ' + periodoKey;
+
+  await cargarRecibosTracking(periodoKey);
+  updateBadgeRecibos();
+
+  var items = Object.values(recibosTracking);
+
+  // Filtros
+  var filtroEstado = document.getElementById('recibos-filter-estado') ? document.getElementById('recibos-filter-estado').value : '';
+  var filtroPersona = document.getElementById('recibos-filter-persona') ? document.getElementById('recibos-filter-persona').value : '';
+
+  // Poblar filtro personas
+  var personas = {};
+  items.forEach(function(r) {
+    if (r.emailResponsable) personas[r.emailResponsable] = r.nombreResponsable || r.emailResponsable;
+  });
+  var selPersona = document.getElementById('recibos-filter-persona');
+  if (selPersona) {
+    var curVal = selPersona.value;
+    var opts = '<option value="">Todas las personas</option>';
+    Object.keys(personas).forEach(function(em) {
+      opts += '<option value="' + em + '"' + (curVal === em ? ' selected' : '') + '>' + personas[em] + '</option>';
+    });
+    selPersona.innerHTML = opts;
+  }
+
+  if (filtroEstado) items = items.filter(function(r) { return r.estado === filtroEstado; });
+  if (filtroPersona) items = items.filter(function(r) { return r.emailResponsable === filtroPersona; });
+
+  // KPIs
+  var total = Object.values(recibosTracking).length;
+  var totalPend = Object.values(recibosTracking).filter(function(r) { return r.estado === 'pendiente'; }).length;
+  var totalRec = Object.values(recibosTracking).filter(function(r) { return r.estado === 'recibido'; }).length;
+  var sinAsig = Object.values(recibosTracking).filter(function(r) { return r.estado === 'pendiente' && !r.emailResponsable; }).length;
+
+  var kpisEl = document.getElementById('recibos-kpis');
+  if (kpisEl) {
+    kpisEl.innerHTML = '<div class="card"><div class="kpi-label">Total requeridos</div><div class="kpi-value">' + total + '</div></div>'
+      + '<div class="card" style="border-color:var(--yellow)"><div class="kpi-label">Pendientes</div><div class="kpi-value" style="color:var(--yellow)">' + totalPend + '</div></div>'
+      + '<div class="card" style="border-color:var(--green)"><div class="kpi-label">Recibidos</div><div class="kpi-value" style="color:var(--green)">' + totalRec + '</div></div>'
+      + '<div class="card" style="border-color:var(--red)"><div class="kpi-label">Sin asignar</div><div class="kpi-value" style="color:var(--red)">' + sinAsig + '</div></div>';
+  }
+
+  // Alert
+  var alertWrap = document.getElementById('recibos-alert-wrap');
+  if (alertWrap) {
+    if (sinAsig > 0) {
+      alertWrap.innerHTML = '<div class="alert alert-warn">[!] <div><strong>' + sinAsig + ' transacción(es) sin responsable asignado.</strong>'
+        + ' Ve a <button class="btn btn-ghost btn-sm" style="margin-left:8px" onclick="navigate(\'configuracion\')">Configuración → Asignaciones</button> para definirlos.</div></div>';
+    } else {
+      alertWrap.innerHTML = '';
+    }
+  }
+
+  // Tabla
+  var tbody = document.getElementById('recibos-body');
+  if (!tbody) return;
+  if (items.length === 0) {
+    tbody.innerHTML = '<tr class="no-data-row"><td colspan="6">Sin transacciones que requieran soporte en este período</td></tr>';
+    return;
+  }
+
+  items.sort(function(a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
+
+  var html = '';
+  items.forEach(function(r) {
+    var estadoTag = r.estado === 'recibido'
+      ? '<span class="tag tag-empresarial">✓ Recibido</span>'
+      : '<span class="tag tag-pendiente">⚠ Pendiente</span>';
+
+    var valorStr = r.moneda === 'USD'
+      ? ('$' + (parseFloat(r.valor) || 0).toFixed(2) + ' USD')
+      : fmtCOP(r.valor);
+
+    var persona = r.nombreResponsable || r.emailResponsable
+      ? ('<div style="font-size:12px">' + (r.nombreResponsable || r.emailResponsable) + '</div>'
+          + '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">' + (r.emailResponsable || '') + '</div>')
+      : '<span style="color:var(--red);font-size:12px">⚠ Sin asignar</span>';
+
+    var acciones = r.estado === 'recibido'
+      ? (r.urlDrive ? '<a href="' + r.urlDrive + '" target="_blank" class="btn btn-ghost btn-sm">📄 Ver</a>' : '<span style="color:var(--text3);font-size:11px">Sin enlace</span>')
+      : '<button class="btn btn-primary btn-sm" onclick="promptMarcarRecibido(\'' + r.id + '\')">Marcar recibido</button>';
+
+    html += '<tr>'
+      + '<td>' + persona + '</td>'
+      + '<td style="max-width:220px;font-size:12px">' + (r.descripcion || '') + '</td>'
+      + '<td class="mono" style="text-align:right;white-space:nowrap">' + valorStr + '</td>'
+      + '<td class="mono" style="font-size:11px">' + (r.fecha || '') + '</td>'
+      + '<td style="text-align:center">' + estadoTag + '</td>'
+      + '<td style="text-align:center">' + acciones + '</td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+
+  // Log de notificaciones
+  await cargarLogNotificaciones(periodoKey);
+}
+
+async function cargarLogNotificaciones(periodoKey) {
+  var logEl = document.getElementById('recibos-notif-log');
+  if (!logEl) return;
+  try {
+    var snap = await db.collection('org').doc('pixel-tc-monitor')
+      .collection('recibos-notif-log')
+      .where('periodoKey', '==', periodoKey)
+      .orderBy('fecha', 'desc').limit(20).get();
+    if (snap.empty) {
+      logEl.textContent = 'Sin notificaciones enviadas aún.';
+      return;
+    }
+    var html = '';
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var fechaStr = d.fecha ? d.fecha.substring(0, 16).replace('T', ' ') : '';
+      html += '<div style="padding:4px 0;border-bottom:1px solid var(--border)">'
+        + '<span style="color:var(--text2)">' + fechaStr + '</span>'
+        + ' &nbsp; <span style="color:var(--accent)">' + (d.tipo || '') + '</span>'
+        + (d.emailDestinatario ? ' &nbsp; → ' + d.emailDestinatario : '')
+        + (d.cantidad ? ' &nbsp; (' + d.cantidad + ' items)' : '')
+        + '</div>';
+    });
+    logEl.innerHTML = html;
+  } catch(e) {
+    logEl.textContent = 'Error cargando log.';
+  }
+}
+
+function promptMarcarRecibido(trackKey) {
+  var url = prompt('URL de Google Drive del PDF (opcional):', '');
+  if (url === null) return; // cancelado
+  marcarReciboRecibido(trackKey, url || '');
+}
+
+// ----- Exportar recibos a Excel -----
+function exportRecibosExcel() {
+  var items = Object.values(recibosTracking);
+  if (!items.length) { showToast('Sin datos para exportar', 'info'); return; }
+  var rows = [['Período', 'Descripción', 'Valor', 'Moneda', 'Fecha', 'Responsable', 'Email', 'Estado', 'URL Drive', 'Notificado', 'Recordado']];
+  items.forEach(function(r) {
+    rows.push([r.periodoKey, r.descripcion, r.valor, r.moneda, r.fecha, r.nombreResponsable, r.emailResponsable, r.estado, r.urlDrive, r.notificadoEn, r.recordadoEn]);
+  });
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Recibos');
+  XLSX.writeFile(wb, 'recibos-' + getPeriodKey() + '.xlsx');
+}
+
+// ----- Configuracion: Render asignaciones -----
+async function renderAsignacionesConfig() {
+  // Rellenar inputs de configuracion de notificaciones
+  var emailRemEl = document.getElementById('recibos-email-remitente');
+  var diasEl = document.getElementById('recibos-dias-recordatorio');
+  var portalEl = document.getElementById('recibos-portal-url');
+  if (emailRemEl && config.params.recibosEmailRemitente) emailRemEl.value = config.params.recibosEmailRemitente;
+  if (diasEl && config.params.recibosDiasRecordatorio) diasEl.value = config.params.recibosDiasRecordatorio;
+  if (portalEl && config.params.recibosPortalUrl) portalEl.value = config.params.recibosPortalUrl;
+
+  await cargarAsignaciones();
+  var container = document.getElementById('asignaciones-recibos-list');
+  if (!container) return;
+
+  if (asignacionesRecibos.length === 0) {
+    container.innerHTML = '<div style="padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--text3)">'
+      + 'Sin asignaciones. Haz clic en "+ Agregar asignación" para crear la primera.</div>';
+    return;
+  }
+
+  var html = '<div style="padding:0 20px">';
+  asignacionesRecibos.forEach(function(a, i) {
+    html += '<div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">'
+      + '<input class="settings-input" style="flex:2;min-width:160px;font-size:12px" data-asig-id="' + (a.id || i) + '" data-field="descripcion" value="' + (a.descripcion || '').replace(/"/g, '&quot;') + '" placeholder="Descripción en extracto">'
+      + '<input class="settings-input" style="flex:1;min-width:140px;font-size:12px" data-asig-id="' + (a.id || i) + '" data-field="nombreResponsable" value="' + (a.nombreResponsable || '').replace(/"/g, '&quot;') + '" placeholder="Nombre">'
+      + '<input class="settings-input" style="flex:2;min-width:180px;font-size:12px" data-asig-id="' + (a.id || i) + '" data-field="emailResponsable" value="' + (a.emailResponsable || '').replace(/"/g, '&quot;') + '" placeholder="email@pixel-g.com">'
+      + '<button class="btn btn-ghost btn-sm" style="color:var(--red);flex-shrink:0" onclick="eliminarAsignacion(\'' + (a.id || '') + '\', ' + i + ')">\u{1F5D1}</button>'
+      + '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function agregarAsignacionRecibo() {
+  asignacionesRecibos.push({ id: '', descripcion: '', nombreResponsable: '', emailResponsable: '' });
+  renderAsignacionesConfig();
+}
+
+async function eliminarAsignacion(firestoreId, idx) {
+  if (!confirm('¿Eliminar esta asignación?')) return;
+  if (firestoreId) {
+    try {
+      await db.collection('org').doc('pixel-tc-monitor')
+        .collection('asignaciones-recibos').doc(firestoreId).delete();
+    } catch(e) { showToast('Error: ' + e.message, 'err'); return; }
+  }
+  asignacionesRecibos.splice(idx, 1);
+  renderAsignacionesConfig();
+}
+
+async function guardarAsignaciones() {
+  var status = document.getElementById('asignaciones-save-status');
+  if (status) status.textContent = 'Guardando...';
+
+  // Leer todos los valores actuales desde el DOM
+  var inputs = document.querySelectorAll('[data-asig-id]');
+  var byId = {};
+  inputs.forEach(function(inp) {
+    var id = inp.getAttribute('data-asig-id');
+    var field = inp.getAttribute('data-field');
+    if (!byId[id]) byId[id] = {};
+    byId[id][field] = inp.value.trim();
+  });
+
+  // Mapear de vuelta a asignacionesRecibos
+  asignacionesRecibos.forEach(function(a, i) {
+    var id = a.id || String(i);
+    if (byId[id]) {
+      a.descripcion = byId[id].descripcion || a.descripcion;
+      a.nombreResponsable = byId[id].nombreResponsable || a.nombreResponsable;
+      a.emailResponsable = byId[id].emailResponsable || a.emailResponsable;
+    }
+  });
+
+  var ORG_REF = db.collection('org').doc('pixel-tc-monitor');
+  var errores = 0;
+  for (var i = 0; i < asignacionesRecibos.length; i++) {
+    var a = asignacionesRecibos[i];
+    if (!a.descripcion || !a.emailResponsable) continue;
+    try {
+      var datos = {
+        descripcion: a.descripcion,
+        nombreResponsable: a.nombreResponsable || '',
+        emailResponsable: a.emailResponsable,
+        actualizadoEn: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (a.id) {
+        await ORG_REF.collection('asignaciones-recibos').doc(a.id).set(datos, { merge: true });
+      } else {
+        var docRef = await ORG_REF.collection('asignaciones-recibos').add(datos);
+        a.id = docRef.id;
+      }
+    } catch(e) {
+      errores++;
+      console.warn('Error guardando asignacion:', e);
+    }
+  }
+
+  if (status) status.textContent = errores === 0 ? '✓ Guardado' : '⚠ ' + errores + ' error(es)';
+  setTimeout(function() { if (status) status.textContent = ''; }, 3000);
+}
+
+// ----- Integrar cargarAsignaciones en el renderConfig existente -----
+var _origRenderConfig = typeof renderConfig === 'function' ? renderConfig : null;
+if (_origRenderConfig) {
+  renderConfig = function() {
+    _origRenderConfig();
+    renderAsignacionesConfig();
+  };
+}
+
+// Cargar asignaciones al inicio (después de loadFromFirebase)
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    if (typeof cargarAsignaciones === 'function') cargarAsignaciones();
+  }, 3000);
+});
 
 </script>
 </body>
